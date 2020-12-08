@@ -24,6 +24,12 @@ void chessGame::loadCfg()
         logger<<"Config file could not be opened at path ./config.conf!"<<std::endl; //Print an error
         exit(EXIT_FAILURE); //Close the program
     }
-    SCREEN_WIDTH
+
+    //Start reading config file
+
+    SCREEN_WIDTH = stoi(readCfgLine(cfg)); //Read line of the cfg file and store in screen width
+    SCREEN_HEIGHT = stoi(readCfgLine(cfg)); //Read line of cfg and store in screen height
+
+    
 
 }
