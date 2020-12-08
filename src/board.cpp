@@ -62,8 +62,46 @@ void board_t::init()
             //On the bottom row...
             if(y == board_1)
             {
-                
+                switch(x)
+                {
+                    //a1 and h1 have white rook
+                    case board_a:
+                    case board_h:
+                        board[x][y] = piece_t(wROOK); //Make the piece a white rook
+                    break;
+
+                    //b1 and g1 both have a white knight
+                    case board_b:
+                    case board_g:
+                        board[x][y] = piece_t(wKNIGHT); //Make the piece a white knight
+                    break;
+
+                    //c1 and f1 have a black bishop
+                    case board_c:
+                    case board_f:
+                        board[x][y] = piece_t(wBISHOP); //Make the piece a white bishop
+                    break;
+                    
+                    //d1 is a white queen
+                    case board_d:
+                        board[x][y] = piece_t(wQUEEN); //Make the piece a white queen
+                    break;
+
+                    //e1 is a white king
+                    case board_e:
+                        board[x][y] = piece_t(wKING); //Make the piece a white king
+                    break;
+
+                }
             }
+
+            //On the second to bottom row...
+            if(y == board_2)
+            {
+                board[x][y] = piece_t(wPAWN); //Make the piece a white pawn
+            }
+        
         }
     }
 }
+
