@@ -19,7 +19,8 @@ typedef struct piece_t
     bitBoard canAttack; //What pieces the piece can attack
 
     piece_t(bitBoard _pos, uint8_t _type); //Function used to initialize a piece
-    void loadIcon(std::string& path, SDL_Renderer* render); //Function to load a texture from a PNG file
+    piece_t() {} //Default constructor
+    void loadIcon(std::string path, SDL_Renderer* render); //Function to load a texture from a PNG file
     
 } piece_t;
 
@@ -54,6 +55,7 @@ public:
     //----------Functions----------//
 
     void init(); //Function used to set all pieces with right values and in right spots
+    board_t() {} //Default constructor
 };
 
 //Class that will hold the chess game logic, input, and display functions
@@ -68,6 +70,9 @@ public:
     bool IS_RUNNING = true;
 
     std::ofstream logger; //Logger file object for logging errors / messages
+
+    board_t Board; //The board object that contains all pieces
+    chessGame() {} //Default constructor
 
 
     //--------------------Functions--------------------//

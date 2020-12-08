@@ -37,7 +37,7 @@ void chessGame::init()
 
     logger<<"Created SDL2 renderer!"<<std::endl;
 
-
-
+    //----------Finished SDL2 Things----------//
+    Board.init();
 
 }
