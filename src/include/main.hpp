@@ -66,6 +66,8 @@ public:
     SDL_Window* win = NULL; //Window object of the (duh) window
     SDL_Renderer* render = NULL; //The object that will draw everything onscreen for us
 
+    std::ofstream logger; //Logger file object for logging errors / messages
+
 
     //--------------------Functions--------------------//
 
@@ -82,3 +84,4 @@ public:
 
 
 };
+

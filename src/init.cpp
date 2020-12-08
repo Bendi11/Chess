@@ -3,3 +3,7 @@ Function to handle the game init, so setting up SDL2 objects, checking the list 
 */
 #include "include/main.hpp"
 
+void chessGame::init()
+{
+
+}
