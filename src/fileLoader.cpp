@@ -37,7 +37,7 @@ void chessGame::loadCfg()
 }
 
 //Function to load a PNG file from a specified path as an icon for a piece
-void piece_t::loadIcon(std::string& path, SDL_Renderer render)
+void piece_t::loadIcon(std::string& path, SDL_Renderer* render)
 {
     icon = SDL_CreateTextureFromSurface(render, IMG_Load(path.c_str())); //Load the file 
 }

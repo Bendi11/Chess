@@ -12,5 +12,9 @@ int main(int argc, char** argv)
 {
     chessGame g;
     g.init();
-    SDL_Delay(2000);
+    while(g.IS_RUNNING)
+    {
+        g.getInput();
+        g.renderUpdate();
+    }
 }

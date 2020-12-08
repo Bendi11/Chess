@@ -19,7 +19,7 @@ typedef struct piece_t
     bitBoard canAttack; //What pieces the piece can attack
 
     piece_t(bitBoard _pos, uint8_t _type); //Function used to initialize a piece
-    void loadIcon(std::string& path, SDL_Renderer render); //Function to load a texture from a PNG file
+    void loadIcon(std::string& path, SDL_Renderer* render); //Function to load a texture from a PNG file
     
 } piece_t;
 
@@ -64,6 +64,8 @@ public:
     /*SDL2 things*/
     SDL_Window* win = NULL; //Window object of the (duh) window
     SDL_Renderer* render = NULL; //The object that will draw everything onscreen for us
+    SDL_Event userE; //SDL user event queue
+    bool IS_RUNNING = true;
 
     std::ofstream logger; //Logger file object for logging errors / messages
 
@@ -74,6 +76,12 @@ public:
 
     /*File loading functions*/
     void loadCfg(); //Function to load config values from a CFG file
+
+    void getInput(); //Function to get user input
+
+    void renderUpdate(); //Function to display what game logic updates
+
+    void logicUpdate(); //Function to take in player moves like ke5 and actually change values
 
 
     //--------------------Values to be set by cfg file and never changed again--------------------//
