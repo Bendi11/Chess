@@ -9,16 +9,18 @@
 typedef std::vector<std::vector <double > > mat; //Defining the matrix type so that I don't have to type this over and over
 typedef std::vector<std::vector < piece_t > > pMat; //Defining matrix of pieces as a board type
 
+typedef uint64_t bitBoard; //Bit board of 8x8 board is a 64 bit integer
 
 //Structure that will hold all data pertaining to a piece on the board
 typedef struct piece_t
 {
-    unsigned int type; //What type of piece the piece is (defined in defs.hpp)
-    unsigned int x; //Piece x coordinate
-    unsigned int y; //Piece y coordinate
+    uint8_t type; //What type of piece the piece is (defined in defs.hpp)
 
-    SDL_Texture* icon; //Icon of the piece
-    piece_t(unsigned int iType); //Constructor for settting up type of piece and loading icon
+    bitBoard pos; //Position bitboard, 1 on where the piece is
+    bitBoard canMove; //Where the piece can move
+    bitBoard canAttack; //What pieces the piece can attack
+
+    piece_t(bitBoard pos, uint8_t _type); //Function used to initialize a piece
     
 } piece_t;
 

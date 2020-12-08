@@ -1,4 +1,6 @@
 
+#define ROW /**/
+
 //--------------------CHESS PIECE DEFINITIONS--------------------//
 #define wPAWN 0
 #define wKNIGHT 1
@@ -33,3 +35,5 @@
 #define board_6 5
 #define board_7 6
 #define board_8 7
+
+//--------------------BITBOARD LOCATION LOOKUPS--------------------//
