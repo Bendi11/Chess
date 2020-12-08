@@ -12,12 +12,14 @@ typedef uint64_t bitBoard; //Bit board of 8x8 board is a 64 bit integer
 typedef struct piece_t
 {
     uint8_t type; //What type of piece the piece is (defined in defs.hpp)
+    SDL_Texture* icon = NULL; //What icon this piece has
 
     bitBoard pos; //Position bitboard, 1 on where the piece is
     bitBoard canMove; //Where the piece can move
     bitBoard canAttack; //What pieces the piece can attack
 
     piece_t(bitBoard _pos, uint8_t _type); //Function used to initialize a piece
+    void loadIcon(std::string& path, SDL_Renderer render); //Function to load a texture from a PNG file
     
 } piece_t;
 
