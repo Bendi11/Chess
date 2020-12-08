@@ -25,11 +25,13 @@ void chessGame::loadCfg()
         exit(EXIT_FAILURE); //Close the program
     }
 
+    logger<<"Config file opened!"<<std::endl; //Log that we opened the cfg file
+
     //Start reading config file
 
     SCREEN_WIDTH = stoi(readCfgLine(cfg)); //Read line of the cfg file and store in screen width
     SCREEN_HEIGHT = stoi(readCfgLine(cfg)); //Read line of cfg and store in screen height
 
-    
+
 
 }

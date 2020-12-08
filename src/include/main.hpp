@@ -6,9 +6,6 @@
 
 #include "defs.hpp"
 
-typedef std::vector<std::vector <double > > mat; //Defining the matrix type so that I don't have to type this over and over
-typedef std::vector<std::vector < piece_t > > pMat; //Defining matrix of pieces as a board type
-
 typedef uint64_t bitBoard; //Bit board of 8x8 board is a 64 bit integer
 
 //Structure that will hold all data pertaining to a piece on the board
