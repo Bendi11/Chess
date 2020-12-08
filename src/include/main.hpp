@@ -18,7 +18,7 @@ typedef struct piece_t
     unsigned int y; //Piece y coordinate
 
     SDL_Texture* icon; //Icon of the piece
-    bool loadIcon(std::string& path); //Function to load the icon from hard drive and return false if no error was caught
+    piece_t(unsigned int iType); //Constructor for settting up type of piece and loading icon
     
 } piece_t;
 
