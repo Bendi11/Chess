@@ -553,3 +553,4 @@ void board_t::findQueen(unsigned int x, unsigned int y, bool WHITE) //Function t
     findRook(x, y, WHITE);
     findBishop(x, y, WHITE);
 }
+

@@ -1,8 +1,9 @@
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#pragma once
 #include <string>
 #include <vector>
-#include <fstream>
+
+#include <iostream> //Take this out
+
 
 #include "defs.hpp"
 
