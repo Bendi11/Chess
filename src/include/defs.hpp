@@ -2,21 +2,30 @@
 #define PIECE_X 77
 #define PIECE_Y 77
 
+#define EMPTY 0
+
 //--------------------CHESS PIECE DEFINITIONS--------------------//
-#define wPAWN 0
-#define wKNIGHT 1
-#define wBISHOP 2
-#define wROOK 3
-#define wKING 4
-#define wQUEEN 5
+#define wPAWN 1
+#define wKNIGHT 2
+#define wBISHOP 3
+#define wROOK 4
+#define wKING 5
+#define wQUEEN 6
+/*
+A note on WHITE_END:
+because all white pieces' IDs are lower or equal to WHITE_END, and all black pieces' 
+IDs are higher than WHITE_END, you can use WHITE_END to check if a piece
+is white or black
+*/
+#define WHITE_END 6
 
 //----------BLACK PIECES----------//
-#define bPAWN 6
-#define bKNIGHT 7
-#define bBISHOP 8
-#define bROOK 9
-#define bKING 10
-#define bQUEEN 11
+#define bPAWN 7
+#define bKNIGHT 8
+#define bBISHOP 9
+#define bROOK 10
+#define bKING 11
+#define bQUEEN 12
 
 //--------------------POSITION DEFINITIONS--------------------//
 #define board_a 0

@@ -51,4 +51,361 @@ board_t::board_t()
     }
 }
 
+
 //Function to find where a piece can move on the board
+void board_t::findMoves(unsigned int x, unsigned int y)
+{
+    //Make sure we're not trying to check a pawn that doesn't exist
+    if(x > container.size() || y > container[0].size())
+    {
+        return;
+    }
+
+    container[x][y].moveable.clear(); //Clear the current moveable tiles
+    container[x][y].attackable.clear(); //Clear attackable tiles
+
+    //Different piece types can move in different ways
+    switch(container[x][y].type)
+    {
+        case wPAWN:
+            findPawn(x, y, true); //Find white pawn moves
+        break;
+
+        case bPAWN:
+            findPawn(x, y, false); //Find black pawn moves
+        break;
+
+        //White rooks can attack black pieces in all four directions
+        case wROOK:
+            findRook(x, y, true); //Find white rook moves
+        break;
+
+         //Black rooks can attack black pieces in all four directions
+        case bROOK:
+            findRook(x, y, false); //Find black rook moves
+        break;
+
+        //Bishops can attack in all four diagonals
+        case wBISHOP:
+            findBishop(x, y, true); //Find white bishop moves
+        break;
+
+        case bBISHOP:
+            findBishop(x, y, false); //Find black bishop moves
+        break;
+
+    }
+}
+
+//Functions for finding moves for each type of piece
+void board_t::findPawn(unsigned int x, unsigned int y, bool WHITE) //Function to find black or white pawn's moves
+{
+    if(WHITE)
+    {
+        //Pawns can move forwards if the square in front is empty
+        if(y != sizeY)
+        {
+            if(container[x][y + 1].type == EMPTY)
+                container[x][y].moveable.push_back(std::make_pair(x, y + 1)); //Add the square up if it is empty
+        }
+
+        if(x != sizeX && y != sizeY) //Check for up and right
+        {
+            if(container[x + 1][y + 1].type != EMPTY && container[x + 1][y + 1].type > WHITE_END)
+                container[x][y].attackable.push_back(std::make_pair(x + 1, y + 1)); //Add the attackable square
+        }
+        if(x != 0 && y != sizeY) //Check up and left
+        {
+            if(container[x - 1][y + 1].type != EMPTY && container[x - 1][y + 1].type > WHITE_END)
+                container[x][y].attackable.push_back(std::make_pair(x - 1, y + 1)); 
+        }
+    }
+    else
+    {
+    if(y != 0) //Check down
+        {
+            if(container[x][y - 1].type == EMPTY)
+                container[x][y].moveable.push_back(std::make_pair(x, y - 1));
+        }
+        if(x != sizeX && y != 0) //Check for down and right
+        {
+            if(container[x + 1][y - 1].type != EMPTY && container[x + 1][y - 1].type <= WHITE_END)
+                container[x][y].attackable.push_back(std::make_pair(x + 1, y - 1));
+        }
+        if(x != 0 && y != 0) //Check for down and left
+        {
+            if(container[x -1][y - 1].type != EMPTY && container[x - 1][y - 1].type <= WHITE_END)
+                container[x][y].attackable.push_back(std::make_pair(x - 1, y - 1));
+        }  
+    }
+    
+}
+
+void board_t::findRook(unsigned int x, unsigned int y, bool WHITE) //Function to find black or white rook's moves
+{
+    int temp = 0;
+
+    if(y != sizeY) //Check up first
+    {
+        while(y + temp < sizeY) //While we haven't hit the ceiling
+        {
+            if(container[x][y + temp].type == EMPTY) //If type is empty, we can move
+            {
+                container[x][y].moveable.push_back(std::make_pair(x, y + temp));
+            }
+            //If something is in front of us, then check if we can attack it, then stop this line
+            else 
+            {
+                if((container[x][y + temp].type > WHITE_END && WHITE ) || (container[x][y + temp].type <= WHITE_END && !WHITE ) ) //Make sure the piece is opposite color
+                {
+                    container[x][y].attackable.push_back(std::make_pair(x, y + temp)); //If it is, add it to attackable
+                }
+                break;
+            }
+            temp++; //Increase y
+        }
+    }
+
+    temp = 0;
+    if(y != 0) //Check down next
+    {
+        while(y + temp > 0) //Go to floor
+        {
+            if(container[x][y + temp].type == EMPTY) //Make sure it's empty
+            {
+                container[x][y].moveable.push_back(std::make_pair(x, y + temp)); //Add this to moveable
+            }
+            else
+            {
+                if((container[x][y - temp].type > WHITE_END && WHITE) || (container[x][y - temp].type <= WHITE_END && !WHITE)) //make sure piece is black
+                {
+                    container[x][y].attackable.push_back(std::make_pair(x, y + temp));
+                }
+                break; //Exit the loop
+            }
+            temp--; //Decrease Y
+            
+        }
+    }
+
+    temp = 0;
+    if(x != sizeX) //Check right next
+    {
+        while(x + temp < sizeX) //While we haven't hit the wall...
+        {
+            if(container[x + temp][y].type == EMPTY)
+            {
+                container[x][y].moveable.push_back(std::make_pair(x + temp, y)); //Add that to the moveable list
+            }
+            else
+            {
+                if((container[x + temp][y].type > WHITE_END && WHITE) || (container[x + temp][y].type <= WHITE_END && !WHITE)) //Check is piece is black
+                {
+                    container[x][y].attackable.push_back(std::make_pair(x + temp, y)); //Add this to the attackable list
+                }
+                break;
+            }
+            
+        }
+    }
+
+    temp = 0;
+    if(x != 0) //Check left finally
+    {
+        while(x + temp > 0) //While we haven't hit a wall...
+        {
+            if(container[x + temp][y].type == EMPTY)
+            {
+                container[x][y].moveable.push_back(std::make_pair(x + temp, y)); //Add to the moveable list if the sqaure is empty
+            }
+            else
+            {
+                if( (container[x + temp][y].type > WHITE_END && WHITE) || (container[x + temp][y].type <= WHITE_END && !WHITE)) //Check if the piece is black
+                {
+                    container[x][y].attackable.push_back(std::make_pair(x + temp, y)); 
+                }
+                break;
+            }
+            
+        }
+    }
+
+}
+
+void board_t::findKnight(unsigned int x, unsigned int y, bool WHITE) //Function to find black or white knight's moves
+{
+    if(!(x + 2 > sizeX || y + 1 > sizeY)) //Check up 1, right 2 first
+    {
+        if(container[x + 2][y + 1].type == EMPTY)
+        {
+            container[x][y].moveable.push_back(std::make_pair(x + 2, y + 1)); //Add to moveable if it is empty
+        }
+        else
+        {
+            if( (container[x + 2][y + 1].type > WHITE_END && WHITE) || (container[x + 2][y + 1].type <= WHITE_END && !WHITE) )
+            {
+                container[x][y].attackable.push_back(std::make_pair(x + 2, y + 1)); //Add to attackable if other side
+            }
+        }
+        
+    }
+
+    if(!(x + 1 > sizeX || y + 2 > sizeY)) //Check up 2, right 1
+    {
+        if(container[x + 1][y + 2].type == EMPTY)
+        {
+            container[x][y].moveable.push_back(std::make_pair(x + 1, y + 2)); //Add to moveable if empty
+        }
+        else
+        {
+            if((container[x + 1][y + 2].type > WHITE_END && WHITE) || (container[x + 1][y + 2].type <= WHITE_END && !WHITE) )
+            {
+                container[x][y].attackable.push_back(std::make_pair(x + 1, y + 2)); //Add to attackable if on other side
+            }
+        }
+        
+    }
+
+    if(!(x - 1 > sizeX || y + 2 > sizeY)) //Check up 2, left 1
+    {
+        if(container[x - 1][y + 2].type == EMPTY)
+        {
+            container[x][y].moveable.push_back(std::make_pair(x - 1, y + 2)); //Add to moveable if empty
+        }
+        else
+        {
+            if((container[x - 1][y + 2].type > WHITE_END && WHITE) || (container[x - 1][y + 2].type <= WHITE_END && !WHITE) )
+            {
+                container[x][y].attackable.push_back(std::make_pair(x - 1, y + 2)); //Add to attackable if on other side
+            }
+        }
+        
+    }
+
+    if(!(x - 2 > sizeX || y + 1 > sizeY)) //Check up 1, left 2
+    {
+        if(container[x - 2][y + 1].type == EMPTY)
+        {
+            container[x][y].moveable.push_back(std::make_pair(x - 2, y + 1)); //Add to moveable if empty
+        }
+        else
+        {
+            if((container[x - 2][y + 1].type > WHITE_END && WHITE) || (container[x - 2][y + 1].type <= WHITE_END && !WHITE) )
+            {
+                container[x][y].attackable.push_back(std::make_pair(x - 2, y + 1)); //Add to attackable if on other side
+            }
+        }
+        
+    }
+
+    if(!(x - 2 > sizeX || y - 1 > sizeY)) //Check down 1, left 2
+    {
+        if(container[x - 2][y - 1].type == EMPTY)
+        {
+            container[x][y].moveable.push_back(std::make_pair(x - 2, y - 1)); //Add to moveable if empty
+        }
+        else
+        {
+            if((container[x - 2][y - 1].type > WHITE_END && WHITE) || (container[x - 2][y - 1].type <= WHITE_END && !WHITE) )
+            {
+                container[x][y].attackable.push_back(std::make_pair(x - 2, y - 1)); //Add to attackable if on other side
+            }
+        }
+        
+    }
+}
+
+void board_t::findBishop(unsigned int x, unsigned int y, bool WHITE) //Function to find black or white bishop's moves
+{
+    int temp = 0;
+
+    if(y != sizeY && x != sizeX) //Check up and right first
+    {
+        while(y + temp < sizeY && x + temp < sizeX) //While we haven't hit floor or wall...
+        {   
+            if(container[x + temp][y + temp].type == EMPTY) //If the tile is empty, add it to the moveable list
+            {
+                container[x][y].moveable.push_back(std::make_pair(x + temp, y + temp));
+            }
+            else
+            {
+                if( (container[x + temp][y + temp].type > WHITE_END && WHITE) ||(container[x + temp][y + temp].type <= WHITE_END && !WHITE)) //Check if piece is black
+                {
+                    container[x][y].attackable.push_back(std::make_pair(x + temp, y + temp)); //Add that to attackable list 
+                }
+                break; //Exit loop
+            }
+            temp++; //Add to x and y
+        }
+    }   
+    temp = 0;
+    if(y != sizeY && x != 0) //Check up and left next
+    {
+        while(y + temp < sizeY && x - temp > 0) //While we haven't hit wall or ceiling...
+        {
+            if(container[x - temp][y + temp].type == EMPTY)
+            {
+                container[x][y].moveable.push_back(std::make_pair(x - temp, y + temp)); //Add that square to moveable if it is empty
+            }
+            else
+            {
+                if( (container[x - temp][y + temp].type > WHITE_END && WHITE) || (container[x - temp][y + temp].type <= WHITE_END && !WHITE)) //Check if piece is black
+                {
+                    container[x][y].attackable.push_back(std::make_pair(x - temp, y + temp)); //Add to attackable list
+                }
+                break;
+            }
+            temp++;
+        }   
+    }
+    temp = 0;
+    if(y != 0 && x != sizeX) //Check down and right next
+    {
+        while(y - temp > 0 && x + temp < sizeX) //While we haven't hit wall or ceiling
+        {
+            if(container[x + temp][y - temp].type == EMPTY)
+            {
+                container[x][y].moveable.push_back(std::make_pair(x + temp, y - temp)); //Add to moveable if the tile is empty
+            }
+            else
+            {
+                if( (container[x + temp][y - temp].type > WHITE_END && WHITE) || (container[x + temp][y - temp].type <= WHITE_END && !WHITE)) //Check if the piece is black
+                {
+                    container[x][y].attackable.push_back(std::make_pair(x + temp, y - temp));
+                }
+                break;
+            }
+            temp++;
+        }
+    }  
+    temp = 0;
+    if(y != 0 && x != 0) //Check down and left finally
+    {
+        while(y - temp > 0 && x - temp > 0) //While we haven't hit floor or wall...
+        {
+            if(container[x - temp][y - temp].type == EMPTY)
+            {
+                container[x][y].moveable.push_back(std::make_pair(x - temp, y - temp));
+            }
+            else
+            {
+                if( (container[x - temp][y - temp].type > WHITE_END && WHITE) || (container[x - temp][y - temp].type <= WHITE_END && !WHITE)) //If the piece is black
+                {
+                    container[x][y].moveable.push_back(std::make_pair(x - temp, y - temp));
+                }
+            }
+            temp++;
+        }
+    }
+
+}
+
+void board_t::findKing(unsigned int x, unsigned int y, bool WHITE) //Function to find black or white king's moves
+{
+
+}
+
+void board_t::findQueen(unsigned int x, unsigned int y, bool WHITE) //Function to find black or white queen's moves
+{
+
+}
