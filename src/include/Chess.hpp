@@ -43,7 +43,6 @@ namespace Chess
         board_t(unsigned int w, unsigned int h); //Function for making a variable height and width grid
 
         bool move(unsigned int x, unsigned int y, unsigned int moveX, unsigned int moveY); //Function to move a piece from one spot to another
-
         void findMoves(unsigned int x, unsigned int y); //Function to find which tiles a certain piece can move to
 
         //Functions for finding moves for each type of piece

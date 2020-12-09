@@ -9,56 +9,110 @@ void Drawer::init(unsigned int w, unsigned int h, Chess::board_t& Board)
 {
     SCREEN_WIDTH = w;
     SCREEN_HEIGHT = h;
-    scale = SCREEN_HEIGHT / (8 * 77);
+    scale = (float)SCREEN_WIDTH / (8.0f * 77.0f);
+    std::cout<<scale<<std::endl;
 
     SDL_Init(SDL_INIT_VIDEO);
     IMG_Init(IMG_INIT_PNG);
     win = SDL_CreateWindow("Chess", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     render = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
 
+    size.x = 0;
+    size.y = 0;
+    size.w = 78 * scale;
+    size.h = 78 * scale;
+    unsigned int realY = 8;
+
     textures.resize(8);
     pos.resize(8);
-    size.resize(8);
     BGTextures.resize(8);
-    unsigned int shift = 0;
 
     for(unsigned x = 0; x < 8; ++x)
     {
         textures[x].resize(8);
         pos[x].resize(8);
-        size[x].resize(8);
         BGTextures[x].resize(8);
+        realY = 7;
 
         for(unsigned y = 0; y < 8; ++y)
         {
-            if(x == y)
+            if(y % 2 == 0)
             {
-                BGTextures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wSquare.png"));
+                if(x % 2)
+                    BGTextures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bSquare.png"));
+                else
+                {
+                    BGTextures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wSquare.png"));
+                }
+                
             }
             else
             {
-                BGTextures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bSquare.png"));
+                 if(x % 2)
+                    BGTextures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wSquare.png"));
+                else
+                {
+                    BGTextures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bSquare.png"));
+                }
             }
             
-            if(x == 0 && y == 7)
+            switch(Board.container[x][y].type)
             {
-                textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wQueen.png"));
-            }
-            else if(Board.container[x][y].type != EMPTY)
-            {
-                textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bRook.png"));
-            }
-            pos[x][y].x = x * (SCREEN_WIDTH / 8);
-            pos[x][y].y = y * (SCREEN_HEIGHT / 8);
-            pos[x][y].w = 77 * scale;
-            pos[x][y].h = 77 * scale;
+                case wPAWN:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wPawn.png"));
+                break;
 
-            size[x][y].x = 0;
-            size[x][y].y = 0;
-            size[x][y].w = 77 * scale;
-            size[x][y].h = 77 * scale;
-            if(shift == 0) shift = 1;
-            else shift = 0;
+                case bPAWN:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bPawn.png"));
+                break;
+
+                case wROOK:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wRook.png"));
+                break;
+
+                case bROOK:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bRook.png"));
+                break;
+
+                case wBISHOP:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wBishop.png"));
+                break;
+
+                case bBISHOP:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bBishop.png"));
+                break;
+
+                case wKNIGHT:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wKnight.png"));
+                break;
+
+                case bKNIGHT:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bKnight.png"));
+                break;
+
+                case wKING:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wKing.png"));
+                break;
+
+                case bKING:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bKing.png"));
+                break;
+
+                case wQUEEN:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wQueen.png"));
+                break;
+
+                case bQUEEN:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bQueen.png"));
+                break;
+            }
+            
+            
+            pos[x][y].x = x * (SCREEN_WIDTH / 8);
+            pos[x][y].y = realY * (SCREEN_HEIGHT / 8);
+            pos[x][y].w = 78 * scale;
+            pos[x][y].h = 78 * scale;
+            realY--;
             
         }
     }
@@ -72,13 +126,33 @@ void Drawer::drawBoard(Chess::board_t& Board)
     {
         for(unsigned y = 0; y < 8; ++y)
         {
-            SDL_RenderCopy(render, BGTextures[x][y], &size[x][y], &pos[x][y]);
+            SDL_RenderCopy(render, BGTextures[x][y], &size, &pos[x][y]);
             if(Board.container[x][y].type != EMPTY)
             {
-                SDL_RenderCopy(render, textures[x][y], &size[x][y], &pos[x][y]);
+                SDL_RenderCopy(render, textures[x][y], &size, &pos[x][y]);
             }
             
         }
     }
     SDL_RenderPresent(render);
+}
+
+void Drawer::input(Chess::board_t& Board)
+{
+    std::string temp;
+    unsigned int moved1, moved2, moving1, moving2;
+
+    std::getline(std::cin, temp);
+    moved1 = stoi(temp);
+
+    std::getline(std::cin, temp);
+    moved2 = stoi(temp);
+
+    std::getline(std::cin, temp);
+    moving1 = stoi(temp);
+
+    std::getline(std::cin, temp);
+    moving2 = stoi(temp);
+    if(Board.move(moved1, moved2, moving1, moving2)) std::cout<<"Can move!"<<std::endl;
+    else std::cout<<"Can't move!"<<std::endl;
 }

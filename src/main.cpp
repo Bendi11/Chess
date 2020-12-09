@@ -22,6 +22,7 @@ int main(int argc, char** argv)
     bool running = true;
     while(running)
     {
+        d.input(b);
         d.drawBoard(b);
         while(SDL_PollEvent(&d.e))
         {
@@ -30,6 +31,7 @@ int main(int argc, char** argv)
                 running = false;
             }
         }
+        d.input(b);
     }
     
     SDL_Delay(2000);

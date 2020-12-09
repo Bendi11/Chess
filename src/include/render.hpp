@@ -17,7 +17,7 @@ namespace renderer
         std::vector<std::vector<SDL_Texture* > > textures; 
         std::vector<std::vector<SDL_Texture* > > BGTextures;
         std::vector<std::vector<SDL_Rect > > pos;
-        std::vector<std::vector<SDL_Rect > > size;
+        SDL_Rect size;
 
         float scale; //How much to scale pieces for a cerain screen coords
 
@@ -26,6 +26,7 @@ namespace renderer
         SDL_Texture* blacktexture = NULL;
 
         void init(unsigned int w, unsigned int h, Chess::board_t& Board);
+        void input(Chess::board_t& Board);
 
         void drawBoard(Chess::board_t& Board); //Function to draw all pieces on a chessboard
     };
