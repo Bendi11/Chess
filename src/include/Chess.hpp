@@ -34,8 +34,8 @@ namespace Chess
         pMat container; //The object holding all pieces on the board
         unsigned int counter; //How many turns the game has gone for
 
-        unsigned int sizeX = 8;
-        unsigned int sizeY = 8;
+        unsigned int sizeX = 7;
+        unsigned int sizeY = 7;
 
         /*Functions*/
 

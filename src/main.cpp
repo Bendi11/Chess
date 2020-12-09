@@ -19,18 +19,9 @@ int main(int argc, char** argv)
     renderer::Drawer d;
     Chess::board_t b;
     d.init(720, 720, b);
-    bool running = true;
-    while(running)
+    while(d.running)
     {
-        d.input(b);
         d.drawBoard(b);
-        while(SDL_PollEvent(&d.e))
-        {
-            if(d.e.type == SDL_QUIT)
-            {
-                running = false;
-            }
-        }
         d.input(b);
     }
     

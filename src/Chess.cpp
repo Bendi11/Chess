@@ -8,9 +8,24 @@ using namespace Chess;
 bool board_t::move(unsigned int x, unsigned int y, unsigned int moveX, unsigned int moveY)
 {
     findMoves(x, y); //Get moves of the selected piece
-    for(unsigned i = 0; i < container[x][y].moveable.size(); ++i)
+    for(unsigned i = 0; i < container[x][y].moveable.size(); ++i) //Iterate through all of the moveable tiles of that piece
     {
-        if(container[x][y].moveable[i] == std::make_pair(moveX, moveY) ) return true;
+        if(container[x][y].moveable[i] == std::make_pair(moveX, moveY) ) //If the moveable tiles contains the desired move, move the piece
+        {  
+            container[moveX][moveY] = container[x][y].type; //Assign  the moving square's type as the moved piece
+            container[x][y].type = EMPTY; //Make the old location empty
+            return true;
+        }
+    }
+    //Now go through all attackable tiles and see if one matches
+    for(unsigned n = 0; n < container[x][y].attackable.size(); ++n)
+    {
+        if(container[x][y].attackable[n] == std::make_pair(moveX, moveY))
+        {
+            container[moveX][moveY] = container[x][y].type; //Assign  the moving square's type as the moved piece
+            container[x][y].type = EMPTY; //Make the old location empty
+            return true;
+        }
     }
     return false;
 }
@@ -128,28 +143,38 @@ void board_t::findMoves(unsigned int x, unsigned int y)
             findQueen(x, y, false); //Find black queen moves
         break;
 
+        case EMPTY:
+
+        break;
+
     }
 }
 
 
 //Functions for finding moves for each type of piece
-void board_t::findPawn(unsigned int x, unsigned int y, bool WHITE) //Function to find black or white pawn's moves
+void board_t::findPawn(unsigned int _x, unsigned int _y, bool WHITE) //Function to find black or white pawn's moves
 {
+    //We have to cast to a signed int because I am not very smart and
+    //Need to prevent underflowing when subtracting 2 from 0. 
+    //I am an idiot
+    int x = (int)_x;
+    int y = (int)_y;
+
     if(WHITE)
     {
         //Pawns can move forwards if the square in front is empty
-        if(y != sizeY)
+        if(y < sizeY)
         {
             if(container[x][y + 1].type == EMPTY)
                 container[x][y].moveable.push_back(std::make_pair(x, y + 1)); //Add the square up if it is empty
         }
 
-        if(x != sizeX && y != sizeY) //Check for up and right
+        if(x < sizeX && y < sizeY) //Check for up and right
         {
             if(container[x + 1][y + 1].type != EMPTY && container[x + 1][y + 1].type > WHITE_END)
                 container[x][y].attackable.push_back(std::make_pair(x + 1, y + 1)); //Add the attackable square
         }
-        if(x != 0 && y != sizeY) //Check up and left
+        if(x > 0 && y < sizeY) //Check up and left
         {
             if(container[x - 1][y + 1].type != EMPTY && container[x - 1][y + 1].type > WHITE_END)
                 container[x][y].attackable.push_back(std::make_pair(x - 1, y + 1)); 
@@ -157,17 +182,17 @@ void board_t::findPawn(unsigned int x, unsigned int y, bool WHITE) //Function to
     }
     else
     {
-    if(y != 0) //Check down
+    if(y > 0) //Check down
         {
             if(container[x][y - 1].type == EMPTY)
                 container[x][y].moveable.push_back(std::make_pair(x, y - 1));
         }
-        if(x != sizeX && y != 0) //Check for down and right
+        if(x < sizeX && y > 0) //Check for down and right
         {
             if(container[x + 1][y - 1].type != EMPTY && container[x + 1][y - 1].type <= WHITE_END)
                 container[x][y].attackable.push_back(std::make_pair(x + 1, y - 1));
         }
-        if(x != 0 && y != 0) //Check for down and left
+        if(x > 0 && y > 0) //Check for down and left
         {
             if(container[x -1][y - 1].type != EMPTY && container[x - 1][y - 1].type <= WHITE_END)
                 container[x][y].attackable.push_back(std::make_pair(x - 1, y - 1));
@@ -176,8 +201,13 @@ void board_t::findPawn(unsigned int x, unsigned int y, bool WHITE) //Function to
     
 }
 
-void board_t::findRook(unsigned int x, unsigned int y, bool WHITE) //Function to find black or white rook's moves
+void board_t::findRook(unsigned int _x, unsigned int _y, bool WHITE) //Function to find black or white rook's moves
 {
+    //We have to cast to a signed int because I am not very smart and
+    //Need to prevent underflowing when subtracting 2 from 0. 
+    //I am an idiot
+    int x = (int)_x;
+    int y = (int)_y;
     int temp = 0;
 
     if(y != sizeY) //Check up first
@@ -267,8 +297,14 @@ void board_t::findRook(unsigned int x, unsigned int y, bool WHITE) //Function to
 
 }
 
-void board_t::findKnight(unsigned int x, unsigned int y, bool WHITE) //Function to find black or white knight's moves
+void board_t::findKnight(unsigned int _x, unsigned int _y, bool WHITE) //Function to find black or white knight's moves
 {
+    //We have to cast to a signed int because I am not very smart and
+    //Need to prevent underflowing when subtracting 2 from 0. 
+    //I am an idiot
+    int x = (int)_x;
+    int y = (int)_y;
+
     if(!(x + 2 > sizeX || y + 1 > sizeY)) //Check up 1, right 2 first
     {
         if(container[x + 2][y + 1].type == EMPTY)
@@ -301,7 +337,7 @@ void board_t::findKnight(unsigned int x, unsigned int y, bool WHITE) //Function 
         
     }
 
-    if(!(x - 1 > sizeX || y + 2 > sizeY)) //Check up 2, left 1
+    if(!(x - 1 < 0 || y + 2 > sizeY)) //Check up 2, left 1
     {
         if(container[x - 1][y + 2].type == EMPTY)
         {
@@ -317,7 +353,7 @@ void board_t::findKnight(unsigned int x, unsigned int y, bool WHITE) //Function 
         
     }
 
-    if(!(x - 2 > sizeX || y + 1 > sizeY)) //Check up 1, left 2
+    if(!(x - 2 < 0 || y + 1 > sizeY)) //Check up 1, left 2
     {
         if(container[x - 2][y + 1].type == EMPTY)
         {
@@ -333,7 +369,7 @@ void board_t::findKnight(unsigned int x, unsigned int y, bool WHITE) //Function 
         
     }
 
-    if(!(x - 2 > sizeX || y - 1 > sizeY)) //Check down 1, left 2
+    if(!(x - 2 < 0 || y - 1 < 0)) //Check down 1, left 2
     {
         if(container[x - 2][y - 1].type == EMPTY)
         {
@@ -349,7 +385,7 @@ void board_t::findKnight(unsigned int x, unsigned int y, bool WHITE) //Function 
         
     }
 
-    if(!(x - 1 > sizeX || y - 2 > sizeY)) //Check down 2, left 1
+    if(!(x - 1 < 0 || y - 2 < 0)) //Check down 2, left 1
     {
         if(container[x - 1][y - 2].type == EMPTY)
         {
@@ -365,7 +401,7 @@ void board_t::findKnight(unsigned int x, unsigned int y, bool WHITE) //Function 
         
     }
 
-    if(!(x + 1 > sizeX || y - 2 > sizeY)) //Check down 2, right 1
+    if(!(x + 1 > sizeX || y - 2 < 0)) //Check down 2, right 1
     {
         if(container[x + 1][y - 2].type == EMPTY)
         {
@@ -381,7 +417,7 @@ void board_t::findKnight(unsigned int x, unsigned int y, bool WHITE) //Function 
         
     }
 
-    if(!(x + 2 > sizeX || y - 1 > sizeY)) //Check down 1, right 2
+    if(!(x + 2 > sizeX || y - 1 < 0)) //Check down 1, right 2
     {
         if(container[x + 2][y - 1].type == EMPTY)
         {
@@ -399,14 +435,21 @@ void board_t::findKnight(unsigned int x, unsigned int y, bool WHITE) //Function 
 
 }
 
-void board_t::findBishop(unsigned int x, unsigned int y, bool WHITE) //Function to find black or white bishop's moves
+void board_t::findBishop(unsigned int _x, unsigned int _y, bool WHITE) //Function to find black or white bishop's moves
 {
+    //We have to cast to a signed int because I am not very smart and
+    //Need to prevent underflowing when subtracting 2 from 0. 
+    //I am an idiot
+    int x = (int)_x;
+    int y = (int)_y;
+
     int temp = 0;
 
-    if(y != sizeY && x != sizeX) //Check up and right first
+    if(y < sizeY && x < sizeX) //Check up and right first
     {
-        while(y + temp < sizeY && x + temp < sizeX) //While we haven't hit floor or wall...
+        while((y + temp) < sizeY && (x + temp) < sizeX) //While we haven't hit ceiling or wall...
         {   
+            std::cout<<x + temp<<" "<<y + temp<<std::endl;
             if(container[x + temp][y + temp].type == EMPTY) //If the tile is empty, add it to the moveable list
             {
                 container[x][y].moveable.push_back(std::make_pair(x + temp, y + temp));
@@ -419,7 +462,7 @@ void board_t::findBishop(unsigned int x, unsigned int y, bool WHITE) //Function 
                 }
                 break; //Exit loop
             }
-            temp++; //Add to x and y
+            ++temp; //Add to x and y
         }
     }   
     temp = 0;
@@ -484,8 +527,15 @@ void board_t::findBishop(unsigned int x, unsigned int y, bool WHITE) //Function 
 
 }
 
-void board_t::findKing(unsigned int x, unsigned int y, bool WHITE) //Function to find black or white king's moves
+void board_t::findKing(unsigned int _x, unsigned int _y, bool WHITE) //Function to find black or white king's moves
 {
+    //We have to cast to a signed int because I am not very smart and
+    //Need to prevent underflowing when subtracting 2 from 0. 
+    //I am an idiot
+    int x = (int)_x;
+    int y = (int)_y;
+
+
     //Check top 3 moves first
     for(int i = -1; i < 3; ++i)
     {

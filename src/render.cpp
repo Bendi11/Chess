@@ -139,20 +139,87 @@ void Drawer::drawBoard(Chess::board_t& Board)
 
 void Drawer::input(Chess::board_t& Board)
 {
-    std::string temp;
-    unsigned int moved1, moved2, moving1, moving2;
+    while(SDL_PollEvent(&e))
+    {
+        if(e.type == SDL_QUIT)
+        {
+            running = false;
+        }
+        else if(e.type == SDL_MOUSEBUTTONDOWN)
+        {
+            unsigned int mX = (unsigned int)(e.motion.x / (SCREEN_WIDTH / 8) );
+            unsigned int mY = (unsigned int)(e.motion.y / (SCREEN_HEIGHT / 8));
+            mY = ( (7 - 0) / (0 - 7)) * (mY - 7);
+            if(e.button.button == SDL_BUTTON_RIGHT)
+            {
+                storedY = mY;
+                storedX = mX;
+            }
+            else
+            {
+            std::cout<<"Mouse X: "<<mX<<" Mouse Y: "<<mY<<std::endl;
+                
+                if(Board.move(storedX, storedY, mX, mY))
+                {   
+        std::cout<<"Can move!"<<std::endl;
+        SDL_DestroyTexture(textures[storedX][storedY]);
+        SDL_DestroyTexture(textures[mX][mY]);
+        unsigned int x = mX;
+        unsigned int y = mY;
 
-    std::getline(std::cin, temp);
-    moved1 = stoi(temp);
+        switch(Board.container[x][y].type)
+            {
+                case wPAWN:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wPawn.png"));
+                break;
 
-    std::getline(std::cin, temp);
-    moved2 = stoi(temp);
+                case bPAWN:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bPawn.png"));
+                break;
 
-    std::getline(std::cin, temp);
-    moving1 = stoi(temp);
+                case wROOK:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wRook.png"));
+                break;
 
-    std::getline(std::cin, temp);
-    moving2 = stoi(temp);
-    if(Board.move(moved1, moved2, moving1, moving2)) std::cout<<"Can move!"<<std::endl;
-    else std::cout<<"Can't move!"<<std::endl;
+                case bROOK:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bRook.png"));
+                break;
+
+                case wBISHOP:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wBishop.png"));
+                break;
+
+                case bBISHOP:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bBishop.png"));
+                break;
+
+                case wKNIGHT:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wKnight.png"));
+                break;
+
+                case bKNIGHT:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bKnight.png"));
+                break;
+
+                case wKING:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wKing.png"));
+                break;
+
+                case bKING:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bKing.png"));
+                break;
+
+                case wQUEEN:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wQueen.png"));
+                break;
+
+                case bQUEEN:
+                    textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bQueen.png"));
+                break;
+            }
+            } 
+        }
+    }
+    }
+    
 }

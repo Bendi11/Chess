@@ -13,6 +13,12 @@ namespace renderer
         SDL_Event e;
         unsigned int SCREEN_WIDTH;
         unsigned int SCREEN_HEIGHT;
+        bool running = true;
+
+        unsigned int storedX = 0;
+        unsigned int storedY = 0;
+
+        bool isMove = false;
 
         std::vector<std::vector<SDL_Texture* > > textures; 
         std::vector<std::vector<SDL_Texture* > > BGTextures;
