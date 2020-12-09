@@ -14,7 +14,7 @@ int main(int argc, char** argv)
 {
     chessGame g;
     g.init();
-    g.Board.wKing.loadIcon("assets/pawn.png", g.render);
+    g.Board.wKing.loadIcon("assets/bKing.png", g.render);
     SDL_Rect pos;
     pos.x = 0;
     pos.y = 0;
