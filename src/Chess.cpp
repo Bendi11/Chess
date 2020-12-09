@@ -94,8 +94,33 @@ void board_t::findMoves(unsigned int x, unsigned int y)
             findBishop(x, y, false); //Find black bishop moves
         break;
 
+        case wKNIGHT:
+            findKnight(x, y, true); //Find white knight moves
+        break;
+
+        case bKNIGHT:
+            findKnight(x, y, false); //Find black knight moves
+        break;
+
+        case wKING:
+            findKing(x, y, true); //Find white king moves
+        break;
+
+        case bKING:
+            findKing(x, y, false); //Find black king moves
+        break;
+
+        case wQUEEN:
+            findQueen(x, y, true); //Find white queen moves
+        break;
+
+        case bQUEEN:
+            findQueen(x, y, false); //Find black queen moves
+        break;
+
     }
 }
+
 
 //Functions for finding moves for each type of piece
 void board_t::findPawn(unsigned int x, unsigned int y, bool WHITE) //Function to find black or white pawn's moves
@@ -313,6 +338,55 @@ void board_t::findKnight(unsigned int x, unsigned int y, bool WHITE) //Function 
         }
         
     }
+
+    if(!(x - 1 > sizeX || y - 2 > sizeY)) //Check down 2, left 1
+    {
+        if(container[x - 1][y - 2].type == EMPTY)
+        {
+            container[x][y].moveable.push_back(std::make_pair(x - 1, y - 2)); //Add to moveable if empty
+        }
+        else
+        {
+            if((container[x - 1][y - 2].type > WHITE_END && WHITE) || (container[x - 1][y - 2].type <= WHITE_END && !WHITE) )
+            {
+                container[x][y].attackable.push_back(std::make_pair(x - 1, y - 2)); //Add to attackable if on other side
+            }
+        }
+        
+    }
+
+    if(!(x + 1 > sizeX || y - 2 > sizeY)) //Check down 2, right 1
+    {
+        if(container[x + 1][y - 2].type == EMPTY)
+        {
+            container[x][y].moveable.push_back(std::make_pair(x + 1, y - 2)); //Add to moveable if empty
+        }
+        else
+        {
+            if((container[x + 1][y - 2].type > WHITE_END && WHITE) || (container[x + 1][y - 2].type <= WHITE_END && !WHITE) )
+            {
+                container[x][y].attackable.push_back(std::make_pair(x + 1, y - 2)); //Add to attackable if on other side
+            }
+        }
+        
+    }
+
+    if(!(x + 2 > sizeX || y - 1 > sizeY)) //Check down 1, right 2
+    {
+        if(container[x + 2][y - 1].type == EMPTY)
+        {
+            container[x][y].moveable.push_back(std::make_pair(x + 2, y - 1)); //Add to moveable if empty
+        }
+        else
+        {
+            if((container[x + 2][y - 1].type > WHITE_END && WHITE) || (container[x + 2][y - 1].type <= WHITE_END && !WHITE) )
+            {
+                container[x][y].attackable.push_back(std::make_pair(x + 2, y - 1)); //Add to attackable if on other side
+            }
+        }
+        
+    }
+
 }
 
 void board_t::findBishop(unsigned int x, unsigned int y, bool WHITE) //Function to find black or white bishop's moves
@@ -402,10 +476,80 @@ void board_t::findBishop(unsigned int x, unsigned int y, bool WHITE) //Function 
 
 void board_t::findKing(unsigned int x, unsigned int y, bool WHITE) //Function to find black or white king's moves
 {
+    //Check top 3 moves first
+    for(int i = -1; i < 3; ++i)
+    {
+        if(!((x + i) > 0 || (x + i) < sizeX) || y + 1 < sizeY) //Make sure we aren't out of bounds
+        {
+            if(container[x + i][y + 1].type == EMPTY)
+            {
+                container[x][y].moveable.push_back(std::make_pair(x + i, y + 1)); //Add to movable list if it is empty
+            }
+            else
+            {
+                if((container[x + i][y + 1].type > WHITE_END && WHITE) || (container[x + i][y + 1].type <= WHITE_END && !WHITE))
+                {
+                    container[x][y].attackable.push_back(std::make_pair(x + i, y + 1)); //Add to attackable list if enemy
+                }
+            }
+            
+        }
+    }
 
+    //Check bottom 3 moves next
+    for(int i = -1; i < 3; ++i)
+    {
+        if(!((x + i) > 0 || (x + i) < sizeX) || y - 1 > 0) //Make sure we aren't out of bounds
+        {
+            if(container[x + i][y +-1].type == EMPTY)
+            {
+                container[x][y].moveable.push_back(std::make_pair(x + i, y - 1)); //Add to movable list if it is empty
+            }
+            else
+            {
+                if((container[x + i][y - 1].type > WHITE_END && WHITE) || (container[x + i][y - 1].type <= WHITE_END && !WHITE))
+                {
+                    container[x][y].attackable.push_back(std::make_pair(x + i, y - 1)); //Add to attackable list if enemy
+                }
+            }
+            
+        }
+    }
+
+    //Check left and right moves
+    if(x + 1 < sizeX)
+    {
+        if(container[x + 1][y].type == EMPTY)
+        {
+            container[x][y].moveable.push_back(std::make_pair(x + 1, y)); //Add to movable list if it is empty
+        }
+        else
+        {
+            if((container[x + 1][y].type > WHITE_END && WHITE) || (container[x + 1][y].type <= WHITE_END && !WHITE))
+            {
+                container[x][y].attackable.push_back(std::make_pair(x + 1, y)); //Add to attackable list if enemy
+            }
+        }
+    }
+    if(x - 1 > 0)
+    {
+        if(container[x - 1][y].type == EMPTY)
+        {
+            container[x][y].moveable.push_back(std::make_pair(x - 1, y)); //Add to movable list if it is empty
+        }
+        else
+        {
+            if((container[x - 1][y].type > WHITE_END && WHITE) || (container[x - 1][y].type <= WHITE_END && !WHITE))
+            {
+                container[x][y].attackable.push_back(std::make_pair(x - 1, y)); //Add to attackable list if enemy
+            }
+        }
+    }
 }
 
 void board_t::findQueen(unsigned int x, unsigned int y, bool WHITE) //Function to find black or white queen's moves
 {
-
+    //Queen is just combination of rook and bishop, so just do both those checks
+    findRook(x, y, WHITE);
+    findBishop(x, y, WHITE);
 }
