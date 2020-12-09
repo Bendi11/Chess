@@ -68,6 +68,8 @@ public:
     SDL_Renderer* render = NULL; //The object that will draw everything onscreen for us
     SDL_Event userE; //SDL user event queue
     bool IS_RUNNING = true;
+    double SCALING_X; //How much the icons should be scaled, assuming a resolution of 77x77 for sprites
+    double SCALING_Y; //How much the icons should be scaled in height, assuming 77x77 resolution
 
     std::ofstream logger; //Logger file object for logging errors / messages
 
@@ -85,6 +87,7 @@ public:
     void getInput(); //Function to get user input
 
     void renderUpdate(); //Function to display what game logic updates
+    void renderBG(); //Function to render the board graphic
 
     void logicUpdate(); //Function to take in player moves like ke5 and actually change values
 

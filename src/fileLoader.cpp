@@ -32,6 +32,19 @@ void chessGame::loadCfg()
     SCREEN_WIDTH = stoi(readCfgLine(cfg)); //Read line of the cfg file and store in screen width
     SCREEN_HEIGHT = stoi(readCfgLine(cfg)); //Read line of cfg and store in screen height
 
+    //Read if sprites should always be square or not
+    if(stoi(readCfgLine(cfg)))
+    {
+        SCALING_Y = SCREEN_HEIGHT / (8 * PIECE_Y);
+        SCALING_X = SCALING_Y;
+    }
+    else
+    {
+        SCALING_X = SCREEN_WIDTH / (8 * PIECE_X); //Set the scaling for the window size width
+        SCALING_Y = SCREEN_HEIGHT / (8 * PIECE_Y); //Set the right scale factor for this screen height       
+    }
+
+
 
 
 }
