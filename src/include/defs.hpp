@@ -1,5 +1,6 @@
 
-#define ROW /**/
+#define PIECE_X 77
+#define PIECE_Y 77
 
 //--------------------CHESS PIECE DEFINITIONS--------------------//
 #define wPAWN 0

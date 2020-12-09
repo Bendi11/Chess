@@ -14,17 +14,17 @@ int main(int argc, char** argv)
 {
     chessGame g;
     g.init();
-    g.Board.wKing.loadIcon("assets/bKing.png", g.render);
+    g.Board.wKing.loadIcon("assets/wPawn.png", g.render);
     SDL_Rect pos;
     pos.x = 0;
     pos.y = 0;
-    pos.w = 188;
-    pos.h = 188;
+    pos.w = 77;
+    pos.h = 77;
     SDL_Rect Pos;
     Pos.x = 0;
     Pos.y = 0;
-    Pos.w = pos.w * 0.47872340425;
-    Pos.h = pos.h * 0.47872340425;
+    Pos.w = pos.w * g.SCALING_X;
+    Pos.h = pos.h * g.SCALING_Y;
     SDL_RenderCopy(g.render, g.Board.wKing.icon, &pos, &Pos);
     while(g.IS_RUNNING)
     {
