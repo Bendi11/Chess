@@ -35,6 +35,7 @@ void chessGame::loadCfg()
     //Read if sprites should always be square or not
     if(stoi(readCfgLine(cfg)))
     {
+        //Make scaling for X and Y of sprites be equal
         SCALING_Y = SCREEN_HEIGHT / (8 * PIECE_Y);
         SCALING_X = SCALING_Y;
     }

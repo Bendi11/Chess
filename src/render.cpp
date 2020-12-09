@@ -6,5 +6,10 @@ File to render what the game logic is saying
 //Function to render game logic onscreen
 void chessGame::renderUpdate()
 {
-    SDL_RenderPresent(render);
+    unsigned int i; //Iterator
+    //Scan through white pawns and draw them
+    for(i = 0; i < 8; ++i)
+    {
+        
+    }
 }
