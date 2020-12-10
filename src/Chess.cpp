@@ -12,7 +12,7 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
     findMoves();
 
     //Make sure the player is only controlling their pieces and that it is their turn and that nobody has won
-    if( ( (container[x][y].type > WHITE_END && !WHITE) || (container[x][y].type <= WHITE_END && WHITE)  ) && WINNER == WINNER_NONE && (WHITE && TURN == WHITE_TURN) && (!WHITE && TURN == BLACK_TURN))
+    if( ( (container[x][y].type > WHITE_END && !WHITE) || (container[x][y].type <= WHITE_END && WHITE)  ) && WINNER == WINNER_NONE && ( (WHITE && TURN == WHITE_TURN) || (!WHITE && TURN == BLACK_TURN) ) )
     {
         for(unsigned i = 0; i < container[x][y].moveable.size(); ++i) //Iterate through all of the moveable tiles of that piece
         {
