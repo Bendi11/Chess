@@ -203,12 +203,16 @@ void Drawer::input(Chess::board_t& Board)
         {
             if(!isDragging) //Make sure we aren't already dragging
             {
-                isDragging = true; //The user is dragging a piece
-
                 /*Changing mouse screen coordinates to chess board coordinates*/
                 storedX = (unsigned int)(userIn.motion.x / (SCREEN_WIDTH / 8) );
                 storedY = (unsigned int)(userIn.motion.y / (SCREEN_HEIGHT / 8));
                 storedY =   -(storedY - 7); //Y coords need to be reversed because I am not a smart person
+
+                /*Set the mouse dragged sprite position*/
+                mouseRect.x = userIn.motion.x - (PIECE_X / 2);
+                mouseRect.y = userIn.motion.y - (PIECE_Y / 2);
+
+                isDragging = true; //The user is dragging a piece
             }
             
 
