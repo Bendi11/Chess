@@ -50,6 +50,7 @@ namespace Chess
 
         //Functions for finding moves for each type of piece
         void findPawn(unsigned int x, unsigned int y, bool WHITE); //Function to find black or white pawn's moves
+        void checkPromotion(unsigned int x, unsigned int y, bool WHITE); //Function to find black or white pawn's promotion status
 
         void findRook(unsigned int x, unsigned int y, bool WHITE); //Function to find black or white rook's moves
 

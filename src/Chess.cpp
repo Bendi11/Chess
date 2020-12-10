@@ -45,6 +45,8 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
                 container[moveX][moveY] = piece_t(container[x][y].type, true); //Assign  the moving square's type as the moved piece
                 container[x][y] = piece_t(EMPTY, true); //Make the old location empty
 
+                checkPromotion(moveX, moveY, WHITE); //Check if the piece can be promoted
+
                 if(WHITE) TURN = BLACK_TURN; //White made a move, blacks turn now
                 else TURN = WHITE_TURN; //Black made a move, now it is white's turn
 
@@ -58,6 +60,8 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
             {
                 container[moveX][moveY] = piece_t(container[x][y].type, true); //Assign  the moving square's type as the moved piece
                 container[x][y] = piece_t(EMPTY, true); //Make the old location empty
+
+                checkPromotion(moveX, moveY, WHITE); //Check if the piece can be promoted
 
                 if(WHITE) TURN = BLACK_TURN; //White made a move, blacks turn now
                 else TURN = WHITE_TURN; //Black made a move, now it is white's turn
@@ -77,6 +81,7 @@ piece_t::piece_t(uint8_t _type)
     hasMoved = false;
 }
 
+//Function to return a piece with the hasMoved variable set
 piece_t::piece_t(uint8_t _type, bool _HAS_MOVED)
 {
     type = _type;
@@ -258,6 +263,13 @@ void board_t::findPawn(unsigned int _x, unsigned int _y, bool WHITE) //Function 
         }  
     }
     
+}
+
+//Function to check promotion status of a pawn
+void board_t::checkPromotion(unsigned int x, unsigned int y, bool WHITE)
+{
+    if(container[x][y].type == wPAWN && y == board_8) container[x][y] = piece_t(wQUEEN, true); //Set the pawn to a queen if it is promoted
+    else if(container[x][y].type == bPAWN && y == board_1) container[x][y] = piece_t(bQUEEN, true); //Set the pawn to a queen if it is promoted
 }
 
 void board_t::findRook(unsigned int _x, unsigned int _y, bool WHITE) //Function to find black or white rook's moves
