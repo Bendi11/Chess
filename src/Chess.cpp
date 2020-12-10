@@ -214,7 +214,7 @@ void board_t::findPawn(unsigned int _x, unsigned int _y, bool WHITE) //Function 
     }
     else
     {
-    if(y > 0) //Check down
+        if(y > 0) //Check down
         {
             if(container[x][y - 1].type == EMPTY)
                 container[x][y].moveable.push_back(std::make_pair(x, y - 1));

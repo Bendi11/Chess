@@ -19,6 +19,7 @@ int main(int argc, char** argv)
     renderer::Drawer d;
     Chess::board_t b;
     d.init(624, 624, b);
+
     while(d.running)
     {
         for(unsigned x = 0; x < b.container.size(); ++x)
@@ -31,6 +32,10 @@ int main(int argc, char** argv)
         d.input(b);
         d.drawBoard(b);
     }
+    SDL_DestroyRenderer(d.render);
+    SDL_DestroyWindow(d.win);
+    IMG_Quit();
+    SDL_Quit();
     
     return 0;
 }

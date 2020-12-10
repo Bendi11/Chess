@@ -9,61 +9,65 @@ using namespace renderer;
 void Drawer::assignTextures(Chess::board_t& Board, unsigned int x, unsigned int y)
 {
     SDL_DestroyTexture(textures[x][y]); //Delete this texture because it will be replaced
+    SDL_Surface* temp = NULL; //Temp surface for loading the texture
     /*Assign a texture*/
     switch(Board.container[x][y].type)
     {
         case wPAWN:
-            textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wPawn.png"));
+            temp = IMG_Load("assets/wPawn.png");
         break;
 
         case bPAWN:
-            textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bPawn.png"));
+            temp =  IMG_Load("assets/bPawn.png");
         break;
 
         case wROOK:
-            textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wRook.png"));
+            temp = IMG_Load("assets/wRook.png");
         break;
 
         case bROOK:
-            textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bRook.png"));
+            temp =  IMG_Load("assets/bRook.png");
         break;
 
         case wBISHOP:
-            textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wBishop.png"));
+            temp =  IMG_Load("assets/wBishop.png");
         break;
 
         case bBISHOP:
-            textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bBishop.png"));
+            temp = IMG_Load("assets/bBishop.png");
         break;
 
         case wKNIGHT:
-            textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wKnight.png"));
+            temp = IMG_Load("assets/wKnight.png");
         break;
 
         case bKNIGHT:
-            textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bKnight.png"));
+            temp = IMG_Load("assets/bKnight.png");
         break;
 
         case wKING:
-            textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wKing.png"));
+            temp = IMG_Load("assets/wKing.png");
         break;
 
         case bKING:
-            textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bKing.png"));
+            temp = IMG_Load("assets/bKing.png");
         break;
 
         case wQUEEN:
-            textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wQueen.png"));
+            temp = IMG_Load("assets/wQueen.png");
         break;
 
         case bQUEEN:
-            textures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bQueen.png"));
+            temp = IMG_Load("assets/bQueen.png");
         break;
 
         case EMPTY:
 
         break;
     }
+
+    textures[x][y] = SDL_CreateTextureFromSurface(render, temp); //Make a texture from the surface
+    SDL_FreeSurface(temp); //Clear the surface to avoid ANOTHER FR*GGING MEMORY LEAK
 }
 
 void Drawer::init(unsigned int w, unsigned int h, Chess::board_t& Board)
@@ -150,6 +154,8 @@ void Drawer::init(unsigned int w, unsigned int h, Chess::board_t& Board)
 //Function to draw a chess board onscreen
 void Drawer::drawBoard(Chess::board_t& Board)
 {
+    SDL_RenderClear(render); //Clear the renderer of all loaded textures
+
     for(unsigned x = 0; x < 8; ++x)
     {
         for(unsigned y = 0; y < 8; ++y)
