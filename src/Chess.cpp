@@ -13,8 +13,8 @@ uint8_t board_t::move(unsigned int x, unsigned int y, unsigned int moveX, unsign
     {
         if(container[x][y].moveable[i] == std::make_pair(moveX, moveY) ) //If the moveable tiles contains the desired move, move the piece
         {  
-            container[moveX][moveY] = container[x][y].type; //Assign  the moving square's type as the moved piece
-            container[x][y].type = EMPTY; //Make the old location empty
+            container[moveX][moveY] = piece_t(container[x][y].type, true); //Assign  the moving square's type as the moved piece
+            container[x][y] = piece_t(EMPTY, true); //Make the old location empty
             return MOVE_GOOD; //Return that the move was good
         }
     }
@@ -23,8 +23,8 @@ uint8_t board_t::move(unsigned int x, unsigned int y, unsigned int moveX, unsign
     {
         if(container[x][y].attackable[n] == std::make_pair(moveX, moveY))
         {
-            container[moveX][moveY] = container[x][y].type; //Assign  the moving square's type as the moved piece
-            container[x][y].type = EMPTY; //Make the old location empty
+            container[moveX][moveY] = piece_t(container[x][y].type, true); //Assign  the moving square's type as the moved piece
+            container[x][y] = piece_t(EMPTY, true); //Make the old location empty
             return MOVE_CAPTURED; //Return that the move captured a piece
         }
     }
@@ -42,8 +42,12 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
         {
             if(container[x][y].moveable[i] == std::make_pair(moveX, moveY) ) //If the moveable tiles contains the desired move, move the piece
             {  
-                container[moveX][moveY] = container[x][y].type; //Assign  the moving square's type as the moved piece
-                container[x][y].type = EMPTY; //Make the old location empty
+                container[moveX][moveY] = piece_t(container[x][y].type, true); //Assign  the moving square's type as the moved piece
+                container[x][y] = piece_t(EMPTY, true); //Make the old location empty
+
+                if(WHITE) TURN = BLACK_TURN; //White made a move, blacks turn now
+                else TURN = WHITE_TURN; //Black made a move, now it is white's turn
+
                 return MOVE_GOOD; //Return that the move was good
             }
         }
@@ -52,8 +56,12 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
         {
             if(container[x][y].attackable[n] == std::make_pair(moveX, moveY))
             {
-                container[moveX][moveY] = container[x][y].type; //Assign  the moving square's type as the moved piece
-                container[x][y].type = EMPTY; //Make the old location empty
+                container[moveX][moveY] = piece_t(container[x][y].type, true); //Assign  the moving square's type as the moved piece
+                container[x][y] = piece_t(EMPTY, true); //Make the old location empty
+
+                if(WHITE) TURN = BLACK_TURN; //White made a move, blacks turn now
+                else TURN = WHITE_TURN; //Black made a move, now it is white's turn
+
                 return MOVE_CAPTURED; //Return that the move captured a piece
             }
         }
@@ -66,6 +74,13 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
 piece_t::piece_t(uint8_t _type)
 {
     type = _type;
+    hasMoved = false;
+}
+
+piece_t::piece_t(uint8_t _type, bool _HAS_MOVED)
+{
+    type = _type;
+    hasMoved = _HAS_MOVED;
 }
 
 //Function to start a chess game with the default chess positions and 8x8 grid
@@ -80,31 +95,31 @@ board_t::board_t()
     }
 
     //Start placing white pieces in their default locations
-    container[board_a][board_1].type = wROOK; //Place rook at A1
-    container[board_b][board_1].type = wKNIGHT; //Place knight at B1
-    container[board_c][board_1].type = wBISHOP; //Place bishop at C1
-    container[board_d][board_1].type = wQUEEN; //Place queen at D1
-    container[board_e][board_1].type = wKING; //Place king at E1
-    container[board_f][board_1].type = wBISHOP; //Place bishop at F1
-    container[board_g][board_1].type = wKNIGHT; //Place knight at G1
-    container[board_h][board_1].type = wROOK; //Place rook at H1
+    container[board_a][board_1] = piece_t(wROOK); //Place white rook at A1
+    container[board_b][board_1] = piece_t(wKNIGHT); //Place knight at B1
+    container[board_c][board_1] = piece_t(wBISHOP); //Place bishop at C1
+    container[board_d][board_1] = piece_t(wQUEEN); //Place queen at D1
+    container[board_e][board_1] = piece_t(wKING); //Place king at E1
+    container[board_f][board_1] = piece_t(wBISHOP); //Place bishop at F1
+    container[board_g][board_1] = piece_t(wKNIGHT); //Place knight at G1
+    container[board_h][board_1] = piece_t(wROOK); //Place rook at H1
     for(i = 0; i < 8; ++i) //Place eight pawns
     {
-        container[i][board_2].type = wPAWN;
+        container[i][board_2] = piece_t(wPAWN);
     }
 
     //Start placing black pieces in their default locations
-    container[board_a][board_8].type = bROOK; //Place rook at A8
-    container[board_b][board_8].type = bKNIGHT; //Place knight at B8
-    container[board_c][board_8].type = bBISHOP; //Place bishop at C8
-    container[board_d][board_8].type = bQUEEN; //Place queen at D8
-    container[board_e][board_8].type = bKING; //Place king at E8
-    container[board_f][board_8].type = bBISHOP; //Place bishop at F8
-    container[board_g][board_8].type = bKNIGHT; //Place knight at G8
-    container[board_h][board_8].type = bROOK; //Place rook at H8
+    container[board_a][board_8] = piece_t(bROOK); //Place rook at A8
+    container[board_b][board_8] = piece_t(bKNIGHT); //Place knight at B8
+    container[board_c][board_8] = piece_t(bBISHOP); //Place bishop at C8
+    container[board_d][board_8] = piece_t(bQUEEN); //Place queen at D8
+    container[board_e][board_8] = piece_t(bKING); //Place king at E8
+    container[board_f][board_8] = piece_t(bBISHOP); //Place bishop at F8
+    container[board_g][board_8] = piece_t(bKNIGHT); //Place knight at G8
+    container[board_h][board_8] = piece_t(bROOK); //Place rook at H8
     for(i = 0; i < 8; ++i) //Place eight pawns
     {
-        container[i][board_7].type = bPAWN;
+        container[i][board_7] = piece_t(bPAWN);
     }
 }
 
@@ -194,6 +209,12 @@ void board_t::findPawn(unsigned int _x, unsigned int _y, bool WHITE) //Function 
 
     if(WHITE)
     {
+        //If pawns haven't moved, they can move up two squares
+        if(!container[x][y].hasMoved)
+        {
+            if(container[x][y + 2].type == EMPTY) //If the square is empty
+                container[x][y].moveable.push_back(std::make_pair(x, y + 2)); //Add the square up if it is empty
+        }
         //Pawns can move forwards if the square in front is empty
         if(y < sizeY)
         {
@@ -214,6 +235,12 @@ void board_t::findPawn(unsigned int _x, unsigned int _y, bool WHITE) //Function 
     }
     else
     {
+        //If pawns haven't moved, they can move down two squares
+        if(!container[x][y].hasMoved)
+        {
+            if(container[x][y - 2].type == EMPTY) //If the square is empty
+                container[x][y].moveable.push_back(std::make_pair(x, y - 2)); //Add the square up if it is empty
+        }
         if(y > 0) //Check down
         {
             if(container[x][y - 1].type == EMPTY)

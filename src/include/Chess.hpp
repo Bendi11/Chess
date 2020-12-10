@@ -17,11 +17,13 @@ namespace Chess
     {
     public:
         uint8_t type; //ID of the type of piece
+        bool hasMoved; //If the piece has been moved from the start, mostly used for pawns at the start moving two spaces
 
         std::vector<std::pair<unsigned int, unsigned int > > moveable; //List of tiles the piece can move to
         std::vector<std::pair<unsigned int, unsigned int> > attackable; //List of tiles the piece can attack
 
         piece_t(uint8_t _type); //Constructor for initializing a new piece
+        piece_t(uint8_t _type, bool HAS_MOVED); //Function for making a piece that hasn't moved yet
         piece_t(void) { type = EMPTY; }; //Default constructor is empty
     };
 
@@ -32,6 +34,7 @@ namespace Chess
     public:
         pMat container; //The object holding all pieces on the board
         unsigned int counter; //How many turns the game has gone for
+        bool TURN; //If it white or blacks turn
 
         unsigned int sizeX = 7;
         unsigned int sizeY = 7;

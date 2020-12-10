@@ -6,6 +6,9 @@
 #define MOVE_GOOD 1
 #define MOVE_CAPTURED 2
 
+#define WHITE_TURN true
+#define BLACK_TURN false
+
 //--------------------CHESS PIECE DEFINITIONS--------------------//
 
 #define EMPTY 0
