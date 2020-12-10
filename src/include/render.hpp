@@ -28,6 +28,7 @@ namespace renderer
         unsigned int storedY = 0;
         bool isDragging = false; //If the user is clicking and holding to drag and drop
         SDL_Rect mouseRect; //Mouse position rectangle for drawing a sprite on where the mouse is
+        SDL_Texture* draggedTexture; //The texture the mouse is dragging
 
         /*A 2D matrix of textures, one for each grid square on the board*/
         std::vector<std::vector<SDL_Texture* > > textures; 

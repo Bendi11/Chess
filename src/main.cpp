@@ -33,7 +33,7 @@ int main(int argc, char** argv)
         d.input(b);
         d.drawBoard(b);
     }
-    
+
     SDL_DestroyRenderer(d.render);
     SDL_DestroyWindow(d.win);
     SDL_CloseAudio();

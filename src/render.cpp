@@ -95,6 +95,7 @@ void Drawer::init(unsigned int w, unsigned int h, Chess::board_t& Board)
     render = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED); //Make a renderer for SDL2 associated with the window
 
     SDL_LoadWAV("assets/sounds/move.wav", &wavSpec, &wavBuffer, &wavLength); //Load a sound effect to populate the specification for WAV data
+    USING_SOUND = true; //Sound is on by default
     if( (audioDevice = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0) ) < 0) //Open the desired audio device
     {
         USING_SOUND = false; //Just don't play sound effects if there was an error with opening an audio device
@@ -102,6 +103,10 @@ void Drawer::init(unsigned int w, unsigned int h, Chess::board_t& Board)
     SDL_PauseAudioDevice(audioDevice, 0); //Enable sound playback
 
     /*SDL2 init done!*/
+
+    //Set the size of the mouse position rectangle
+    mouseRect.w = (PIECE_X + 1) * scale;
+    mouseRect.h = (PIECE_Y + 1) * scale; 
 
     //Set the size rectangle once, everything is the same size
     size.x = 0;
@@ -169,59 +174,80 @@ void Drawer::drawBoard(Chess::board_t& Board)
         {
             assignTextures(Board, x, y); //Assign the correct texture to this coordinate
             SDL_RenderCopy(render, BGTextures[x][y], &size, &pos[x][y]); //Add the background texture 
-            if(Board.container[x][y].type != EMPTY)
-            {
-                SDL_RenderCopy(render, textures[x][y], &size, &pos[x][y]); //Draw the piece texture over it
-            }
-            
+            SDL_RenderCopy(render, textures[x][y], &size, &pos[x][y]); //Draw the piece texture over it 
         }
     }
+    if(isDragging) SDL_RenderCopy(render, textures[storedX][storedY], &size, &mouseRect);
     SDL_RenderPresent(render);
 }
 
 void Drawer::input(Chess::board_t& Board)
 {
-    while(SDL_WaitEventTimeout(&userIn, 100)) //Poll through the queue of inputted events
+    while(SDL_PollEvent(&userIn)) //Poll through the queue of inputted events
     {
         //Exit the program if the inputted event was to quit
         if(userIn.type == SDL_QUIT) 
         {
             running = false;
         }
-
-        //Checking if the event was a mouse push
-        else if(userIn.type == SDL_MOUSEBUTTONDOWN)
+        else if(userIn.type == SDL_MOUSEMOTION) //Check if the user just moved their mouse
         {
+            if(isDragging) //If the user is currently drag and dropping a piece
+            {
+                /*Set mouse dragged sprite position*/
+                mouseRect.x = userIn.motion.x - (PIECE_X / 2);
+                mouseRect.y = userIn.motion.y - (PIECE_Y / 2);
+            }
+        }
+        else if(userIn.type == SDL_MOUSEBUTTONDOWN && userIn.button.button == SDL_BUTTON_LEFT) //Start drag and dropping a piece
+        {
+            if(!isDragging) //Make sure we aren't already dragging
+            {
+                isDragging = true; //The user is dragging a piece
+
+                /*Changing mouse screen coordinates to chess board coordinates*/
+                storedX = (unsigned int)(userIn.motion.x / (SCREEN_WIDTH / 8) );
+                storedY = (unsigned int)(userIn.motion.y / (SCREEN_HEIGHT / 8));
+                storedY =   -(storedY - 7); //Y coords need to be reversed because I am not a smart person
+            }
+            
+
+        }   
+        //Checking if the event was a mouse release
+        else if(userIn.type == SDL_MOUSEBUTTONUP && userIn.button.button == SDL_BUTTON_LEFT && isDragging)
+        {
+            isDragging = false; //We aren't trying to drag and drop anymore
+
             /*Changing mouse screen coordinates to chess board coordinates*/
             unsigned int mX = (unsigned int)(userIn.motion.x / (SCREEN_WIDTH / 8) );
             unsigned int mY = (unsigned int)(userIn.motion.y / (SCREEN_HEIGHT / 8));
 
             mY =   -(mY - 7); //Y coords need to be reversed because I am not a smart person
 
-            if(userIn.button.button == SDL_BUTTON_RIGHT) //Right mouse selects a piece
-            { 
-                /*Store the mouse coords as the piece the player is moving*/
-                storedY = mY; 
-                storedX = mX;
-            }
-            else if(userIn.button.button == SDL_BUTTON_LEFT) //Left mouse attempts a move to the selected coordinate
+            uint8_t success; //Store the move's outcome in success variable
+            success = Board.playerMove(storedX, storedY, mX, mY, true); //Get wether the move failed, completed, or captured a piece
+
+            //playerMove returns 2 if the move captured something, or 1 if it was successful, so play a sound effect based on this
+            if(success == MOVE_GOOD) //If the move completed
             {
-                uint8_t success; //Store the move's outcome in success variable
-                success = Board.playerMove(storedX, storedY, mX, mY, true); //Get wether the move failed, completed, or captured a piece
-                //playerMove returns 2 if the move captured something, or 1 if it was successful, so play a sound effect based on this
-                if(success == MOVE_GOOD && USING_SOUND) 
+                if(USING_SOUND)
                 {
                     SDL_LoadWAV("assets/sounds/move.wav", &wavSpec, &wavBuffer, &wavLength); //Load the move sound effect
-                    SDL_OpenAudio(&wavSpec, NULL);
                     SDL_QueueAudio(audioDevice, wavBuffer, wavLength); //Play the sound effect for moving
-                }
-                else if(success == MOVE_CAPTURED && USING_SOUND)
+                    SDL_PauseAudioDevice(audioDevice, 0); //Un - pause audio
+                } 
+            }
+            else if(success == MOVE_CAPTURED)
+            {
+                if(USING_SOUND)
                 {
                     SDL_LoadWAV("assets/sounds/capture.wav", &wavSpec, &wavBuffer, &wavLength); //Load the capture sound effect
-                    SDL_OpenAudio(&wavSpec, NULL);
                     SDL_QueueAudio(audioDevice, wavBuffer, wavLength); //Play the sound effect for capturing a piece
+                    SDL_PauseAudioDevice(audioDevice, 0); //Un - pause audio
                 }
-            }
+                
+            } 
+            
         }
     } 
 }
