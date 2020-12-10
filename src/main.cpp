@@ -3,7 +3,7 @@ Chess by Benjamin L (Bendi11)
 Chess game made in SDL2
 Compile commands: 
 Windows: 
-g++ -o bin/Chess.exe src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -static-libgcc
+g++ -o bin/Chess.exe src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -static-libgcc -mwindows
 
 Linux: 
 g++ -o bin/Chess src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -lSDL2main -lSDL2 -lSDL2_image -static-libgcc
@@ -21,10 +21,17 @@ int main(int argc, char** argv)
     d.init(720, 720, b);
     while(d.running)
     {
-        d.drawBoard(b);
+        SDL_Delay(100);
+        for(unsigned x = 0; x < b.container.size(); ++x)
+        {
+            for(unsigned y = 0; y < b.container[0].size(); ++y)
+            {
+                b.findMoves(x, y);
+            }
+        }
         d.input(b);
+        d.drawBoard(b);
     }
     
-    SDL_Delay(2000);
     return 0;
 }

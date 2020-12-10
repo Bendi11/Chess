@@ -157,9 +157,8 @@ void Drawer::input(Chess::board_t& Board)
             }
             else
             {
-            std::cout<<"Mouse X: "<<mX<<" Mouse Y: "<<mY<<std::endl;
                 
-                if(Board.move(storedX, storedY, mX, mY))
+                if(Board.playerMove(storedX, storedY, mX, mY, true))
                 {   
         std::cout<<"Can move!"<<std::endl;
         SDL_DestroyTexture(textures[storedX][storedY]);
@@ -223,3 +222,4 @@ void Drawer::input(Chess::board_t& Board)
     }
     
 }
+

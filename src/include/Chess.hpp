@@ -44,6 +44,7 @@ namespace Chess
 
         bool move(unsigned int x, unsigned int y, unsigned int moveX, unsigned int moveY); //Function to move a piece from one spot to another
         void findMoves(unsigned int x, unsigned int y); //Function to find which tiles a certain piece can move to
+        bool playerMove(unsigned int x, unsigned int y, unsigned int moveX, unsigned int moveY, bool WHITE); //Function to allow player to move only their pieces
 
         //Functions for finding moves for each type of piece
         void findPawn(unsigned int x, unsigned int y, bool WHITE); //Function to find black or white pawn's moves

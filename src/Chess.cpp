@@ -30,6 +30,37 @@ bool board_t::move(unsigned int x, unsigned int y, unsigned int moveX, unsigned 
     return false;
 }
 
+//Function to only allow player to move their pieces
+bool board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, unsigned int moveY, bool WHITE)
+{
+    //Make sure the player is only controlling their pieces
+    if( (container[x][y].type > WHITE_END && !WHITE) || (container[x][y].type <= WHITE_END && WHITE))
+    {
+        findMoves(x, y); //Get moves of the selected piece
+        for(unsigned i = 0; i < container[x][y].moveable.size(); ++i) //Iterate through all of the moveable tiles of that piece
+        {
+            if(container[x][y].moveable[i] == std::make_pair(moveX, moveY) ) //If the moveable tiles contains the desired move, move the piece
+            {  
+                container[moveX][moveY] = container[x][y].type; //Assign  the moving square's type as the moved piece
+                container[x][y].type = EMPTY; //Make the old location empty
+                return true;
+            }
+        }
+        //Now go through all attackable tiles and see if one matches
+        for(unsigned n = 0; n < container[x][y].attackable.size(); ++n)
+        {
+            if(container[x][y].attackable[n] == std::make_pair(moveX, moveY))
+            {
+                container[moveX][moveY] = container[x][y].type; //Assign  the moving square's type as the moved piece
+                container[x][y].type = EMPTY; //Make the old location empty
+                return true;
+            }
+        }
+        return false;
+    }
+    else return false;
+}
+
 //Function to init a piece with position and type
 piece_t::piece_t(uint8_t _type)
 {
@@ -210,10 +241,11 @@ void board_t::findRook(unsigned int _x, unsigned int _y, bool WHITE) //Function 
     int y = (int)_y;
     int temp = 0;
 
-    if(y != sizeY) //Check up first
+    if(y < sizeY) //Check up first
     {
         while(y + temp < sizeY) //While we haven't hit the ceiling
         {
+            ++temp;
             if(container[x][y + temp].type == EMPTY) //If type is empty, we can move
             {
                 container[x][y].moveable.push_back(std::make_pair(x, y + temp));
@@ -227,37 +259,37 @@ void board_t::findRook(unsigned int _x, unsigned int _y, bool WHITE) //Function 
                 }
                 break;
             }
-            temp++; //Increase y
         }
     }
 
     temp = 0;
-    if(y != 0) //Check down next
+    if(y > 0) //Check down next
     {
         while(y + temp > 0) //Go to floor
         {
+            --temp;
             if(container[x][y + temp].type == EMPTY) //Make sure it's empty
             {
                 container[x][y].moveable.push_back(std::make_pair(x, y + temp)); //Add this to moveable
             }
             else
             {
-                if((container[x][y - temp].type > WHITE_END && WHITE) || (container[x][y - temp].type <= WHITE_END && !WHITE)) //make sure piece is black
+                if((container[x][y + temp].type > WHITE_END && WHITE) || (container[x][y + temp].type <= WHITE_END && !WHITE)) //make sure piece is black
                 {
                     container[x][y].attackable.push_back(std::make_pair(x, y + temp));
                 }
                 break; //Exit the loop
             }
-            temp--; //Decrease Y
             
         }
     }
 
     temp = 0;
-    if(x != sizeX) //Check right next
+    if(x < sizeX) //Check right next
     {
         while(x + temp < sizeX) //While we haven't hit the wall...
         {
+            ++temp;
             if(container[x + temp][y].type == EMPTY)
             {
                 container[x][y].moveable.push_back(std::make_pair(x + temp, y)); //Add that to the moveable list
@@ -275,10 +307,11 @@ void board_t::findRook(unsigned int _x, unsigned int _y, bool WHITE) //Function 
     }
 
     temp = 0;
-    if(x != 0) //Check left finally
+    if(x > 0) //Check left finally
     {
         while(x + temp > 0) //While we haven't hit a wall...
         {
+            --temp;
             if(container[x + temp][y].type == EMPTY)
             {
                 container[x][y].moveable.push_back(std::make_pair(x + temp, y)); //Add to the moveable list if the sqaure is empty
@@ -305,7 +338,7 @@ void board_t::findKnight(unsigned int _x, unsigned int _y, bool WHITE) //Functio
     int x = (int)_x;
     int y = (int)_y;
 
-    if(!(x + 2 > sizeX || y + 1 > sizeY)) //Check up 1, right 2 first
+    if((x + 2 <= sizeX && y + 1 <= sizeY)) //Check up 1, right 2 first
     {
         if(container[x + 2][y + 1].type == EMPTY)
         {
@@ -321,7 +354,7 @@ void board_t::findKnight(unsigned int _x, unsigned int _y, bool WHITE) //Functio
         
     }
 
-    if(!(x + 1 > sizeX || y + 2 > sizeY)) //Check up 2, right 1
+    if((x + 1 <= sizeX && y + 2 <= sizeY)) //Check up 2, right 1
     {
         if(container[x + 1][y + 2].type == EMPTY)
         {
@@ -337,7 +370,7 @@ void board_t::findKnight(unsigned int _x, unsigned int _y, bool WHITE) //Functio
         
     }
 
-    if(!(x - 1 < 0 || y + 2 > sizeY)) //Check up 2, left 1
+    if((x - 1 >= 0 && y + 2 <= sizeY)) //Check up 2, left 1
     {
         if(container[x - 1][y + 2].type == EMPTY)
         {
@@ -353,7 +386,7 @@ void board_t::findKnight(unsigned int _x, unsigned int _y, bool WHITE) //Functio
         
     }
 
-    if(!(x - 2 < 0 || y + 1 > sizeY)) //Check up 1, left 2
+    if((x - 2 >= 0 && y + 1 <= sizeY)) //Check up 1, left 2
     {
         if(container[x - 2][y + 1].type == EMPTY)
         {
@@ -369,7 +402,7 @@ void board_t::findKnight(unsigned int _x, unsigned int _y, bool WHITE) //Functio
         
     }
 
-    if(!(x - 2 < 0 || y - 1 < 0)) //Check down 1, left 2
+    if((x - 2 >= 0 && y - 1 >= 0)) //Check down 1, left 2
     {
         if(container[x - 2][y - 1].type == EMPTY)
         {
@@ -385,7 +418,7 @@ void board_t::findKnight(unsigned int _x, unsigned int _y, bool WHITE) //Functio
         
     }
 
-    if(!(x - 1 < 0 || y - 2 < 0)) //Check down 2, left 1
+    if((x - 1 >= 0 && y - 2 >= 0)) //Check down 2, left 1
     {
         if(container[x - 1][y - 2].type == EMPTY)
         {
@@ -401,7 +434,7 @@ void board_t::findKnight(unsigned int _x, unsigned int _y, bool WHITE) //Functio
         
     }
 
-    if(!(x + 1 > sizeX || y - 2 < 0)) //Check down 2, right 1
+    if((x + 1 <= sizeX && y - 2 >= 0)) //Check down 2, right 1
     {
         if(container[x + 1][y - 2].type == EMPTY)
         {
@@ -417,7 +450,7 @@ void board_t::findKnight(unsigned int _x, unsigned int _y, bool WHITE) //Functio
         
     }
 
-    if(!(x + 2 > sizeX || y - 1 < 0)) //Check down 1, right 2
+    if((x + 2 <= sizeX && y - 1 >= 0)) //Check down 1, right 2
     {
         if(container[x + 2][y - 1].type == EMPTY)
         {
@@ -449,20 +482,19 @@ void board_t::findBishop(unsigned int _x, unsigned int _y, bool WHITE) //Functio
     {
         while((y + temp) < sizeY && (x + temp) < sizeX) //While we haven't hit ceiling or wall...
         {   
-            std::cout<<x + temp<<" "<<y + temp<<std::endl;
+            ++temp;
             if(container[x + temp][y + temp].type == EMPTY) //If the tile is empty, add it to the moveable list
             {
                 container[x][y].moveable.push_back(std::make_pair(x + temp, y + temp));
             }
             else
             {
-                if( (container[x + temp][y + temp].type > WHITE_END && WHITE) ||(container[x + temp][y + temp].type <= WHITE_END && !WHITE)) //Check if piece is black
+                if( (container[x + temp][y + temp].type > WHITE_END && WHITE) || (container[x + temp][y + temp].type <= WHITE_END && !WHITE)) //Check if piece is black
                 {
                     container[x][y].attackable.push_back(std::make_pair(x + temp, y + temp)); //Add that to attackable list 
                 }
                 break; //Exit loop
             }
-            ++temp; //Add to x and y
         }
     }   
     temp = 0;
@@ -470,6 +502,7 @@ void board_t::findBishop(unsigned int _x, unsigned int _y, bool WHITE) //Functio
     {
         while(y + temp < sizeY && x - temp > 0) //While we haven't hit wall or ceiling...
         {
+            ++temp;
             if(container[x - temp][y + temp].type == EMPTY)
             {
                 container[x][y].moveable.push_back(std::make_pair(x - temp, y + temp)); //Add that square to moveable if it is empty
@@ -482,14 +515,14 @@ void board_t::findBishop(unsigned int _x, unsigned int _y, bool WHITE) //Functio
                 }
                 break;
             }
-            temp++;
         }   
     }
     temp = 0;
-    if(y != 0 && x != sizeX) //Check down and right next
+    if(y > 0 && x < sizeX) //Check down and right next
     {
         while(y - temp > 0 && x + temp < sizeX) //While we haven't hit wall or ceiling
         {
+            ++temp;
             if(container[x + temp][y - temp].type == EMPTY)
             {
                 container[x][y].moveable.push_back(std::make_pair(x + temp, y - temp)); //Add to moveable if the tile is empty
@@ -502,7 +535,6 @@ void board_t::findBishop(unsigned int _x, unsigned int _y, bool WHITE) //Functio
                 }
                 break;
             }
-            temp++;
         }
     }  
     temp = 0;
@@ -510,6 +542,7 @@ void board_t::findBishop(unsigned int _x, unsigned int _y, bool WHITE) //Functio
     {
         while(y - temp > 0 && x - temp > 0) //While we haven't hit floor or wall...
         {
+            ++temp;
             if(container[x - temp][y - temp].type == EMPTY)
             {
                 container[x][y].moveable.push_back(std::make_pair(x - temp, y - temp));
@@ -521,7 +554,6 @@ void board_t::findBishop(unsigned int _x, unsigned int _y, bool WHITE) //Functio
                     container[x][y].moveable.push_back(std::make_pair(x - temp, y - temp));
                 }
             }
-            temp++;
         }
     }
 
