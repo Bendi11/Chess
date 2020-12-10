@@ -1,6 +1,6 @@
 /*
 Chess by Benjamin L (Bendi11)
-Chess game made in SDL2
+Chess game made with C++
 Compile commands: 
 Windows: 
 g++ -o bin/Chess.exe src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -static-libgcc -mwindows icon.o
@@ -8,6 +8,7 @@ g++ -o bin/Chess.exe src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -lm
 Linux: 
 g++ -o bin/Chess src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -lSDL2main -lSDL2 -lSDL2_image -static-libgcc icon.o
 */
+
 #include "include/Chess.hpp"
 #include "include/render.hpp"
 
