@@ -33,8 +33,7 @@ namespace Chess
     {
     public:
         pMat container; //The object holding all pieces on the board
-        unsigned int counter; //How many turns the game has gone for
-        bool TURN = WHITE_TURN; //If it white or blacks turn
+        unsigned int counter = 1; //How many turns the game has gone for
         uint8_t WINNER = WINNER_NONE; //If white or black won
 
         /*Board size*/

@@ -26,6 +26,7 @@ int main(int argc, char** argv)
     {
         d.input(b);
         d.drawBoard(b);
+        std::cout<<b.counter<<std::endl;
         if(b.WINNER != WINNER_NONE)
         {
             if(b.WINNER == WINNER_WHITE)
