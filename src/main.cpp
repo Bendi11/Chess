@@ -18,10 +18,9 @@ int main(int argc, char** argv)
 {
     renderer::Drawer d;
     Chess::board_t b;
-    d.init(720, 720, b);
+    d.init(624, 624, b);
     while(d.running)
     {
-        SDL_Delay(100);
         for(unsigned x = 0; x < b.container.size(); ++x)
         {
             for(unsigned y = 0; y < b.container[0].size(); ++y)

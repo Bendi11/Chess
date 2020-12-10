@@ -193,7 +193,7 @@ void Drawer::input(Chess::board_t& Board)
             }
             else if(userIn.button.button == SDL_BUTTON_LEFT) //Left mouse attempts a move to the selected coordinate
             {
-                Board.move(storedX, storedY, mX, mY); //Try to move the piece
+                Board.playerMove(storedX, storedY, mX, mY, true); //Try to move the piece
             }
         }
     } 
