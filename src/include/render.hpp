@@ -8,33 +8,32 @@ namespace renderer
     {
     public: 
         /*SDL2 things*/
-        SDL_Window* win = NULL;
-        SDL_Renderer* render = NULL;
-        SDL_Event e;
+        SDL_Window* win = NULL; //SDL2 window object
+        SDL_Renderer* render = NULL; //SDL2 renderer used to draw textures onscreen
+        SDL_Event userIn; //Event object holding user inputted event queue
+
+        /*What dimensions the screen will be*/
         unsigned int SCREEN_WIDTH;
         unsigned int SCREEN_HEIGHT;
-        bool running = true;
+        bool running = true; //If the game is still running
 
+        /*The square that the user right clicked on*/
         unsigned int storedX = 0;
         unsigned int storedY = 0;
 
-        bool isMove = false;
-
+        /*A 2D matrix of textures, one for each grid square on the board*/
         std::vector<std::vector<SDL_Texture* > > textures; 
-        std::vector<std::vector<SDL_Texture* > > BGTextures;
-        std::vector<std::vector<SDL_Rect > > pos;
-        SDL_Rect size;
+        std::vector<std::vector<SDL_Texture* > > BGTextures; //Another 8x8 array of textures, these are for the background
+        std::vector<std::vector<SDL_Rect > > pos; //Position rectangles for each texture
+        SDL_Rect size; //We only need one size rectangle, all sprites are the same size
 
-        float scale; //How much to scale pieces for a cerain screen coords
+        float scale; //How much to scale pieces for a certain screen shape
 
-        //Textures for white and black squares of the chess board
-        SDL_Texture* whiteTexture = NULL;
-        SDL_Texture* blacktexture = NULL;
-
-        void init(unsigned int w, unsigned int h, Chess::board_t& Board);
-        void input(Chess::board_t& Board);
+        void init(unsigned int w, unsigned int h, Chess::board_t& Board); //Function to start SDL2 and init other values like BG textures
+        void input(Chess::board_t& Board); //Function to handle input
 
         void drawBoard(Chess::board_t& Board); //Function to draw all pieces on a chessboard
+        void assignTextures(Chess::board_t& Board, unsigned int x, unsigned int y); //Function to iterate through and assign the right texture to each piece on a board
     };
     
 }

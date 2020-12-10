@@ -25,7 +25,6 @@ namespace Chess
         piece_t(void) { type = EMPTY; }; //Default constructor is empty
     };
 
-
     typedef std::vector< std::vector< piece_t > > pMat; //2D matrix of pieces for the board
 
     class board_t //Board holding all pieces and functions for moving them

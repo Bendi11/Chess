@@ -5,6 +5,7 @@ update attackable squares, etc.
 #include "include/Chess.hpp"
 using namespace Chess;
 
+//Function to move any piece to any location, so long as the piece can attack / move there
 bool board_t::move(unsigned int x, unsigned int y, unsigned int moveX, unsigned int moveY)
 {
     findMoves(x, y); //Get moves of the selected piece
@@ -267,7 +268,7 @@ void board_t::findRook(unsigned int _x, unsigned int _y, bool WHITE) //Function 
     {
         while(y + temp > 0) //Go to floor
         {
-            --temp;
+            --temp; //Go lower
             if(container[x][y + temp].type == EMPTY) //Make sure it's empty
             {
                 container[x][y].moveable.push_back(std::make_pair(x, y + temp)); //Add this to moveable
@@ -569,17 +570,17 @@ void board_t::findKing(unsigned int _x, unsigned int _y, bool WHITE) //Function 
 
 
     //Check top 3 moves first
-    for(int i = -1; i < 3; ++i)
+    for(int i = -1; i < 2; ++i)
     {
-        if(!((x + i) > 0 || (x + i) < sizeX) || y + 1 < sizeY) //Make sure we aren't out of bounds
-        {
-            if(container[x + i][y + 1].type == EMPTY)
+        if( ( (x + i) >= 0 && (x + i) <= sizeX)  && (y + 1) <= sizeY) //Make sure we aren't out of bounds
+        { 
+            if(container[x + i][y + 1].type == EMPTY) //If the tile is empty...
             {
                 container[x][y].moveable.push_back(std::make_pair(x + i, y + 1)); //Add to movable list if it is empty
             }
             else
             {
-                if((container[x + i][y + 1].type > WHITE_END && WHITE) || (container[x + i][y + 1].type <= WHITE_END && !WHITE))
+                if((container[x + i][y + 1].type > WHITE_END && WHITE) || (container[x + i][y + 1].type <= WHITE_END && !WHITE)) //If the tile isn't empty but contains a color we aren't...
                 {
                     container[x][y].attackable.push_back(std::make_pair(x + i, y + 1)); //Add to attackable list if enemy
                 }
@@ -589,9 +590,9 @@ void board_t::findKing(unsigned int _x, unsigned int _y, bool WHITE) //Function 
     }
 
     //Check bottom 3 moves next
-    for(int i = -1; i < 3; ++i)
+    for(int i = -1; i < 2; ++i)
     {
-        if(!((x + i) > 0 || (x + i) < sizeX) || y - 1 > 0) //Make sure we aren't out of bounds
+        if( ( (x + i) >= 0 && (x + i) <= sizeX) && (y - 1) >= 0) //Make sure we aren't out of bounds
         {
             if(container[x + i][y +-1].type == EMPTY)
             {
@@ -609,7 +610,7 @@ void board_t::findKing(unsigned int _x, unsigned int _y, bool WHITE) //Function 
     }
 
     //Check left and right moves
-    if(x + 1 < sizeX)
+    if( (x + 1) <= sizeX)
     {
         if(container[x + 1][y].type == EMPTY)
         {
@@ -623,7 +624,7 @@ void board_t::findKing(unsigned int _x, unsigned int _y, bool WHITE) //Function 
             }
         }
     }
-    if(x - 1 > 0)
+    if( (x - 1) >= 0)
     {
         if(container[x - 1][y].type == EMPTY)
         {
