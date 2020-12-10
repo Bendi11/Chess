@@ -20,6 +20,7 @@ int main(int argc, char** argv)
     renderer::Drawer d;
     Chess::board_t b;
     d.init(624, 624, b);
+    bool gameover = false;
 
     while(d.running)
     {
@@ -30,12 +31,19 @@ int main(int argc, char** argv)
             if(b.WINNER == WINNER_WHITE)
             {
                 SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Chess", "You won by checkmate!", d.win);
+                gameover = true;
             }
             else
             {
                 SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Chess", "You lost by checkmate!", d.win);
+                gameover = true;
             }
             
+        }
+        if(gameover == true)
+        {
+            b.restart();
+            gameover = false;
         }
     }
 

@@ -12,7 +12,7 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
     findMoves();
 
     //Make sure the player is only controlling their pieces and that it is their turn and that nobody has won
-    if( ( (container[x][y].type > WHITE_END && !WHITE) || (container[x][y].type <= WHITE_END && WHITE)  ) && WINNER == WINNER_NONE && ( (WHITE && TURN == WHITE_TURN) || (!WHITE && TURN == BLACK_TURN) ) )
+    if( ( (container[x][y].type > WHITE_END && !WHITE) || (container[x][y].type <= WHITE_END && WHITE)  ) && WINNER == WINNER_NONE ) //UNCOMMENT FOR RELEASE //&& ( (WHITE && TURN == WHITE_TURN) || (!WHITE && TURN == BLACK_TURN) ) )
     {
         for(unsigned i = 0; i < container[x][y].moveable.size(); ++i) //Iterate through all of the moveable tiles of that piece
         {
@@ -76,9 +76,6 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
 
                 checkPromotion(moveX, moveY, WHITE); //Check if the piece can be promoted
 
-                if(WHITE) TURN = BLACK_TURN; //White made a move, blacks turn now
-                else TURN = WHITE_TURN; //Black made a move, now it is white's turn
-
                 rVal = MOVE_CAPTURED; //Return that the move captured a piece
             }
         }
@@ -86,8 +83,9 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
     }
     else rVal = MOVE_BAD; //Return move bad if the player tried to move a peice they don't control
 
-    if(WHITE) TURN = BLACK_TURN; //White made a move, blacks turn now
-    else TURN = WHITE_TURN; //Black made a move, now it is white's turn
+    //FOR RELEASE UNCOMMENT THIS
+    //if(WHITE) TURN = BLACK_TURN; //White made a move, blacks turn now
+    //else TURN = WHITE_TURN; //Black made a move, now it is white's turn
 
     bool foundWKing = false;
     bool foundBKing = false;
@@ -160,6 +158,51 @@ board_t::board_t()
     }
 }
 
+//Function to restart the chess game
+void board_t::restart()
+{
+    counter = 0; //How many turns the game has gone for
+    TURN = WHITE_TURN; //If it white or blacks turn
+    WINNER = WINNER_NONE; //If white or black won
+    unsigned int i; //Iterator variable
+
+    //Make the board empty
+    for(unsigned x = 0; x < 8; ++x)
+    {
+        for(unsigned y = 0; y < 8; ++y)
+        {
+            container[x][y] = piece_t(EMPTY);
+        }
+    }
+
+    //Start placing white pieces in their default locations
+    container[board_a][board_1] = piece_t(wROOK); //Place white rook at A1
+    container[board_b][board_1] = piece_t(wKNIGHT); //Place knight at B1
+    container[board_c][board_1] = piece_t(wBISHOP); //Place bishop at C1
+    container[board_d][board_1] = piece_t(wQUEEN); //Place queen at D1
+    container[board_e][board_1] = piece_t(wKING); //Place king at E1
+    container[board_f][board_1] = piece_t(wBISHOP); //Place bishop at F1
+    container[board_g][board_1] = piece_t(wKNIGHT); //Place knight at G1
+    container[board_h][board_1] = piece_t(wROOK); //Place rook at H1
+    for(i = 0; i < 8; ++i) //Place eight pawns
+    {
+        container[i][board_2] = piece_t(wPAWN);
+    }
+
+    //Start placing black pieces in their default locations
+    container[board_a][board_8] = piece_t(bROOK); //Place rook at A8
+    container[board_b][board_8] = piece_t(bKNIGHT); //Place knight at B8
+    container[board_c][board_8] = piece_t(bBISHOP); //Place bishop at C8
+    container[board_d][board_8] = piece_t(bQUEEN); //Place queen at D8
+    container[board_e][board_8] = piece_t(bKING); //Place king at E8
+    container[board_f][board_8] = piece_t(bBISHOP); //Place bishop at F8
+    container[board_g][board_8] = piece_t(bKNIGHT); //Place knight at G8
+    container[board_h][board_8] = piece_t(bROOK); //Place rook at H8
+    for(i = 0; i < 8; ++i) //Place eight pawns
+    {
+        container[i][board_7] = piece_t(bPAWN);
+    }
+}
 
 //Function to find where a piece can move on the board
 void board_t::findMoves()
@@ -717,6 +760,7 @@ void board_t::findKing(unsigned int _x, unsigned int _y, bool WHITE) //Function 
 
 void board_t::findCastle(bool WHITE) //Function to check for availible castles
 {
+    //Checking for white king castling
     if(WHITE)
     {
         //Checking for kingside castle
@@ -730,16 +774,17 @@ void board_t::findCastle(bool WHITE) //Function to check for availible castles
             container[board_e][board_1].moveable.push_back(std::make_pair<unsigned int, unsigned int>(board_c, board_1));
         }
     }
-
+    
+    //Checking for black king castling
     else
     {
         //Checking for kingside castle
-        if(container[board_e][board_8].type == wKING && container[board_e][board_8].hasMoved == false && container[board_f][board_8].type == EMPTY && container[board_g][board_8].type == EMPTY && container[board_h][board_8].type == wROOK && container[board_h][board_8].hasMoved == false)
+        if(container[board_e][board_8].type == bKING && container[board_e][board_8].hasMoved == false && container[board_f][board_8].type == EMPTY && container[board_g][board_8].type == EMPTY && container[board_h][board_8].type == bROOK && container[board_h][board_8].hasMoved == false)
         {
             container[board_e][board_8].moveable.push_back(std::make_pair<unsigned int, unsigned int>(board_g, board_8));
         }
         //Checking for queenside castle
-        if(container[board_e][board_8].type == wKING && container[board_e][board_8].hasMoved == false && container[board_d][board_8].type == EMPTY && container[board_c][board_8].type == EMPTY && container[board_b][board_8].type == EMPTY && container[board_a][board_8].type == wROOK && container[board_a][board_8].hasMoved == false)
+        if(container[board_e][board_8].type == bKING && container[board_e][board_8].hasMoved == false && container[board_d][board_8].type == EMPTY && container[board_c][board_8].type == EMPTY && container[board_b][board_8].type == EMPTY && container[board_a][board_8].type == bROOK && container[board_a][board_8].hasMoved == false)
         {
             container[board_e][board_1].moveable.push_back(std::make_pair<unsigned int, unsigned int>(board_c, board_8));
         }

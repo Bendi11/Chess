@@ -8,7 +8,7 @@ namespace renderer
     {
     public: 
         //TAKE THIS OUT, DEBUGGING
-        bool WHITEORBLACK;
+        bool WHITEORBLACK = true;
         bool turn = BLACK_TURN;
 
         /*SDL2 things*/

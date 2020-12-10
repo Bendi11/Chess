@@ -37,6 +37,7 @@ namespace Chess
         bool TURN = WHITE_TURN; //If it white or blacks turn
         uint8_t WINNER = WINNER_NONE; //If white or black won
 
+        /*Board size*/
         unsigned int sizeX = 7;
         unsigned int sizeY = 7;
 
@@ -44,6 +45,7 @@ namespace Chess
 
         board_t(void); //One constructor for making a default chess board
         board_t(unsigned int w, unsigned int h); //Function for making a variable height and width grid
+        void restart(); //Function to replace all pieces in the right places
 
         uint8_t move(unsigned int x, unsigned int y, unsigned int moveX, unsigned int moveY); //Function to move a piece from one spot to another
         void findMoves(); //Function to find which tiles a certain piece can move to
