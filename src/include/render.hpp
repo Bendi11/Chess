@@ -13,7 +13,7 @@ namespace renderer
         SDL_Event userIn; //Event object holding user inputted event queue
         SDL_AudioDeviceID audioDevice; //The audio device we'll be playing sound effects to
 
-        bool USING_SOUND = true;
+        bool USING_SOUND = true; //If we should use sound effects
         SDL_AudioSpec wavSpec; //The audio specification for sound effects, .WAV in this case
         Uint32 wavLength; //How long the sound effect is
         uint8_t *wavBuffer; //Buffer for the sound effect
@@ -26,6 +26,8 @@ namespace renderer
         /*The square that the user right clicked on*/
         unsigned int storedX = 0;
         unsigned int storedY = 0;
+        bool isDragging = false; //If the user is clicking and holding to drag and drop
+        SDL_Rect mouseRect; //Mouse position rectangle for drawing a sprite on where the mouse is
 
         /*A 2D matrix of textures, one for each grid square on the board*/
         std::vector<std::vector<SDL_Texture* > > textures; 
