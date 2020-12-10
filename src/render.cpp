@@ -79,7 +79,7 @@ void Drawer::init(unsigned int w, unsigned int h, Chess::board_t& Board)
     scale = (float)SCREEN_WIDTH / (8.0f * 77.0f); //Get how much to scale sprites in order to fit them to the screen
 
     /*Make sure that SDL init goes well*/
-    if(SDL_Init(SDL_INIT_VIDEO))
+    if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO))
     {
         exit(EXIT_FAILURE); //Exit the program if SDL2 couldn't init
     }
@@ -93,6 +93,13 @@ void Drawer::init(unsigned int w, unsigned int h, Chess::board_t& Board)
     }
 
     render = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED); //Make a renderer for SDL2 associated with the window
+
+    SDL_LoadWAV("assets/sounds/move.wav", &wavSpec, &wavBuffer, &wavLength); //Load a sound effect to populate the specification for WAV data
+    if( (audioDevice = SDL_OpenAudio(&wavSpec, NULL) ) < 0) //Open the desired audio device
+    {
+        USING_SOUND = false; //Just don't play sound effects if there was an error with opening an audio device
+    }
+    SDL_PauseAudio(0); //Enable sound playback
 
     /*SDL2 init done!*/
 
@@ -199,7 +206,19 @@ void Drawer::input(Chess::board_t& Board)
             }
             else if(userIn.button.button == SDL_BUTTON_LEFT) //Left mouse attempts a move to the selected coordinate
             {
-                Board.playerMove(storedX, storedY, mX, mY, true); //Try to move the piece
+                uint8_t success; //Store the move's outcome in success variable
+                success = Board.playerMove(storedX, storedY, mX, mY, true); //Get wether the move failed, completed, or captured a piece
+                //playerMove returns 2 if the move captured something, or 1 if it was successful, so play a sound effect based on this
+                if(success == 1) 
+                {
+                    SDL_LoadWAV("assets/sounds/move.wav", &wavSpec, &wavBuffer, &wavLength); //Load the move sound effect
+                    SDL_QueueAudio(audioDevice, wavBuffer, wavLength); //Play the sound effect for moving
+                }
+                else if(success == 2)
+                {
+                    SDL_LoadWAV("assets/sounds/capture.wav", &wavSpec, &wavBuffer, &wavLength); //Load the capture sound effect
+                    SDL_QueueAudio(audioDevice, wavBuffer, wavLength); //Play the sound effect for capturing a piece
+                }
             }
         }
     } 

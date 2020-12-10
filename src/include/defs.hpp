@@ -2,9 +2,14 @@
 #define PIECE_X 77
 #define PIECE_Y 77
 
-#define EMPTY 0
+#define MOVE_BAD 0
+#define MOVE_GOOD 1
+#define MOVE_CAPTURED 2
 
 //--------------------CHESS PIECE DEFINITIONS--------------------//
+
+#define EMPTY 0
+
 #define wPAWN 1
 #define wKNIGHT 2
 #define wBISHOP 3

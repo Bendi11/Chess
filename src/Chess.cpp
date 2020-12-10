@@ -6,7 +6,7 @@ update attackable squares, etc.
 using namespace Chess;
 
 //Function to move any piece to any location, so long as the piece can attack / move there
-bool board_t::move(unsigned int x, unsigned int y, unsigned int moveX, unsigned int moveY)
+uint8_t board_t::move(unsigned int x, unsigned int y, unsigned int moveX, unsigned int moveY)
 {
     findMoves(x, y); //Get moves of the selected piece
     for(unsigned i = 0; i < container[x][y].moveable.size(); ++i) //Iterate through all of the moveable tiles of that piece
@@ -15,7 +15,7 @@ bool board_t::move(unsigned int x, unsigned int y, unsigned int moveX, unsigned 
         {  
             container[moveX][moveY] = container[x][y].type; //Assign  the moving square's type as the moved piece
             container[x][y].type = EMPTY; //Make the old location empty
-            return true;
+            return MOVE_GOOD; //Return that the move was good
         }
     }
     //Now go through all attackable tiles and see if one matches
@@ -25,14 +25,14 @@ bool board_t::move(unsigned int x, unsigned int y, unsigned int moveX, unsigned 
         {
             container[moveX][moveY] = container[x][y].type; //Assign  the moving square's type as the moved piece
             container[x][y].type = EMPTY; //Make the old location empty
-            return true;
+            return MOVE_CAPTURED; //Return that the move captured a piece
         }
     }
-    return false;
+    return MOVE_BAD; //Return that the move failed
 }
 
 //Function to only allow player to move their pieces
-bool board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, unsigned int moveY, bool WHITE)
+uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, unsigned int moveY, bool WHITE)
 {
     //Make sure the player is only controlling their pieces
     if( (container[x][y].type > WHITE_END && !WHITE) || (container[x][y].type <= WHITE_END && WHITE))
@@ -44,7 +44,7 @@ bool board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, uns
             {  
                 container[moveX][moveY] = container[x][y].type; //Assign  the moving square's type as the moved piece
                 container[x][y].type = EMPTY; //Make the old location empty
-                return true;
+                return MOVE_GOOD; //Return that the move was good
             }
         }
         //Now go through all attackable tiles and see if one matches
@@ -54,12 +54,12 @@ bool board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, uns
             {
                 container[moveX][moveY] = container[x][y].type; //Assign  the moving square's type as the moved piece
                 container[x][y].type = EMPTY; //Make the old location empty
-                return true;
+                return MOVE_CAPTURED; //Return that the move captured a piece
             }
         }
-        return false;
+        return MOVE_BAD; //Return move didn't work if the piece couldn't move
     }
-    else return false;
+    else return MOVE_BAD; //Return move bad if the player tried to move a peice they don't control
 }
 
 //Function to init a piece with position and type

@@ -11,6 +11,12 @@ namespace renderer
         SDL_Window* win = NULL; //SDL2 window object
         SDL_Renderer* render = NULL; //SDL2 renderer used to draw textures onscreen
         SDL_Event userIn; //Event object holding user inputted event queue
+        SDL_AudioDeviceID audioDevice = NULL; //The audio device we'll be playing sound effects to
+
+        bool USING_SOUND = true;
+        SDL_AudioSpec wavSpec; //The audio specification for sound effects, .WAV in this case
+        Uint32 wavLength; //How long the sound effect is
+        uint8_t *wavBuffer; //Buffer for the sound effect
 
         /*What dimensions the screen will be*/
         unsigned int SCREEN_WIDTH;
