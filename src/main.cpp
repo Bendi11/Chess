@@ -25,6 +25,18 @@ int main(int argc, char** argv)
     {
         d.input(b);
         d.drawBoard(b);
+        if(b.WINNER != WINNER_NONE)
+        {
+            if(b.WINNER == WINNER_WHITE)
+            {
+                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Chess", "You won by checkmate!", d.win);
+            }
+            else
+            {
+                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Chess", "You lost by checkmate!", d.win);
+            }
+            
+        }
     }
 
     SDL_DestroyRenderer(d.render);

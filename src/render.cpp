@@ -8,66 +8,63 @@ using namespace renderer;
 //Function to assign right textures to each piece on a board
 void Drawer::assignTextures(Chess::board_t& Board, unsigned int x, unsigned int y)
 {
-    SDL_DestroyTexture(textures[x][y]); //Delete this texture because it will be replaced
-    SDL_Surface* temp = NULL; //Temp surface for loading the texture
+    //SDL_DestroyTexture(textures[x][y]); //Delete this texture because it will be replaced
     /*Assign a texture*/
     switch(Board.container[x][y].type)
     {
         case wPAWN:
-            temp = IMG_Load("assets/wPawn.png");
+            textures[x][y] = textureList[wPAWN];
         break;
 
         case bPAWN:
-            temp =  IMG_Load("assets/bPawn.png");
+            textures[x][y] = textureList[bPAWN];
         break;
 
         case wROOK:
-            temp = IMG_Load("assets/wRook.png");
+            textures[x][y] = textureList[wROOK];
         break;
 
         case bROOK:
-            temp =  IMG_Load("assets/bRook.png");
+            textures[x][y] = textureList[bROOK];
         break;
 
         case wBISHOP:
-            temp =  IMG_Load("assets/wBishop.png");
+            textures[x][y] = textureList[wBISHOP];
         break;
 
         case bBISHOP:
-            temp = IMG_Load("assets/bBishop.png");
+            textures[x][y] = textureList[bBISHOP];
         break;
 
         case wKNIGHT:
-            temp = IMG_Load("assets/wKnight.png");
+            textures[x][y] = textureList[wKNIGHT];
         break;
 
         case bKNIGHT:
-            temp = IMG_Load("assets/bKnight.png");
+            textures[x][y] = textureList[bKNIGHT];
         break;
 
         case wKING:
-            temp = IMG_Load("assets/wKing.png");
+            textures[x][y] = textureList[wKING];
         break;
 
         case bKING:
-            temp = IMG_Load("assets/bKing.png");
+            textures[x][y] = textureList[bKING];
         break;
 
         case wQUEEN:
-            temp = IMG_Load("assets/wQueen.png");
+            textures[x][y] = textureList[wQUEEN];
         break;
 
         case bQUEEN:
-            temp = IMG_Load("assets/bQueen.png");
+            textures[x][y] = textureList[bQUEEN];
         break;
 
         case EMPTY:
-
+            textures[x][y] = NULL;
         break;
     }
-
-    textures[x][y] = SDL_CreateTextureFromSurface(render, temp); //Make a texture from the surface
-    SDL_FreeSurface(temp); //Clear the surface to avoid ANOTHER FR*GGING MEMORY LEAK
+    
 }
 
 void Drawer::init(unsigned int w, unsigned int h, Chess::board_t& Board)
@@ -117,8 +114,50 @@ void Drawer::init(unsigned int w, unsigned int h, Chess::board_t& Board)
 
     /*Resize all matrices to be 8x8, matching the chess board*/
     textures.resize(8);
+    textureList.resize(14); //12 pieces + 2 BG tiles
     pos.resize(8);
     BGTextures.resize(8);
+
+    SDL_Surface* temp;
+    temp = IMG_Load("assets/wPawn.png");
+    textureList[wPAWN] = SDL_CreateTextureFromSurface(render, temp); //Make a texture from the surface
+
+    temp = IMG_Load("assets/wKnight.png");
+    textureList[wKNIGHT] = SDL_CreateTextureFromSurface(render, temp); //Make a texture from the surface
+
+    temp = IMG_Load("assets/wBishop.png");
+    textureList[wBISHOP] = SDL_CreateTextureFromSurface(render, temp); //Make a texture from the surface
+
+    temp = IMG_Load("assets/wRook.png");
+    textureList[wROOK] = SDL_CreateTextureFromSurface(render, temp); //Make a texture from the surface
+
+    temp = IMG_Load("assets/wking.png");
+    textureList[wKING] = SDL_CreateTextureFromSurface(render, temp); //Make a texture from the surface
+
+    temp = IMG_Load("assets/wQueen.png");
+    textureList[wQUEEN] = SDL_CreateTextureFromSurface(render, temp); //Make a texture from the surface
+
+
+    temp = IMG_Load("assets/bPawn.png");
+    textureList[bPAWN] = SDL_CreateTextureFromSurface(render, temp); //Make a texture from the surface
+
+    temp = IMG_Load("assets/bKnight.png");
+    textureList[bKNIGHT] = SDL_CreateTextureFromSurface(render, temp); //Make a texture from the surface
+
+    temp = IMG_Load("assets/bBishop.png");
+    textureList[bBISHOP] = SDL_CreateTextureFromSurface(render, temp); //Make a texture from the surface
+
+    temp = IMG_Load("assets/bRook.png");
+    textureList[bROOK] = SDL_CreateTextureFromSurface(render, temp); //Make a texture from the surface
+
+    temp = IMG_Load("assets/bking.png");
+    textureList[bKING] = SDL_CreateTextureFromSurface(render, temp); //Make a texture from the surface
+
+    temp = IMG_Load("assets/bQueen.png");
+    textureList[bQUEEN] = SDL_CreateTextureFromSurface(render, temp); //Make a texture from the surface
+
+    SDL_FreeSurface(temp);
+
 
     for(unsigned x = 0; x < 8; ++x)
     {
@@ -172,11 +211,14 @@ void Drawer::drawBoard(Chess::board_t& Board)
     {
         for(unsigned y = 0; y < 8; ++y)
         {
+            //Only update textures when a turn happens, and something changes
+
             assignTextures(Board, x, y); //Assign the correct texture to this coordinate
             SDL_RenderCopy(render, BGTextures[x][y], &size, &pos[x][y]); //Add the background texture 
             SDL_RenderCopy(render, textures[x][y], &size, &pos[x][y]); //Draw the piece texture over it 
         }
     }
+    SDL_Delay(13);
     if(isDragging) SDL_RenderCopy(render, textures[storedX][storedY], &size, &mouseRect);
     SDL_RenderPresent(render);
 }
@@ -185,6 +227,11 @@ void Drawer::input(Chess::board_t& Board)
 {
     while(SDL_PollEvent(&userIn)) //Poll through the queue of inputted events
     {
+        if(userIn.type == SDL_KEYUP && userIn.key.keysym.sym == SDLK_t)
+        {
+            if(WHITEORBLACK) WHITEORBLACK = false;
+            else WHITEORBLACK = true;
+        }
         //Exit the program if the inputted event was to quit
         if(userIn.type == SDL_QUIT) 
         {
@@ -229,7 +276,7 @@ void Drawer::input(Chess::board_t& Board)
             mY =   -(mY - 7); //Y coords need to be reversed because I am not a smart person
 
             uint8_t success; //Store the move's outcome in success variable
-            success = Board.playerMove(storedX, storedY, mX, mY, true); //Get wether the move failed, completed, or captured a piece
+            success = Board.playerMove(storedX, storedY, mX, mY, WHITEORBLACK); //Get wether the move failed, completed, or captured a piece
 
             //playerMove returns 2 if the move captured something, or 1 if it was successful, so play a sound effect based on this
             if(success == MOVE_GOOD) //If the move completed

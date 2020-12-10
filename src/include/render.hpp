@@ -7,6 +7,10 @@ namespace renderer
     class Drawer
     {
     public: 
+        //TAKE THIS OUT, DEBUGGING
+        bool WHITEORBLACK;
+        bool turn = BLACK_TURN;
+
         /*SDL2 things*/
         SDL_Window* win = NULL; //SDL2 window object
         SDL_Renderer* render = NULL; //SDL2 renderer used to draw textures onscreen
@@ -31,6 +35,7 @@ namespace renderer
         SDL_Texture* draggedTexture; //The texture the mouse is dragging
 
         /*A 2D matrix of textures, one for each grid square on the board*/
+        std::vector<SDL_Texture* > textureList; //List of all loaded textures on the board
         std::vector<std::vector<SDL_Texture* > > textures; 
         std::vector<std::vector<SDL_Texture* > > BGTextures; //Another 8x8 array of textures, these are for the background
         std::vector<std::vector<SDL_Rect > > pos; //Position rectangles for each texture
