@@ -35,6 +35,7 @@ namespace Chess
         pMat container; //The object holding all pieces on the board
         unsigned int counter; //How many turns the game has gone for
         bool TURN; //If it white or blacks turn
+        uint8_t WINNER = WINNER_NONE; //If white or black won
 
         unsigned int sizeX = 7;
         unsigned int sizeY = 7;
@@ -45,7 +46,7 @@ namespace Chess
         board_t(unsigned int w, unsigned int h); //Function for making a variable height and width grid
 
         uint8_t move(unsigned int x, unsigned int y, unsigned int moveX, unsigned int moveY); //Function to move a piece from one spot to another
-        void findMoves(unsigned int x, unsigned int y); //Function to find which tiles a certain piece can move to
+        void findMoves(); //Function to find which tiles a certain piece can move to
         uint8_t playerMove(unsigned int x, unsigned int y, unsigned int moveX, unsigned int moveY, bool WHITE); //Function to allow player to move only their pieces
 
         //Functions for finding moves for each type of piece
@@ -59,6 +60,7 @@ namespace Chess
         void findBishop(unsigned int x, unsigned int y, bool WHITE); //Function to find black or white bishop's moves
 
         void findKing(unsigned int x, unsigned int y, bool WHITE); //Function to find black or white king's moves
+        void findCastle(bool WHITE); //Function to check for possible castles
 
         void findQueen(unsigned int x, unsigned int y, bool WHITE); //Function to find black or white queen's moves
 

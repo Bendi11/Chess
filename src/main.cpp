@@ -23,13 +23,6 @@ int main(int argc, char** argv)
 
     while(d.running)
     {
-        for(unsigned x = 0; x < b.container.size(); ++x)
-        {
-            for(unsigned y = 0; y < b.container[0].size(); ++y)
-            {
-                b.findMoves(x, y);
-            }
-        }
         d.input(b);
         d.drawBoard(b);
     }

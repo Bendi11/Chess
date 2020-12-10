@@ -5,52 +5,65 @@ update attackable squares, etc.
 #include "include/Chess.hpp"
 using namespace Chess;
 
-//Function to move any piece to any location, so long as the piece can attack / move there
-uint8_t board_t::move(unsigned int x, unsigned int y, unsigned int moveX, unsigned int moveY)
-{
-    findMoves(x, y); //Get moves of the selected piece
-    for(unsigned i = 0; i < container[x][y].moveable.size(); ++i) //Iterate through all of the moveable tiles of that piece
-    {
-        if(container[x][y].moveable[i] == std::make_pair(moveX, moveY) ) //If the moveable tiles contains the desired move, move the piece
-        {  
-            container[moveX][moveY] = piece_t(container[x][y].type, true); //Assign  the moving square's type as the moved piece
-            container[x][y] = piece_t(EMPTY, true); //Make the old location empty
-            return MOVE_GOOD; //Return that the move was good
-        }
-    }
-    //Now go through all attackable tiles and see if one matches
-    for(unsigned n = 0; n < container[x][y].attackable.size(); ++n)
-    {
-        if(container[x][y].attackable[n] == std::make_pair(moveX, moveY))
-        {
-            container[moveX][moveY] = piece_t(container[x][y].type, true); //Assign  the moving square's type as the moved piece
-            container[x][y] = piece_t(EMPTY, true); //Make the old location empty
-            return MOVE_CAPTURED; //Return that the move captured a piece
-        }
-    }
-    return MOVE_BAD; //Return that the move failed
-}
-
 //Function to only allow player to move their pieces
 uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, unsigned int moveY, bool WHITE)
 {
-    //Make sure the player is only controlling their pieces
-    if( (container[x][y].type > WHITE_END && !WHITE) || (container[x][y].type <= WHITE_END && WHITE))
+    uint8_t rVal; //Return value
+    findMoves();
+
+    //Make sure the player is only controlling their pieces and that it is their turn and that nobody has won
+    if( ( (container[x][y].type > WHITE_END && !WHITE) || (container[x][y].type <= WHITE_END && WHITE)  ) && WINNER == WINNER_NONE && (WHITE && TURN == WHITE_TURN) && (!WHITE && TURN == BLACK_TURN))
     {
-        findMoves(x, y); //Get moves of the selected piece
         for(unsigned i = 0; i < container[x][y].moveable.size(); ++i) //Iterate through all of the moveable tiles of that piece
         {
             if(container[x][y].moveable[i] == std::make_pair(moveX, moveY) ) //If the moveable tiles contains the desired move, move the piece
             {  
+                //Checking if the white king is castling
+                if(container[x][y].type == wKING && container[x][y].hasMoved == false)
+                {
+                    //Checking for kingside castle
+                    if(moveX == board_g && moveY == board_1)
+                    {
+                        //Move the rook if the king is castling
+                        container[board_f][board_1] = piece_t(container[board_h][board_1].type, true);
+                        container[board_h][board_1] = piece_t(EMPTY, true);
+                    }
+                    else if(moveX == board_c && moveY == board_1)
+                    {
+                        //Move the rook if the king is castling
+                        container[board_d][board_1] = piece_t(container[board_a][board_1].type, true);
+                        container[board_a][board_1] = piece_t(EMPTY, true);
+                    }
+                    
+                }
+
+                //Checking if the black king is castling
+                if(container[x][y].type == bKING && container[x][y].hasMoved == false)
+                {
+                    //Checking for kingside castle
+                    if(moveX == board_g && moveY == board_8)
+                    {
+                        //Move the rook if the king is castling
+                        container[board_f][board_8] = piece_t(container[board_h][board_8].type, true);
+                        container[board_h][board_8] = piece_t(EMPTY, true);
+                    }
+                    else if(moveX == board_c && moveY == board_8)
+                    {
+                        //Move the rook if the king is castling
+                        container[board_d][board_8] = piece_t(container[board_a][board_8].type, true);
+                        container[board_a][board_8] = piece_t(EMPTY, true);
+                    }
+                    
+                }
+                
                 container[moveX][moveY] = piece_t(container[x][y].type, true); //Assign  the moving square's type as the moved piece
                 container[x][y] = piece_t(EMPTY, true); //Make the old location empty
 
                 checkPromotion(moveX, moveY, WHITE); //Check if the piece can be promoted
 
-                if(WHITE) TURN = BLACK_TURN; //White made a move, blacks turn now
-                else TURN = WHITE_TURN; //Black made a move, now it is white's turn
+                
 
-                return MOVE_GOOD; //Return that the move was good
+                rVal =  MOVE_GOOD; //Return that the move was good
             }
         }
         //Now go through all attackable tiles and see if one matches
@@ -66,12 +79,31 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
                 if(WHITE) TURN = BLACK_TURN; //White made a move, blacks turn now
                 else TURN = WHITE_TURN; //Black made a move, now it is white's turn
 
-                return MOVE_CAPTURED; //Return that the move captured a piece
+                rVal = MOVE_CAPTURED; //Return that the move captured a piece
             }
         }
-        return MOVE_BAD; //Return move didn't work if the piece couldn't move
+        rVal = MOVE_BAD; //Return move didn't work if the piece couldn't move
     }
-    else return MOVE_BAD; //Return move bad if the player tried to move a peice they don't control
+    else rVal = MOVE_BAD; //Return move bad if the player tried to move a peice they don't control
+
+    if(WHITE) TURN = BLACK_TURN; //White made a move, blacks turn now
+    else TURN = WHITE_TURN; //Black made a move, now it is white's turn
+
+    bool foundWKing = false;
+    bool foundBKing = false;
+
+    for(unsigned __x = 0; __x < 8; ++__x)
+    {
+        for(unsigned __y = 0; __y < 8; ++__y)
+        {
+            if(container[__x][__y].type == wKING) foundWKing = true;
+            else if(container[__x][__y].type == bKING) foundBKing = true;
+        }
+    }
+    if(!foundWKing) WINNER = WINNER_BLACK;
+    if(!foundBKing) WINNER = WINNER_WHITE;
+
+    return rVal;
 }
 
 //Function to init a piece with position and type
@@ -130,76 +162,80 @@ board_t::board_t()
 
 
 //Function to find where a piece can move on the board
-void board_t::findMoves(unsigned int x, unsigned int y)
+void board_t::findMoves()
 {
-    //Make sure we're not trying to check a pawn that doesn't exist
-    if(x > container.size() || y > container[0].size())
+    for(unsigned x = 0; x < 8; ++x)
     {
-        return;
+        for(unsigned y = 0; y < 8; ++y)
+        {
+            container[x][y].moveable.clear(); //Clear the current moveable tiles
+            container[x][y].attackable.clear(); //Clear attackable tiles
+
+            //Different piece types can move in different ways
+            switch(container[x][y].type)
+            {
+                case wPAWN:
+                    findPawn(x, y, true); //Find white pawn moves
+                break;
+
+                case bPAWN:
+                    findPawn(x, y, false); //Find black pawn moves
+                break;
+
+                //White rooks can attack black pieces in all four directions
+                case wROOK:
+                    findRook(x, y, true); //Find white rook moves
+                break;
+
+                //Black rooks can attack black pieces in all four directions
+                case bROOK:
+                    findRook(x, y, false); //Find black rook moves
+                break;
+
+                //Bishops can attack in all four diagonals
+                case wBISHOP:
+                    findBishop(x, y, true); //Find white bishop moves
+                break;
+
+                case bBISHOP:
+                    findBishop(x, y, false); //Find black bishop moves
+                break;
+
+                case wKNIGHT:
+                    findKnight(x, y, true); //Find white knight moves
+                break;
+
+                case bKNIGHT:
+                    findKnight(x, y, false); //Find black knight moves
+                break;
+
+                case wKING:
+                    findKing(x, y, true); //Find white king moves
+                    findCastle(true); //Find white castles
+                break;
+
+                case bKING:
+                    findKing(x, y, false); //Find black king moves
+                    findCastle(false); //Find black castles
+                break;
+
+                case wQUEEN:
+                    findQueen(x, y, true); //Find white queen moves
+                break;
+
+                case bQUEEN:
+                    findQueen(x, y, false); //Find black queen moves
+                break;
+
+                case EMPTY:
+
+                break;
+
+            }
+        }
     }
 
-    container[x][y].moveable.clear(); //Clear the current moveable tiles
-    container[x][y].attackable.clear(); //Clear attackable tiles
-
-    //Different piece types can move in different ways
-    switch(container[x][y].type)
-    {
-        case wPAWN:
-            findPawn(x, y, true); //Find white pawn moves
-        break;
-
-        case bPAWN:
-            findPawn(x, y, false); //Find black pawn moves
-        break;
-
-        //White rooks can attack black pieces in all four directions
-        case wROOK:
-            findRook(x, y, true); //Find white rook moves
-        break;
-
-         //Black rooks can attack black pieces in all four directions
-        case bROOK:
-            findRook(x, y, false); //Find black rook moves
-        break;
-
-        //Bishops can attack in all four diagonals
-        case wBISHOP:
-            findBishop(x, y, true); //Find white bishop moves
-        break;
-
-        case bBISHOP:
-            findBishop(x, y, false); //Find black bishop moves
-        break;
-
-        case wKNIGHT:
-            findKnight(x, y, true); //Find white knight moves
-        break;
-
-        case bKNIGHT:
-            findKnight(x, y, false); //Find black knight moves
-        break;
-
-        case wKING:
-            findKing(x, y, true); //Find white king moves
-        break;
-
-        case bKING:
-            findKing(x, y, false); //Find black king moves
-        break;
-
-        case wQUEEN:
-            findQueen(x, y, true); //Find white queen moves
-        break;
-
-        case bQUEEN:
-            findQueen(x, y, false); //Find black queen moves
-        break;
-
-        case EMPTY:
-
-        break;
-
-    }
+    
 }
 
 
@@ -675,6 +711,37 @@ void board_t::findKing(unsigned int _x, unsigned int _y, bool WHITE) //Function 
             {
                 container[x][y].attackable.push_back(std::make_pair(x - 1, y)); //Add to attackable list if enemy
             }
+        }
+    }
+}
+
+void board_t::findCastle(bool WHITE) //Function to check for availible castles
+{
+    if(WHITE)
+    {
+        //Checking for kingside castle
+        if(container[board_e][board_1].type == wKING && container[board_e][board_1].hasMoved == false && container[board_f][board_1].type == EMPTY && container[board_g][board_1].type == EMPTY && container[board_h][board_1].type == wROOK && container[board_h][board_1].hasMoved == false)
+        {
+            container[board_e][board_1].moveable.push_back(std::make_pair<unsigned int, unsigned int>(board_g, board_1));
+        }
+        //Checking for queenside castle
+        if(container[board_e][board_1].type == wKING && container[board_e][board_1].hasMoved == false && container[board_d][board_1].type == EMPTY && container[board_c][board_1].type == EMPTY && container[board_b][board_1].type == EMPTY && container[board_a][board_1].type == wROOK && container[board_a][board_1].hasMoved == false)
+        {
+            container[board_e][board_1].moveable.push_back(std::make_pair<unsigned int, unsigned int>(board_c, board_1));
+        }
+    }
+
+    else
+    {
+        //Checking for kingside castle
+        if(container[board_e][board_8].type == wKING && container[board_e][board_8].hasMoved == false && container[board_f][board_8].type == EMPTY && container[board_g][board_8].type == EMPTY && container[board_h][board_8].type == wROOK && container[board_h][board_8].hasMoved == false)
+        {
+            container[board_e][board_8].moveable.push_back(std::make_pair<unsigned int, unsigned int>(board_g, board_8));
+        }
+        //Checking for queenside castle
+        if(container[board_e][board_8].type == wKING && container[board_e][board_8].hasMoved == false && container[board_d][board_8].type == EMPTY && container[board_c][board_8].type == EMPTY && container[board_b][board_8].type == EMPTY && container[board_a][board_8].type == wROOK && container[board_a][board_8].hasMoved == false)
+        {
+            container[board_e][board_1].moveable.push_back(std::make_pair<unsigned int, unsigned int>(board_c, board_8));
         }
     }
 }

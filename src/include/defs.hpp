@@ -9,6 +9,10 @@
 #define WHITE_TURN true
 #define BLACK_TURN false
 
+#define WINNER_NONE 0
+#define WINNER_WHITE 1
+#define WINNER_BLACK 2
+
 //--------------------CHESS PIECE DEFINITIONS--------------------//
 
 #define EMPTY 0
