@@ -12,7 +12,7 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
     findMoves();
 
     //Make sure the player is only controlling their pieces and that it is their turn and that nobody has won
-    if( ( (container[x][y].type > WHITE_END && !WHITE) || (container[x][y].type <= WHITE_END && WHITE)  ) && WINNER == WINNER_NONE ) //UNCOMMENT FOR RELEASE //&& ( (WHITE && TURN == WHITE_TURN) || (!WHITE && TURN == BLACK_TURN) ) )
+    if( ( ( (container[x][y].type > WHITE_END && !WHITE) || (container[x][y].type <= WHITE_END && WHITE)  ) && WINNER == WINNER_NONE ) && ( (WHITE && TURN == WHITE_TURN) || (!WHITE && TURN == BLACK_TURN) ) )
     {
         for(unsigned i = 0; i < container[x][y].moveable.size(); ++i) //Iterate through all of the moveable tiles of that piece
         {
@@ -84,8 +84,8 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
     else rVal = MOVE_BAD; //Return move bad if the player tried to move a peice they don't control
 
     //FOR RELEASE UNCOMMENT THIS
-    //if(WHITE) TURN = BLACK_TURN; //White made a move, blacks turn now
-    //else TURN = WHITE_TURN; //Black made a move, now it is white's turn
+    if(WHITE) TURN = BLACK_TURN; //White made a move, blacks turn now
+    else TURN = WHITE_TURN; //Black made a move, now it is white's turn
 
     bool foundWKing = false;
     bool foundBKing = false;
