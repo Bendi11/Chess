@@ -23,6 +23,7 @@ std::string makeMoveString(unsigned int x, unsigned int y, unsigned int mX, unsi
     moveString.append(std::to_string(mX));
     moveString.append(",");
     moveString.append(std::to_string(mY));
+    moveString.append("\n");
 
     return moveString;
 

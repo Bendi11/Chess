@@ -3,7 +3,7 @@ Chess by Benjamin L (Bendi11)
 Chess game made with C++
 Compile commands: 
 Windows: 
-g++ -o bin/Chess.exe src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -IE:/asio-1.18.0/include -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -static-libgcc -static-libstdc++ -mwindows icon.o
+g++ -o bin/Chess.exe src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -IE:/boost_1_74_0 -IE:/asio-1.18.0/include -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -static-libgcc -static-libstdc++ -mwindows icon.o
 
 Linux: 
 g++ -o bin/Chess src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -lSDL2main -lSDL2 -lSDL2_image -static-libgcc -static-libstdc++ icon.o
@@ -11,23 +11,63 @@ g++ -o bin/Chess src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -lSDL2m
 
 #include "include/Chess.hpp"
 #include "include/render.hpp"
+#include <thread>
 #include <asio.hpp>
+#include <iostream>
 
 #include <fstream>
 
 using asio::ip::tcp;
+
 asio::io_context ioContext;
 
 std::string storedBMove;
 std::string storedWMove;
+unsigned int myCounter = 1;
+std::string received;
+Chess::board_t b;
+tcp::acceptor servAccept(ioContext, tcp::endpoint(tcp::v4(), 8080)); //Server request acceptor   
 
-bool server = false;
 
-std::string make_daytime_string()
+
+bool server = true;
+bool isWhite = true;
+bool receivedMessage = false;
+
+//Function to be run in parallel with the game logic to check for messages being sent
+void netThread()
 {
-  using namespace std; // For time_t, time and ctime;
-  time_t now = time(0);
-  return ctime(&now);
+
+    for(;;)
+    {
+        if(server)
+        {
+            
+            asio::error_code error;
+            char buf[128];   
+            for(;;)
+            {
+                
+
+                //asio::read(socket, asio::buffer(buf));
+                if(buf[0] != '\0') 
+                {
+                    std::cout<<buf<<std::endl;
+                    //W:1,2->1,1
+                    if(!isWhite)
+                    {
+                        b.playerMove(buf[2] - '0', buf[4] - '0', buf[7] - '0', buf[9] - '0', true);
+                    }
+                    else
+                    {
+                        b.playerMove(buf[2] - '0', buf[4] - '0', buf[7] - '0', buf[9] - '0', false);
+                    }
+                    
+                }
+            }     
+            
+        }
+    }
 }
 
 //Function to show a message box asking for client / server socket connection
@@ -67,81 +107,47 @@ void showStartupBox()
     if(buttonID == 0) //User decided to connect to a game
     {
         server = false;
+        isWhite = false;
     }
     else if(buttonID == 1) //User decided to host a game
     {
         server = true;
+        isWhite = true;
     }
 
 } 
 
-
-
 int main(int argc, char** argv)
 {
     renderer::Drawer d;
-    Chess::board_t b;
+    
     d.init(624, 624, b);
     bool gameover = false;
+    showStartupBox();
 
-    //If user is a server
-    if(server)
-    {  
-        //for(;;) //Loop waiting for a client to connect
-        //{
-            //tcp::socket socket(ioContext); //Open a new socket
-            //serverAcceptor.accept(socket); //Await a connection to the socket
-            //asio::write(socket, asio::buffer(test));
 
-        //}
-    }
-    else //If user is a client
-    {
-        try
-        {
-            if (argc != 2)
-            {
-            std::cerr << "Usage: client <host>" << std::endl;
-            //return 1;
-            }
+    tcp::socket socket(ioContext); //Make a new socket
+    servAccept.accept(socket); //Await a connection request
 
-            asio::io_context io_context;
+    d.WHITEORBLACK = isWhite;
+    std::thread t1(netThread);
 
-            tcp::resolver resolver(io_context);
-            tcp::resolver::results_type endpoints =
-            resolver.resolve("10.0.0.24", "daytime");
-
-            tcp::socket socket(io_context);
-            asio::connect(socket, endpoints);
-
-        }
-        catch(std::exception& e)
-        {
-            std::cerr<<e.what()<<std::endl;
-        }   
-    }
-    
-    tcp::acceptor serverAcceptor(ioContext, tcp::endpoint(tcp::v4(), 8080)); //Listen for IPv4 requests on port 8080
-
-    tcp::socket socket(ioContext); //Open a new socket
-    serverAcceptor.accept(socket); //Await a connection to the socket
-
-    std::string sent = " ";
     while(d.running)
     {
+
         d.input(b);
         d.drawBoard(b);
-        /*If another move was made, send it*/
-        if(storedBMove != b.bMoveString)
+        if(myCounter != b.counter && !isWhite)
         {
-            storedBMove = b.bMoveString;
+            myCounter = b.counter;
             asio::write(socket, asio::buffer(b.bMoveString));
         }
-        else if(storedWMove != b.wMoveString)
+        else if(myCounter != b.counter && isWhite)
         {
-            storedWMove = b.wMoveString;
+            myCounter = b.counter;
             asio::write(socket, asio::buffer(b.wMoveString));
         }
+
         if(b.WINNER != WINNER_NONE)
         {
             if(b.WINNER == WINNER_WHITE)
