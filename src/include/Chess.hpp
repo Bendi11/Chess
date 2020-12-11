@@ -35,6 +35,8 @@ namespace Chess
         pMat container; //The object holding all pieces on the board
         unsigned int counter = 0; //How many turns the game has gone for
         uint8_t WINNER = WINNER_NONE; //If white or black won
+        std::string wMoveString = " "; //String holding the stringified version of white's last move
+        std::string bMoveString = " "; //String holding the stringified version of black's last move
 
         /*Board size*/
         unsigned int sizeX = 7;

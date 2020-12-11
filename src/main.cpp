@@ -18,6 +18,10 @@ g++ -o bin/Chess src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -lSDL2m
 
 using asio::ip::tcp;
 asio::io_context ioContext;
+
+std::string storedBMove;
+std::string storedWMove;
+
 bool server = false;
 
 std::string make_daytime_string()
@@ -84,21 +88,14 @@ int main(int argc, char** argv)
 
     //If user is a server
     if(server)
-    {
-        try
-            {   
-                tcp::acceptor serverAcceptor(ioContext, tcp::endpoint(tcp::v4(), 8080)); //Listen for IPv4 requests on port 8080
-                for(;;) //Loop waiting for a client to connect
-                {
-                    tcp::socket socket(ioContext); //Open a new socket
-                    serverAcceptor.accept(socket); //Await a connection to the socket
-                }
-            }
-        catch(const std::exception& e) //Catch any errors
-        {
-            std::cerr << e.what() << '\n';
-        }
+    {  
+        //for(;;) //Loop waiting for a client to connect
+        //{
+            //tcp::socket socket(ioContext); //Open a new socket
+            //serverAcceptor.accept(socket); //Await a connection to the socket
+            //asio::write(socket, asio::buffer(test));
 
+        //}
     }
     else //If user is a client
     {
@@ -125,12 +122,28 @@ int main(int argc, char** argv)
             std::cerr<<e.what()<<std::endl;
         }   
     }
+    
+    tcp::acceptor serverAcceptor(ioContext, tcp::endpoint(tcp::v4(), 8080)); //Listen for IPv4 requests on port 8080
 
+    tcp::socket socket(ioContext); //Open a new socket
+    serverAcceptor.accept(socket); //Await a connection to the socket
 
+    std::string sent = " ";
     while(d.running)
     {
         d.input(b);
         d.drawBoard(b);
+        /*If another move was made, send it*/
+        if(storedBMove != b.bMoveString)
+        {
+            storedBMove = b.bMoveString;
+            asio::write(socket, asio::buffer(b.bMoveString));
+        }
+        else if(storedWMove != b.wMoveString)
+        {
+            storedWMove = b.wMoveString;
+            asio::write(socket, asio::buffer(b.wMoveString));
+        }
         if(b.WINNER != WINNER_NONE)
         {
             if(b.WINNER == WINNER_WHITE)

@@ -5,6 +5,29 @@ update attackable squares, etc.
 #include "include/Chess.hpp"
 using namespace Chess;
 
+//Function to stringify a move
+std::string makeMoveString(unsigned int x, unsigned int y, unsigned int mX, unsigned int mY, bool WHITE)
+{
+    std::string moveString; //The returned string
+    if(WHITE) moveString.append("W:"); //Append that white made the move
+    else moveString.append("B:"); //Append that black made the move
+
+    /*Append the old coords*/
+    moveString.append(std::to_string(x));
+    moveString.append(",");
+    moveString.append(std::to_string(y));
+
+    moveString.append("->"); //Append a move marker
+
+    /*Append new coords*/
+    moveString.append(std::to_string(mX));
+    moveString.append(",");
+    moveString.append(std::to_string(mY));
+
+    return moveString;
+
+}
+
 //Function to only allow player to move their pieces
 uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, unsigned int moveY, bool WHITE)
 {
@@ -59,9 +82,11 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
                 container[moveX][moveY] = piece_t(container[x][y].type, true); //Assign  the moving square's type as the moved piece
                 container[x][y] = piece_t(EMPTY, true); //Make the old location empty
 
-                checkPromotion(moveX, moveY, WHITE); //Check if the piece can be promoted
+                /*Make a move string for this move*/
+                if(WHITE) wMoveString.append(makeMoveString(x, y, moveX, moveY, true) );
+                else bMoveString.append(makeMoveString(x, y, moveX, moveY, false) );
 
-                
+                checkPromotion(moveX, moveY, WHITE); //Check if the piece can be promoted
 
                 rVal = MOVE_GOOD; //Return that the move was good
             }
@@ -75,6 +100,10 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
                 container[x][y] = piece_t(EMPTY, true); //Make the old location empty
 
                 checkPromotion(moveX, moveY, WHITE); //Check if the piece can be promoted
+
+                /*Make a move string for this move*/
+                if(WHITE) wMoveString.append(makeMoveString(x, y, moveX, moveY, true) );
+                else bMoveString.append(makeMoveString(x, y, moveX, moveY, false) );
 
                 rVal = MOVE_CAPTURED; //Return that the move captured a piece
             }

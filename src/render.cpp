@@ -281,6 +281,9 @@ void Drawer::input(Chess::board_t& Board)
             //playerMove returns 2 if the move captured something, or 1 if it was successful, so play a sound effect based on this
             if(success == MOVE_GOOD) //If the move completed
             {
+                movedX = mX;
+                movedY = mY;
+
                 if(USING_SOUND)
                 {
                     SDL_LoadWAV("assets/sounds/move.wav", &wavSpec, &wavBuffer, &wavLength); //Load the move sound effect
@@ -290,6 +293,8 @@ void Drawer::input(Chess::board_t& Board)
             }
             else if(success == MOVE_CAPTURED)
             {
+                movedX = mX;
+                movedY = mY;
                 if(USING_SOUND)
                 {
                     SDL_LoadWAV("assets/sounds/capture.wav", &wavSpec, &wavBuffer, &wavLength); //Load the capture sound effect

@@ -22,6 +22,9 @@ namespace renderer
         Uint32 wavLength; //How long the sound effect is
         uint8_t *wavBuffer; //Buffer for the sound effect
 
+        unsigned int movedX;
+        unsigned int movedY;
+
         /*What dimensions the screen will be*/
         unsigned int SCREEN_WIDTH;
         unsigned int SCREEN_HEIGHT;
