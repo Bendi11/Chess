@@ -131,7 +131,7 @@ void Drawer::init(unsigned int w, unsigned int h, Chess::board_t& Board)
     temp = IMG_Load("assets/wRook.png");
     textureList[wROOK] = SDL_CreateTextureFromSurface(render, temp); //Make a texture from the surface
 
-    temp = IMG_Load("assets/wking.png");
+    temp = IMG_Load("assets/wKing.png");
     textureList[wKING] = SDL_CreateTextureFromSurface(render, temp); //Make a texture from the surface
 
     temp = IMG_Load("assets/wQueen.png");
@@ -150,7 +150,7 @@ void Drawer::init(unsigned int w, unsigned int h, Chess::board_t& Board)
     temp = IMG_Load("assets/bRook.png");
     textureList[bROOK] = SDL_CreateTextureFromSurface(render, temp); //Make a texture from the surface
 
-    temp = IMG_Load("assets/bking.png");
+    temp = IMG_Load("assets/bKing.png");
     textureList[bKING] = SDL_CreateTextureFromSurface(render, temp); //Make a texture from the surface
 
     temp = IMG_Load("assets/bQueen.png");
