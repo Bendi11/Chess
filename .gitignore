@@ -4,3 +4,4 @@ bin/log.txt
 bin/Chess.exe - Shortcut.lnk
 Chess-v0.1.zip
 Chess-v0.1-x86_64.zip
+.vscode/**
