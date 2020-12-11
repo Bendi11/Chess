@@ -52,12 +52,6 @@
         "functional": "cpp",
         "iterator": "cpp",
         "numeric": "cpp",
-        "random": "cpp",
-        "any": "cpp",
-        "codecvt": "cpp",
-        "csignal": "cpp",
-        "cstring": "cpp",
-        "source_location": "cpp",
-        "future": "cpp"
+        "random": "cpp"
     }
 }

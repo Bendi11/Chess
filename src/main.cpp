@@ -9,7 +9,6 @@ Linux:
 g++ -o bin/Chess src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -lSDL2main -lSDL2 -lSDL2_image -static-libgcc -static-libstdc++ icon.o
 */
 
-#define PORT 23
 #include "include/Chess.hpp"
 #include "include/render.hpp"
 #include <asio.hpp>
@@ -83,7 +82,6 @@ int main(int argc, char** argv)
     renderer::Drawer d;
     Chess::board_t b;
     d.init(624, 624, b);
-    showStartupBox();
     bool gameover = false;
 
     //If user is a server
