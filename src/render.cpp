@@ -218,7 +218,7 @@ void Drawer::drawBoard(Chess::board_t& Board)
             SDL_RenderCopy(render, textures[x][y], &size, &pos[x][y]); //Draw the piece texture over it 
         }
     }
-    SDL_Delay(13);
+    SDL_Delay(13); //Cap FPS
     if(isDragging) SDL_RenderCopy(render, textures[storedX][storedY], &size, &mouseRect);
     SDL_RenderPresent(render);
 }
