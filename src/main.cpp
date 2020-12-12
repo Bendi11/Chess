@@ -11,22 +11,21 @@ g++ -o bin/Chess src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -lSDL2m
 
 #include "include/Chess.hpp"
 #include "include/render.hpp"
-#include <thread>
-#include <asio.hpp>
+//#include <thread>
+//#include <asio.hpp>
 #include <iostream>
 
 #include <fstream>
 
-using asio::ip::tcp;
+//using asio::ip::tcp;
 
-asio::io_context ioContext;
+//asio::io_context ioContext;
 
 std::string storedBMove;
 std::string storedWMove;
 unsigned int myCounter = 1;
 std::string received;
-Chess::board_t b;
-tcp::acceptor servAccept(ioContext, tcp::endpoint(tcp::v4(), 8080)); //Server request acceptor   
+//tcp::acceptor servAccept(ioContext, tcp::endpoint(tcp::v4(), 8080)); //Server request acceptor   
 
 
 
@@ -34,7 +33,7 @@ bool server = true;
 bool isWhite = true;
 bool receivedMessage = false;
 
-//Function to be run in parallel with the game logic to check for messages being sent
+/*/Function to be run in parallel with the game logic to check for messages being sent
 void netThread()
 {
 
@@ -68,7 +67,7 @@ void netThread()
             
         }
     }
-}
+}*/
 
 //Function to show a message box asking for client / server socket connection
 void showStartupBox()
@@ -119,34 +118,34 @@ void showStartupBox()
 
 int main(int argc, char** argv)
 {
+    Chess::board_t b;
     renderer::Drawer d;
     
     d.init(624, 624, b);
     bool gameover = false;
-    showStartupBox();
+    //showStartupBox();
 
 
-    tcp::socket socket(ioContext); //Make a new socket
-    servAccept.accept(socket); //Await a connection request
+    //tcp::socket socket(ioContext); //Make a new socket
+    //servAccept.accept(socket); //Await a connection request
 
     d.WHITEORBLACK = isWhite;
-    std::thread t1(netThread);
+    //std::thread t1(netThread);
 
     while(d.running)
     {
-
-        d.input(b);
         d.drawBoard(b);
-        if(myCounter != b.counter && !isWhite)
+        d.input(b);
+        /*if(myCounter != b.counter && !isWhite)
         {
             myCounter = b.counter;
-            asio::write(socket, asio::buffer(b.bMoveString));
+            //asio::write(socket, asio::buffer(b.bMoveString));
         }
         else if(myCounter != b.counter && isWhite)
         {
             myCounter = b.counter;
-            asio::write(socket, asio::buffer(b.wMoveString));
-        }
+            //asio::write(socket, asio::buffer(b.wMoveString));
+        }*/
 
         if(b.WINNER != WINNER_NONE)
         {
