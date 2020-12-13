@@ -84,8 +84,8 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
                 container[x][y] = piece_t(EMPTY, true); //Make the old location empty
 
                 /*Make a move string for this move*/
-                if(WHITE) wMoveString.append(makeMoveString(x, y, moveX, moveY, true) );
-                else bMoveString.append(makeMoveString(x, y, moveX, moveY, false) );
+                if(WHITE) wMoveString = makeMoveString(x, y, moveX, moveY, true);
+                else bMoveString = makeMoveString(x, y, moveX, moveY, false);
 
                 checkPromotion(moveX, moveY, WHITE); //Check if the piece can be promoted
 

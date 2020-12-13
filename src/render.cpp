@@ -211,8 +211,6 @@ void Drawer::drawBoard(Chess::board_t& Board)
     {
         for(unsigned y = 0; y < 8; ++y)
         {
-            //Only update textures when a turn happens, and something changes
-
             assignTextures(Board, x, y); //Assign the correct texture to this coordinate
             SDL_RenderCopy(render, BGTextures[x][y], &size, &pos[x][y]); //Add the background texture 
             SDL_RenderCopy(render, textures[x][y], &size, &pos[x][y]); //Draw the piece texture over it 
@@ -227,11 +225,6 @@ void Drawer::input(Chess::board_t& Board)
 {
     while(SDL_PollEvent(&userIn)) //Poll through the queue of inputted events
     {
-        if(userIn.type == SDL_KEYUP && userIn.key.keysym.sym == SDLK_t)
-        {
-            if(WHITEORBLACK) WHITEORBLACK = false;
-            else WHITEORBLACK = true;
-        }
         //Exit the program if the inputted event was to quit
         if(userIn.type == SDL_QUIT) 
         {
