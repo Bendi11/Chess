@@ -93,7 +93,7 @@ void Drawer::init(unsigned int w, unsigned int h, Chess::board_t& Board)
         exit(EXIT_FAILURE); //Quit the program
     }
 
-    render = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED); //Make a renderer for SDL2 associated with the window
+    render = SDL_CreateRenderer(win, -1, SDL_RENDERER_SOFTWARE); //Make a renderer for SDL2 associated with the window
 
     SDL_LoadWAV("assets/sounds/move.wav", &wavSpec, &wavBuffer, &wavLength); //Load a sound effect to populate the specification for WAV data
     USING_SOUND = true; //Sound is on by default

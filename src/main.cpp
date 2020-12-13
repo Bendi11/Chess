@@ -3,7 +3,7 @@ Chess by Benjamin L (Bendi11)
 Chess game made with C++
 Compile commands: 
 Windows: 
-g++ -o bin/Chess.exe src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -IE:/boost_1_74_0 -IE:/asio-1.18.0/include -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -static-libgcc -static-libstdc++ -mwindows icon.o
+g++ -o bin/Chess.exe src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -IF:/asio-1.18.0/include -Lbin/ -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -static-libgcc -static-libstdc++ -lws2_32 -mwindows -O3  icon.o
 
 Linux: 
 g++ -o bin/Chess src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -static-libgcc -static-libstdc++ icon.o
@@ -18,9 +18,6 @@ g++ -o bin/Chess src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -lSDL2m
 #include <fstream>
 
 /*--------------------NETWORKING OBJECTS--------------------*/
-
-
-
 using asio::ip::tcp;
 
 asio::io_context ioContext;
@@ -29,8 +26,7 @@ std::string storedBMove = " ";
 std::string storedWMove = " ";
 tcp::acceptor servAccept(ioContext, tcp::endpoint(tcp::v4(), 8080)); //Server request acceptor   
 
-
-bool server = true;
+bool server = true; //If the user is hosting
 
 //Function to be run in parallel with the game logic to check for messages being sent
 static void netThread(Chess::board_t& Board, bool server, tcp::socket& socket)
