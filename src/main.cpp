@@ -110,7 +110,7 @@ int main(int argc, char** argv)
     if(server)
     {
         //Get IP of localhost eg. the host's IP
-        std::string localIPs = "Copy this number to connection.txt: ";
+        std::string localIPs = "Type this number on the other computer: ";
         tcp::resolver resolver(ioContext); //Resolver to resolve IP from name
         tcp::resolver::query query(asio::ip::host_name(), ""); //Query for the resolver
         tcp::resolver::iterator iter = resolver.resolve(query); //Resolve the query

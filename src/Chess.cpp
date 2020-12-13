@@ -320,17 +320,18 @@ void board_t::findPawn(unsigned int _x, unsigned int _y, bool WHITE) //Function 
 
     if(WHITE)
     {
-        //If pawns haven't moved, they can move up two squares
-        if(!container[x][y].hasMoved)
-        {
-            if(container[x][y + 2].type == EMPTY) //If the square is empty
-                container[x][y].moveable.push_back(std::make_pair(x, y + 2)); //Add the square up if it is empty
-        }
+        
         //Pawns can move forwards if the square in front is empty
         if(y < sizeY)
         {
             if(container[x][y + 1].type == EMPTY)
                 container[x][y].moveable.push_back(std::make_pair(x, y + 1)); //Add the square up if it is empty
+                //If pawns haven't moved, they can move up two squares
+            if(!container[x][y].hasMoved)
+            {
+                if(container[x][y + 2].type == EMPTY) //If the square is empty
+                    container[x][y].moveable.push_back(std::make_pair(x, y + 2)); //Add the square up if it is empty
+            }
         }
 
         if(x < sizeX && y < sizeY) //Check for up and right
@@ -346,16 +347,17 @@ void board_t::findPawn(unsigned int _x, unsigned int _y, bool WHITE) //Function 
     }
     else
     {
-        //If pawns haven't moved, they can move down two squares
-        if(!container[x][y].hasMoved)
-        {
-            if(container[x][y - 2].type == EMPTY) //If the square is empty
-                container[x][y].moveable.push_back(std::make_pair(x, y - 2)); //Add the square up if it is empty
-        }
+        
         if(y > 0) //Check down
         {
             if(container[x][y - 1].type == EMPTY)
                 container[x][y].moveable.push_back(std::make_pair(x, y - 1));
+                //If pawns haven't moved, they can move down two squares
+            if(!container[x][y].hasMoved)
+            {
+                if(container[x][y - 2].type == EMPTY) //If the square is empty
+                    container[x][y].moveable.push_back(std::make_pair(x, y - 2)); //Add the square up if it is empty
+            }
         }
         if(x < sizeX && y > 0) //Check for down and right
         {
