@@ -1,5 +1,7 @@
+#pragma once
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 #include "Chess.hpp"
 
 namespace renderer
@@ -16,6 +18,7 @@ namespace renderer
         SDL_Renderer* render = NULL; //SDL2 renderer used to draw textures onscreen
         SDL_Event userIn; //Event object holding user inputted event queue
         SDL_AudioDeviceID audioDevice; //The audio device we'll be playing sound effects to
+        TTF_Font* sans; //FreeSans font
 
         bool USING_SOUND = true; //If we should use sound effects
         SDL_AudioSpec wavSpec; //The audio specification for sound effects, .WAV in this case
@@ -51,6 +54,7 @@ namespace renderer
 
         void drawBoard(Chess::board_t& Board); //Function to draw all pieces on a chessboard
         void assignTextures(Chess::board_t& Board, unsigned int x, unsigned int y); //Function to iterate through and assign the right texture to each piece on a board
+        std::string getTextInput(); //Function to get text input and return the string of text, while displaying the inputted text
     };
     
 }

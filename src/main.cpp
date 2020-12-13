@@ -3,34 +3,34 @@ Chess by Benjamin L (Bendi11)
 Chess game made with C++
 Compile commands: 
 Windows: 
-g++ -o bin/Chess.exe src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -IE:/boost_1_74_0 -IE:/asio-1.18.0/include -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -static-libgcc -static-libstdc++ -mwindows icon.o
+g++ -o bin/Chess.exe src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -IE:/boost_1_74_0 -IE:/asio-1.18.0/include -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -static-libgcc -static-libstdc++ -mwindows icon.o
 
 Linux: 
-g++ -o bin/Chess src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -lSDL2main -lSDL2 -lSDL2_image -static-libgcc -static-libstdc++ icon.o
+g++ -o bin/Chess src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -static-libgcc -static-libstdc++ icon.o
 */
 
 #include "include/Chess.hpp"
 #include "include/render.hpp"
+
 #include <asio.hpp>
-#include <iostream>
-#include <fstream>
 #include <thread>
+#include <ctype.h>
+#include <fstream>
+
+/*--------------------NETWORKING OBJECTS--------------------*/
+
+
 
 using asio::ip::tcp;
 
 asio::io_context ioContext;
-asio::io_service ioService;
 
 std::string storedBMove = " ";
 std::string storedWMove = " ";
-std::string received;
-tcp::acceptor servAccept(ioContext, tcp::endpoint(tcp::v4(), 23)); //Server request acceptor   
-tcp::resolver resolver(ioContext); //Used for resolving host names for client
-tcp::endpoint ep(asio::ip::address::from_string("192.168.1.73"), 8080);
+tcp::acceptor servAccept(ioContext, tcp::endpoint(tcp::v4(), 8080)); //Server request acceptor   
 
 
 bool server = true;
-bool receivedMessage = false;
 
 //Function to be run in parallel with the game logic to check for messages being sent
 static void netThread(Chess::board_t& Board, bool server, tcp::socket& socket)
@@ -38,49 +38,20 @@ static void netThread(Chess::board_t& Board, bool server, tcp::socket& socket)
     char buf[128] = {0}; 
     std::vector<char> buffer(128); 
     
-    if(server)
+    for(;;)
     {
-        for(;;)
+        /*Read the sent message*/
+        size_t n = socket.read_some(asio::buffer(buffer));
+        std::cout<<std::string(buffer.begin(), buffer.end())<<std::endl;
+        if(!server) //Make a move for white if the player is black
         {
-            /*Read the sent message*/
-            size_t n = socket.read_some(asio::buffer(buffer));
-            if(buffer[0] != 'E')
-            {
-                if(!server) //Make a move for white if the player is black
-                {
-                    Board.playerMove(buffer[2] - '0', buffer[4] - '0', buffer[7] - '0', buffer[9] - '0', true);
-                }
-                else //make a move for black if the player is white
-                {
-                    Board.playerMove(buffer[2] - '0', buffer[4] - '0', buffer[7] - '0', buffer[9] - '0', false);
-                }
-            }
+            Board.playerMove(buffer[2] - '0', buffer[4] - '0', buffer[7] - '0', buffer[9] - '0', true);
+        }
+        else //make a move for black if the player is white
+        {
+            Board.playerMove(buffer[2] - '0', buffer[4] - '0', buffer[7] - '0', buffer[9] - '0', false);
         }
     }
-    else
-    {
-        
-
-        for(;;)
-        {
-            /*Read the sent message*/
-            size_t n = socket.read_some(asio::buffer(buffer));
-            std::cout<<std::string(buffer.begin(), buffer.end())<<std::endl;
-            if(buffer[0] != 'E')
-            {
-                if(!server) //Make a move for white if the player is black
-                {
-                    Board.playerMove(buffer[2] - '0', buffer[4] - '0', buffer[7] - '0', buffer[9] - '0', true);
-                }
-                else //make a move for black if the player is white
-                {
-                    Board.playerMove(buffer[2] - '0', buffer[4] - '0', buffer[7] - '0', buffer[9] - '0', false);
-                }
-            }
-            
-        }
-    }
-    
     
 }
 
@@ -140,8 +111,32 @@ int main(int argc, char** argv)
     showStartupBox();
 
     tcp::socket socket(ioContext); //Make a new socket
-    if(server) servAccept.accept(socket); //Await a connection request
-    else socket.connect(ep);
+    if(server)
+    {
+        //Get IP of localhost eg. the host's IP
+        std::string localIPs = "Copy this number to connection.txt: ";
+        tcp::resolver resolver(ioContext); //Resolver to resolve IP from name
+        tcp::resolver::query query(asio::ip::host_name(), ""); //Query for the resolver
+        tcp::resolver::iterator iter = resolver.resolve(query); //Resolve the query
+        tcp::resolver::iterator end; // End marker.
+        while (iter != end)
+        {
+            tcp::endpoint ep = *iter++;
+            if(isdigit(ep.address().to_string()[0]) && isdigit(ep.address().to_string()[1]) ) //If the IP is not an IPv6...
+            {
+                localIPs.append(ep.address().to_string()); //Add it to the message box
+                break;
+            }
+        }
+        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Chess Hosting", localIPs.c_str(), NULL); //Show the user what to paste to the other computer
+        servAccept.accept(socket); //Await a connection request
+    } 
+    else 
+    {
+        std::string ip = d.getTextInput(); //Prompt the user to enter an IP address
+        tcp::endpoint ep(asio::ip::address::from_string(ip), 8080); //Convert to an IP and attempt a connection
+        socket.connect(ep);
+    }
 
     d.WHITEORBLACK = server; //Set the player's color based on server and host
     std::thread netThread1(netThread, std::ref(b), server, std::ref(socket)); //Start the receiving network thread
@@ -150,7 +145,7 @@ int main(int argc, char** argv)
     {
         d.drawBoard(b);
         d.input(b);
-        //Check if we need to send that we just made a move and are black
+        
         if(storedBMove != b.bMoveString && !server)
         {
             storedBMove = b.bMoveString;
@@ -183,14 +178,6 @@ int main(int argc, char** argv)
         }
     }
     
-
-    //d.WHITEORBLACK = isWhite; //Set if the player is white or black
-    d.WHITEORBLACK = false;
-    
-    
-    asio::write(socket, asio::buffer("END"));
-    socket.close();
-
     SDL_DestroyRenderer(d.render);
     SDL_DestroyWindow(d.win);
     SDL_CloseAudio();

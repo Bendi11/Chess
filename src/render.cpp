@@ -80,7 +80,11 @@ void Drawer::init(unsigned int w, unsigned int h, Chess::board_t& Board)
     {
         exit(EXIT_FAILURE); //Exit the program if SDL2 couldn't init
     }
+
     IMG_Init(IMG_INIT_PNG); //Start SDL2_image
+    TTF_Init(); //Start text rendering
+    sans = TTF_OpenFont("assets/FreeSans.ttf", 14); //Load the font from file
+
     
     //Create an SDL2 window with the given parameters
     win = SDL_CreateWindow("Chess", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
@@ -301,3 +305,90 @@ void Drawer::input(Chess::board_t& Board)
     } 
 }
 
+std::string Drawer::getTextInput() //Function to get text input and return the string of text, while displaying the inputted text
+{
+    bool exit = false; //If the user pressed enter
+    bool edited = false;
+    std::string inputText; //The text the user entered
+
+    SDL_StartTextInput(); //Start SDL2 text input
+
+    SDL_Surface* textSurface; //Surface containing the text window
+    SDL_Color txtCol = {0xFF, 0xFF, 0xFF}; //Text color
+
+    SDL_Surface* promptSurface = TTF_RenderText_Solid(sans, "Enter the host's IPv4 address here: ", txtCol); //The prompt for text input
+    SDL_Rect promptPos;
+    promptPos.x = SCREEN_WIDTH / 2;
+    promptPos.y = SCREEN_HEIGHT / 2;
+
+
+    SDL_Texture* promptTexture = SDL_CreateTextureFromSurface(render, promptSurface); //Texture for the text editing prompt
+    SDL_Texture* textTexture =  SDL_CreateTextureFromSurface(render, promptSurface); //Texture for the text editing prompt
+
+    SDL_Rect pos; //Position of the text surface
+    pos.x = SCREEN_WIDTH / 2;
+    pos.y = (SCREEN_HEIGHT / 2 )+ 20;
+    pos.h = TTF_FontHeight(sans);
+
+
+    SDL_Rect sizee;
+    sizee.h = promptSurface->h;
+    sizee.w = promptSurface->w;
+    sizee.y = (SCREEN_HEIGHT / 2) - 20;
+    sizee.x = (SCREEN_WIDTH / 2) - sizee.w / 2;
+
+    SDL_RenderClear(render);
+    SDL_RenderCopy(render, promptTexture, NULL, &sizee);
+    SDL_RenderPresent(render);
+
+    while(!exit) //While the user hasn't entered an IP...
+    {
+        while(SDL_WaitEventTimeout(&userIn, 30)) //Read through queue of key presses
+        {
+            if(userIn.type == SDL_QUIT) //If the user is quitting
+            {
+                exit = true;
+            }
+            else if(userIn.type == SDL_KEYDOWN) //If the user is pressing backspace / enter
+            {
+                if(userIn.key.keysym.sym == SDLK_BACKSPACE)
+                {
+                    if(inputText.length() > 1) inputText.pop_back(); //Take a character off the string
+                    else
+                    {
+                        inputText[0] = ' ';
+                    }
+                    
+                    edited = true;
+                } 
+                else if(userIn.key.keysym.sym == SDLK_RETURN || userIn.key.keysym.sym == SDLK_RETURN2) exit = true; //Exit the text editing if the user entered
+                
+            }
+            else if(userIn.type == SDL_TEXTINPUT) //If the user is inputting text
+            {
+                inputText += userIn.text.text; //Append the inputted text to the string
+                edited = true;
+            }
+        }
+        if(edited) //Re draw the text box if it was changed
+        {
+            edited = false;
+            SDL_RenderClear(render); //Clear the renderer
+            textSurface = TTF_RenderText_Solid(sans, inputText.c_str(), txtCol); //Render the new text
+            pos.w = textSurface->w;
+            pos.x = (SCREEN_WIDTH / 2) - pos.w / 2;
+
+            SDL_DestroyTexture(textTexture);
+            textTexture = SDL_CreateTextureFromSurface(render, textSurface); //Make a texture from the surface
+            SDL_RenderCopy(render, textTexture, NULL, &pos);
+            SDL_RenderCopy(render, promptTexture, NULL, &sizee);
+            SDL_FreeSurface(textSurface); //Clear the text surface
+            SDL_RenderPresent(render);
+        }
+        
+        
+    }
+    
+    SDL_StopTextInput(); //Stop text input
+    return inputText;
+}

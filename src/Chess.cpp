@@ -102,9 +102,9 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
 
                 checkPromotion(moveX, moveY, WHITE); //Check if the piece can be promoted
 
-                /*Make a move string for this move*/
-                if(WHITE) wMoveString.append(makeMoveString(x, y, moveX, moveY, true) );
-                else bMoveString.append(makeMoveString(x, y, moveX, moveY, false) );
+                /*Make a move string for this move to be sent to the TCP enemy*/
+                if(WHITE) wMoveString = makeMoveString(x, y, moveX, moveY, true);
+                else bMoveString = makeMoveString(x, y, moveX, moveY, false);
 
                 rVal = MOVE_CAPTURED; //Return that the move captured a piece
             }
