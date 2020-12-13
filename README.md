@@ -7,6 +7,7 @@ features are in place and most of the bugs have been squashed.
 
 ## Features:
 - [x] Mouse controlled piece movement
+- [x] Multiplayer over LAN with socket connections
 - [ ] Configurable themes
 - [ ] Enemy engine with varying levels of skill to face against
 - [ ] Enemy AI with varying levels of skill that learns from the player
