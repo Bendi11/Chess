@@ -707,6 +707,7 @@ void board_t::findBishop(unsigned int _x, unsigned int _y, bool WHITE) //Functio
                 {
                     container[x][y].moveable.push_back(std::make_pair(x - temp, y - temp));
                 }
+                break;
             }
         }
     }

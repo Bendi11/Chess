@@ -33,11 +33,17 @@ static void netThread(Chess::board_t& Board, bool server, tcp::socket& socket)
 {
     char buf[128] = {0}; 
     std::vector<char> buffer(128); 
+    asio::error_code err; //Error code for ASIO
     
     for(;;)
     {
         /*Read the sent message*/
-        size_t n = socket.read_some(asio::buffer(buffer));
+        size_t n = socket.read_some(asio::buffer(buffer), err);
+        /*Quit the application if the other user disconnected*/
+        if(err == asio::error::connection_reset)
+        {
+            exit(EXIT_SUCCESS);
+        }
         std::cout<<std::string(buffer.begin(), buffer.end())<<std::endl;
         if(!server) //Make a move for white if the player is black
         {
@@ -121,7 +127,7 @@ int main(int argc, char** argv)
             if(ep.address().is_v4()) //If the IP is not an IPv6...
             {
                 localIPs.append(ep.address().to_string()); //Add it to the message box
-                break;
+                localIPs.append(", ");
             }
         }
         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Chess Hosting", localIPs.c_str(), NULL); //Show the user what to paste to the other computer
@@ -183,3 +189,4 @@ int main(int argc, char** argv)
     
     return 0;
 }
+
