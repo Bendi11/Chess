@@ -48,6 +48,8 @@ namespace renderer
 
         SDL_Texture *moveableTexture; //The texture indicating a moveable square
         std::vector<SDL_Texture *> moveableTexts; //List of all dots indicating where a piece can move
+        std::vector<SDL_Texture *> attackableTexts; //List of all dots indicating attackable tiles
+        std::vector<SDL_Rect > attackablePos; //List of all attackable dot location
         std::vector<SDL_Rect > moveablePos; //List of all moveable sprite positions
 
 

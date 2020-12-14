@@ -224,17 +224,21 @@ void Drawer::drawBoard(Chess::board_t& Board)
             SDL_RenderCopy(render, textures[x][y], &size, &pos[x][y]); //Draw the piece texture over it 
         }
     }
-
     if(isDragging) //If the user is dragging a piece
     {
         SDL_Surface* temp = IMG_Load("assets/moveable.png"); //Temporary surface loaded with moveable.png
-        SDL_RenderCopy(render, textures[storedX][storedY], &size, &mouseRect); //Show the dragged piece
         for(unsigned n = 0; n < moveableTexts.size(); ++n)
         {
             SDL_DestroyTexture(moveableTexts[n]); //Delete all currently stored textures to avoid ANOTHER MEMORY LEAK
         }
+        for(unsigned n = 0; n < attackableTexts.size(); ++n)
+        {
+            SDL_DestroyTexture(attackableTexts[n]); //Delete all currently stored textures to avoid ANOTHER MEMORY LEAK
+        }
 
         moveableTexts.clear(); //Empty the moveable textures object
+        attackableTexts.clear(); //Empty the attackable textures list
+        attackablePos.clear(); //Empty the attackable textures positions list
         moveablePos.clear(); //Empty the positions of the textures 
 
         for(unsigned i = 0; i < Board.container[storedX][storedY].moveable.size(); ++i) //Iterate through each moveable spot
@@ -250,19 +254,20 @@ void Drawer::drawBoard(Chess::board_t& Board)
             SDL_RenderCopy(render, moveableTexts[i], &size, &moveablePos[i]); //Copy the loaded texture
         }
 
-        for(unsigned j = moveableTexts.size() + 1; j < Board.container[storedX][storedY].attackable.size(); ++j) //Iterate through each attackable spot
+        for(unsigned j = 0; j < Board.container[storedX][storedY].attackable.size(); ++j) //Iterate through each attackable spot
         {
-            moveableTexts.push_back(SDL_CreateTextureFromSurface(render, temp)); //Add a new moveable texture object
+            attackableTexts.push_back(SDL_CreateTextureFromSurface(render, temp)); //Add a new moveable texture object
             /*Determine the position of the texture*/
-            moveablePos.push_back(SDL_Rect());
-            moveablePos[j].x = Board.container[storedX][storedY].attackable[j].first * (SCREEN_WIDTH / 8);
-            moveablePos[j].y = -((int)Board.container[storedX][storedY].attackable[j].second - 7) * (SCREEN_HEIGHT / 8); //Reverse Y coordinate
-            moveablePos[j].w = 77;
-            moveablePos[j].h = 77;
+            attackablePos.push_back(SDL_Rect());
+            attackablePos[j].x = Board.container[storedX][storedY].attackable[j].first * (SCREEN_WIDTH / 8);
+            attackablePos[j].y = -((int)Board.container[storedX][storedY].attackable[j].second - 7) * (SCREEN_HEIGHT / 8); //Reverse Y coordinate
+            attackablePos[j].w = 77;
+            attackablePos[j].h = 77;
 
-            SDL_RenderCopy(render, moveableTexts[j], &size, &moveablePos[j]);
+            SDL_RenderCopy(render, attackableTexts[j], &size, &attackablePos[j]);
         }
         SDL_FreeSurface(temp); //Free the temporary surface
+        SDL_RenderCopy(render, textures[storedX][storedY], &size, &mouseRect); //Show the dragged piece
     } 
 
     SDL_RenderPresent(render);
