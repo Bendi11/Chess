@@ -250,7 +250,7 @@ void Drawer::drawBoard(Chess::board_t& Board)
             SDL_RenderCopy(render, moveableTexts[i], &size, &moveablePos[i]); //Copy the loaded texture
         }
 
-        for(unsigned j = moveableTexts.size(); j < Board.container[storedX][storedY].attackable.size(); ++j) //Iterate through each attackable spot
+        for(unsigned j = moveableTexts.size() + 1; j < Board.container[storedX][storedY].attackable.size(); ++j) //Iterate through each attackable spot
         {
             moveableTexts.push_back(SDL_CreateTextureFromSurface(render, temp)); //Add a new moveable texture object
             /*Determine the position of the texture*/
@@ -259,6 +259,7 @@ void Drawer::drawBoard(Chess::board_t& Board)
             moveablePos[j].y = -((int)Board.container[storedX][storedY].attackable[j].second - 7) * (SCREEN_HEIGHT / 8); //Reverse Y coordinate
             moveablePos[j].w = 77;
             moveablePos[j].h = 77;
+
             SDL_RenderCopy(render, moveableTexts[j], &size, &moveablePos[j]);
         }
         SDL_FreeSurface(temp); //Free the temporary surface
