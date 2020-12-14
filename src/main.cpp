@@ -3,7 +3,7 @@ Chess by Benjamin L (Bendi11)
 Chess game made with C++
 Compile commands: 
 Windows: 
-g++ -o bin/Chess.exe src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -IF:/asio-1.18.0/include -Lbin/ -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -static-libgcc -static-libstdc++ -lws2_32 -mwindows -O3  icon.o
+g++ -o bin/Chess.exe src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -I../asio-1.18.0/include -Lbin/ -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -static-libgcc -static-libstdc++ -lws2_32 -mwindows -O3  icon.o
 
 Linux: 
 g++ -o bin/Chess src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -static-libgcc -static-libstdc++ icon.o
@@ -115,10 +115,10 @@ int main(int argc, char** argv)
         tcp::resolver::query query(asio::ip::host_name(), ""); //Query for the resolver
         tcp::resolver::iterator iter = resolver.resolve(query); //Resolve the query
         tcp::resolver::iterator end; // End marker.
-        while (iter != end)
+        while (iter != end) //Iterate through the list of IPs received from query
         {
-            tcp::endpoint ep = *iter++;
-            if(isdigit(ep.address().to_string()[0]) && isdigit(ep.address().to_string()[1]) ) //If the IP is not an IPv6...
+            tcp::endpoint ep = *iter++; 
+            if(ep.address().is_v4()) //If the IP is not an IPv6...
             {
                 localIPs.append(ep.address().to_string()); //Add it to the message box
                 break;

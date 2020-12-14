@@ -45,6 +45,12 @@ namespace renderer
         std::vector<std::vector<SDL_Texture* > > textures; 
         std::vector<std::vector<SDL_Texture* > > BGTextures; //Another 8x8 array of textures, these are for the background
         std::vector<std::vector<SDL_Rect > > pos; //Position rectangles for each texture
+
+        SDL_Texture *moveableTexture; //The texture indicating a moveable square
+        std::vector<SDL_Texture *> moveableTexts; //List of all dots indicating where a piece can move
+        std::vector<SDL_Rect > moveablePos; //List of all moveable sprite positions
+
+
         SDL_Rect size; //We only need one size rectangle, all sprites are the same size
 
         float scale; //How much to scale pieces for a certain screen shape
