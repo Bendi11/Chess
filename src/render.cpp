@@ -364,7 +364,7 @@ std::string Drawer::getTextInput() //Function to get text input and return the s
     SDL_Surface* textSurface; //Surface containing the text window
     SDL_Color txtCol = {0xFF, 0xFF, 0xFF}; //Text color
 
-    SDL_Surface* promptSurface = TTF_RenderText_Solid(sans, "Enter the host's IPv4 address here: ", txtCol); //The prompt for text input
+    SDL_Surface* promptSurface = TTF_RenderText_Shaded(sans, "Enter the host's IPv4 address here: ", txtCol, {0, 0, 0}); //The prompt for text input
     SDL_Rect promptPos;
     promptPos.x = SCREEN_WIDTH / 2;
     promptPos.y = SCREEN_HEIGHT / 2;
@@ -422,7 +422,7 @@ std::string Drawer::getTextInput() //Function to get text input and return the s
         {
             edited = false;
             SDL_RenderClear(render); //Clear the renderer
-            textSurface = TTF_RenderText_Solid(sans, inputText.c_str(), txtCol); //Render the new text
+            textSurface = TTF_RenderText_Shaded(sans, inputText.c_str(), txtCol, {0, 0, 0}); //Render the new text
             pos.w = textSurface->w;
             pos.x = (SCREEN_WIDTH / 2) - pos.w / 2;
 
