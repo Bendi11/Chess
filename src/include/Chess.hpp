@@ -50,6 +50,7 @@ namespace Chess
         void restart(); //Function to replace all pieces in the right places
 
         void findMoves(); //Function to find which tiles a certain piece can move to
+        uint8_t isCheck(); //Function to check if a board is in check and which side is in check
         uint8_t playerMove(unsigned int x, unsigned int y, unsigned int moveX, unsigned int moveY, bool WHITE); //Function to allow player to move only their pieces
 
         //Functions for finding moves for each type of piece

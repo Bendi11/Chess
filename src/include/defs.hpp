@@ -13,6 +13,10 @@
 #define WINNER_WHITE 1
 #define WINNER_BLACK 2
 
+#define WHITE_CHECK 0
+#define BLACK_CHECK 1
+#define NO_CHECK 2
+
 //--------------------CHESS PIECE DEFINITIONS--------------------//
 
 #define EMPTY 0

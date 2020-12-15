@@ -5,6 +5,55 @@ update attackable squares, etc.
 #include "include/Chess.hpp"
 using namespace Chess;
 
+//Function to check if a side is in check
+uint8_t board_t::isCheck()
+{
+    //Where the kings are on the board
+    std::pair<unsigned int, unsigned int> wKingPos;
+    std::pair<unsigned int, unsigned int> bKingPos;
+
+    /*Find where both kings are on the board*/
+    for(unsigned x = 0; x < 8; ++x)
+    {
+        for(unsigned y = 0; y < 8; ++y)
+        {
+            if(container[x][y].type == wKING) 
+            {
+                wKingPos.first = x;
+                wKingPos.second = y;
+            }
+            else if(container[x][y].type == bKING)
+            {
+                bKingPos.first = x;
+                bKingPos.second = y;
+            }
+        }
+    }
+
+    for(unsigned x = 0; x < 8; ++x)
+    {
+        for(unsigned y = 0; y < 8; ++y)
+        {
+            if(container[x][y].type > WHITE_END) //If the piece is black
+            {
+                for(unsigned i = 0; i < container[x][y].attackable.size(); ++i)
+                {
+                    if(container[x][y].attackable[i] == wKingPos) return WHITE_CHECK;
+                }
+            }
+            else if(container[x][y].type != EMPTY) //If the piece is white
+            {
+                for(unsigned i = 0; i < container[x][y].attackable.size(); ++i)
+                {
+                    if(container[x][y].attackable[i] == bKingPos) return BLACK_CHECK;
+                }
+            }
+        }
+    }
+    
+    return NO_CHECK;
+}
+
 //Function to stringify a move
 std::string makeMoveString(unsigned int x, unsigned int y, unsigned int mX, unsigned int mY, bool WHITE)
 {

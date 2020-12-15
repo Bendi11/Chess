@@ -179,7 +179,7 @@ int main(int argc, char** argv)
         }
         else
         {
-            if(b.counter % 2) e.makeMove(b, true, d); //Make a move for the opponent
+            if(b.counter % 2) e.makeMove(b, false, d); //Make a move for the opponent
         }
         
 
