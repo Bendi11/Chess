@@ -3,7 +3,7 @@ Chess by Benjamin L (Bendi11)
 Chess game made with C++
 Compile commands: 
 Windows: 
-g++ -o bin/Chess.exe src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -I../asio-1.18.0/include -Lbin/ -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -static-libgcc -static-libstdc++ -lws2_32 -mwindows -O3  icon.o
+g++ -o bin/Chess.exe src/main.cpp src/Chess.cpp src/render.cpp src/bot.cpp -Isrc/include -I../asio-1.18.0/include -Lbin/ -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -static-libgcc -static-libstdc++ -lws2_32 -mwindows -O3  icon.o
 
 Linux: 
 g++ -o bin/Chess src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -static-libgcc -static-libstdc++ icon.o
@@ -11,6 +11,7 @@ g++ -o bin/Chess src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -lSDL2m
 
 #include "include/Chess.hpp"
 #include "include/render.hpp"
+#include "include/bot.hpp"
 
 #include <asio.hpp>
 #include <thread>
@@ -79,7 +80,7 @@ void showStartupBox()
     {
         {/*Flags,   buttonid, text*/ 0, 0, "Join a game"},
         {0, 1, "Host a game"},
-        {0, 2, "Play vs computer"}
+        {0, 2, "Computer"}
     };
     const SDL_MessageBoxData messageData = 
     {
@@ -113,15 +114,19 @@ int main(int argc, char** argv)
 {
     //Init all objects
     Chess::board_t b;
+    Bot::computerEnemy e;
     renderer::Drawer d;
+    
     d.init(624, 624, b);
     bool gameover = false;
 
     showStartupBox();
 
+    tcp::socket socket(ioContext); //Make a new socket
+
+
     if(isOnline)
     {
-        tcp::socket socket(ioContext); //Make a new socket
         if(server)
         {
             //Get IP of localhost eg. the host's IP
@@ -171,6 +176,10 @@ int main(int argc, char** argv)
                 storedWMove = b.wMoveString;
                 asio::write(socket, asio::buffer(b.wMoveString));
             }
+        }
+        else
+        {
+            if(b.counter % 2) e.makeMove(b, true, d); //Make a move for the opponent
         }
         
 

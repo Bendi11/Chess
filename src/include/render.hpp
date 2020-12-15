@@ -61,6 +61,7 @@ namespace renderer
         void input(Chess::board_t& Board); //Function to handle input
 
         void drawBoard(Chess::board_t& Board); //Function to draw all pieces on a chessboard
+        void fastDrawBoard(Chess::board_t& Board); //Function to draw all pieces on a chessboard without FPS cap
         void assignTextures(Chess::board_t& Board, unsigned int x, unsigned int y); //Function to iterate through and assign the right texture to each piece on a board
         std::string getTextInput(); //Function to get text input and return the string of text, while displaying the inputted text
     };

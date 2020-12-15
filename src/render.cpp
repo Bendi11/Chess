@@ -440,3 +440,21 @@ std::string Drawer::getTextInput() //Function to get text input and return the s
     SDL_StopTextInput(); //Stop text input
     return inputText;
 }
+
+//Function to draw board without FPS cap
+void Drawer::fastDrawBoard(Chess::board_t& Board)
+{
+    SDL_RenderClear(render); //Clear the renderer of all loaded textures
+
+    for(unsigned x = 0; x < 8; ++x)
+    {
+        for(unsigned y = 0; y < 8; ++y)
+        {
+            assignTextures(Board, x, y); //Assign the correct texture to this coordinate
+            SDL_RenderCopy(render, BGTextures[x][y], &size, &pos[x][y]); //Add the background texture 
+            SDL_RenderCopy(render, textures[x][y], &size, &pos[x][y]); //Draw the piece texture over it 
+        }
+    }
+
+    SDL_RenderPresent(render);
+}

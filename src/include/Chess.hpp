@@ -45,6 +45,7 @@ namespace Chess
         /*Functions*/
 
         board_t(void); //One constructor for making a default chess board
+        //board_t operator =(board_t& Board); //Function to assign one chess board to another
         board_t(unsigned int w, unsigned int h); //Function for making a variable height and width grid
         void restart(); //Function to replace all pieces in the right places
 
