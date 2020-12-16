@@ -1,2 +1,2 @@
 setoption name Skill Level value 0
-position startpos move e2e4 g8f6 d2d4 f6e4 f1d3 d7d5 d3e4 d5e4 f2f3 b8c6 f3e4 e7e5 d4e5 d8d1 e1d1 h7h5 g2g4 f8c5 h2h3 h5g4 h3g4 c8g4 g1f3 h8h1 c1e3 d1d2 
+position startpos move e2e4 g8f6 

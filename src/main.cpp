@@ -137,7 +137,7 @@ void showStartupBox()
         //Check what button was pressed
         switch(buttonID)
         {
-            case 0: botDifficulty = 0; botTime = 100; botContempt = 2; break;
+            case 0: botDifficulty = 0; botTime = 200; botContempt = 2; break;
             case 1: botDifficulty = 0; botTime = 500; botContempt = 10; break;
             case 2: botDifficulty = 5; botTime = 1000; botContempt = 20; break;
             case 3: botDifficulty = 7; botTime = 1000; botContempt = 24; break;
