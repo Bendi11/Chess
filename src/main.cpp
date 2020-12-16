@@ -3,8 +3,7 @@ Chess by Benjamin L (Bendi11)
 Chess game made with C++
 Compile commands: 
 Windows: 
-g++ -o bin/Chess.exe src/main.cpp src/Chess.cpp src/render.cpp src/bot.cpp -Isrc/include -I../asio-1.18.0/include -Lbin/ -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -static-libgcc -static-libstdc++ -lws2_32 -mwindows -O3  icon.o
-
+ g++  -o bin/Chess.exe src/main.cpp src/Chess.cpp src/render.cpp src/bot.cpp -Isrc/include  -Lbin/ -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -static-libgcc -static-libstdc++ -lws2_32 -O3  icon.o -IE:\asio-1.18.0\include
 Linux: 
 g++ -o bin/Chess src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -static-libgcc -static-libstdc++ icon.o
 */
@@ -18,9 +17,9 @@ g++ -o bin/Chess src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -lSDL2m
 #include <thread>
 
 std::string wMoveString = " ";
+std::string bMoveString = " ";
 std::string recordString; //Recorded match
 unsigned int botDifficulty; //Stockfish difficulty
-unsigned int storedCount = 0;
 
 
 /*--------------------NETWORKING OBJECTS--------------------*/
@@ -152,8 +151,8 @@ int main(int argc, char** argv)
     Bot::computerEnemy e;
     renderer::Drawer d;
     showStartupBox();
-    unsigned int wCheck; //If white is in check for two turns, black wins
-    unsigned int bCheck; //If black is in check for two turns, white wins
+    unsigned int wCheck = 1; //If white is in check for two turns, black wins
+    unsigned int bCheck = 0; //If black is in check for two turns, white wins
 
     std::ofstream fishFile("move.txt"); //File used for communication between processes
     
@@ -194,56 +193,101 @@ int main(int argc, char** argv)
         std::thread netThread1(netThread, std::ref(b), server, std::ref(socket)); //Start the receiving network thread
     }
     d.WHITEORBLACK = server; //Set the player's color based on server and host
-
+    uint8_t result;
 
     while(d.running)
     {
         d.input(b);
         d.drawBoard(b);
-
-        if(wMoveString != b.wMoveString && !isOnline) //Send the move string to stockfish
+        
+        if(wMoveString != b.wMoveString) //If a move was made and we don't know about it...
         {
+            wMoveString = b.wMoveString;
+            if(!isOnline) //Send the move string to Stockfish
+            {
+                //Clear the file
+                fishFile.open("move.txt", std::ofstream::out | std::ofstream::trunc);
+                fishFile.close();
+                fishFile.open("move.txt", std::ofstream::out);
+                fishFile<<"uci"<<std::endl;
+
+                std::string sentStr = "0000";
+                
+                storedWMove = b.wMoveString;
+                switch(wMoveString[2])
+                {
+                    case '0': sentStr[0] = 'a'; break;
+                    case '1': sentStr[0] = 'b'; break;
+                    case '2': sentStr[0] = 'c'; break;
+                    case '3': sentStr[0] = 'd'; break;
+                    case '4': sentStr[0] = 'e'; break;
+                    case '5': sentStr[0] = 'f'; break;
+                    case '6': sentStr[0] = 'g'; break;
+                    case '7': sentStr[0] = 'h'; break;
+                }
+                sentStr[1] =  (wMoveString[4] + 1);
+                switch(wMoveString[7])
+                {
+                    case '0': sentStr[2] = 'a'; break;
+                    case '1': sentStr[2] = 'b'; break;
+                    case '2': sentStr[2] = 'c'; break;
+                    case '3': sentStr[2] = 'd'; break;
+                    case '4': sentStr[2] = 'e'; break;
+                    case '5': sentStr[2] = 'f'; break;
+                    case '6': sentStr[2] = 'g'; break;
+                    case '7': sentStr[2] = 'h'; break;
+                }
+                sentStr[3] =  (wMoveString[9] + 1);
+
+                fishFile<<"position startpos move ";
+                recordString.append(sentStr); //Add to the recorded string 
+                recordString.append(" ");
+                fishFile<<recordString<<std::endl;
+                fishFile.close();
+            }
+
+            /*Check for a checkmate victory*/
+            result = b.isCheck();
+            std::cout<<(unsigned int)result<<std::endl;
+            if(result == WHITE_CHECK)
+            {
+                wCheck++; //Increase turns white is in check for
+                if(wCheck > 1) //Test if white lost by checkmate
+                {
+                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Chess", "Black won by checkmate!", d.win);
+                    gameover = true;
+                }
+            }
+            else
+            {
+                //wCheck = 0; //Reset hwo many turns white is in check for if white is no longer in check
+            }
+            
+            if(result == BLACK_CHECK)
+            {
+                bCheck++; //Increase turns black is in check for
+                if(bCheck > 1) //Test if black lost by checkmate
+                {
+                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Chess", "White won by checkmate!", d.win);
+                    gameover = true;
+                }
+            }
+            else
+            {
+                bCheck = 0; //Reset how many turns white is in check for if white is no longer in check
+            }
+        
+        }
+        if(gameover == true)
+        {
+            b.restart();
             //Clear the file
             fishFile.open("move.txt", std::ofstream::out | std::ofstream::trunc);
             fishFile.close();
-            fishFile.open("move.txt", std::ofstream::out);
-            fishFile<<"uci"<<std::endl;
-
-            std::string sentStr = "0000";
-            
-            wMoveString = b.wMoveString;
-            switch(wMoveString[2])
-            {
-                case '0': sentStr[0] = 'a'; break;
-                case '1': sentStr[0] = 'b'; break;
-                case '2': sentStr[0] = 'c'; break;
-                case '3': sentStr[0] = 'd'; break;
-                case '4': sentStr[0] = 'e'; break;
-                case '5': sentStr[0] = 'f'; break;
-                case '6': sentStr[0] = 'g'; break;
-                case '7': sentStr[0] = 'h'; break;
-            }
-            sentStr[1] =  (wMoveString[4] + 1);
-            switch(wMoveString[7])
-            {
-                case '0': sentStr[2] = 'a'; break;
-                case '1': sentStr[2] = 'b'; break;
-                case '2': sentStr[2] = 'c'; break;
-                case '3': sentStr[2] = 'd'; break;
-                case '4': sentStr[2] = 'e'; break;
-                case '5': sentStr[2] = 'f'; break;
-                case '6': sentStr[2] = 'g'; break;
-                case '7': sentStr[2] = 'h'; break;
-            }
-            sentStr[3] =  (wMoveString[9] + 1);
-
-            fishFile<<"position startpos move ";
-            recordString.append(sentStr); //Add to the recorded string 
-            recordString.append(" ");
-            fishFile<<recordString<<std::endl;
-            fishFile.close();
+            recordString.clear();
+            gameover = false;
         }
-
+        
         if(isOnline)
         {
             if(storedBMove != b.bMoveString && !server)
@@ -261,16 +305,60 @@ int main(int argc, char** argv)
         {
             if(b.counter % 2) e.stockfishMove(b, recordString, fishFile, botDifficulty, d); //Make a move for the opponent
         }
-        
-        /*Check for a checkmate victory*/
-        uint8_t result = b.isCheck();
-         
-        if(storedCount != b.counter) //If a move was made and we don't know about it...
+
+    
+        if(wMoveString != b.wMoveString) //If a move was made and we don't know about it...
         {
-            storedCount = b.counter;
+            wMoveString = b.wMoveString;
+            if(!isOnline) //Send the move string to Stockfish
+            {
+                //Clear the file
+                fishFile.open("move.txt", std::ofstream::out | std::ofstream::trunc);
+                fishFile.close();
+                fishFile.open("move.txt", std::ofstream::out);
+                fishFile<<"uci"<<std::endl;
+
+                std::string sentStr = "0000";
+                
+                storedWMove = b.wMoveString;
+                switch(wMoveString[2])
+                {
+                    case '0': sentStr[0] = 'a'; break;
+                    case '1': sentStr[0] = 'b'; break;
+                    case '2': sentStr[0] = 'c'; break;
+                    case '3': sentStr[0] = 'd'; break;
+                    case '4': sentStr[0] = 'e'; break;
+                    case '5': sentStr[0] = 'f'; break;
+                    case '6': sentStr[0] = 'g'; break;
+                    case '7': sentStr[0] = 'h'; break;
+                }
+                sentStr[1] =  (wMoveString[4] + 1);
+                switch(wMoveString[7])
+                {
+                    case '0': sentStr[2] = 'a'; break;
+                    case '1': sentStr[2] = 'b'; break;
+                    case '2': sentStr[2] = 'c'; break;
+                    case '3': sentStr[2] = 'd'; break;
+                    case '4': sentStr[2] = 'e'; break;
+                    case '5': sentStr[2] = 'f'; break;
+                    case '6': sentStr[2] = 'g'; break;
+                    case '7': sentStr[2] = 'h'; break;
+                }
+                sentStr[3] =  (wMoveString[9] + 1);
+
+                fishFile<<"position startpos move ";
+                recordString.append(sentStr); //Add to the recorded string 
+                recordString.append(" ");
+                fishFile<<recordString<<std::endl;
+                fishFile.close();
+            }
+
+            /*Check for a checkmate victory*/
+            result = b.isCheck();
             if(result == WHITE_CHECK)
             {
                 wCheck++; //Increase turns white is in check for
+                std::cout<<wCheck<<std::endl;
                 if(wCheck > 1) //Test if white lost by checkmate
                 {
                     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Chess", "Black won by checkmate!", d.win);
@@ -279,7 +367,7 @@ int main(int argc, char** argv)
             }
             else
             {
-                wCheck = 0; //Reset hwo many turns white is in check for if white is no longer in check
+                //wCheck = 0; //Reset hwo many turns white is in check for if white is no longer in check
             }
             
             if(result == BLACK_CHECK)
@@ -297,28 +385,15 @@ int main(int argc, char** argv)
             }
         
         }
-        
-        
-
-        if(b.WINNER != WINNER_NONE)
-        {
-            if(b.WINNER == WINNER_WHITE)
-            {
-                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Chess", "White won by checkmate!", d.win);
-                gameover = true;
-            }
-            else
-            {
-                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Chess", "Black won by checkmate!", d.win);
-                gameover = true;
-            }
-            
-        }
         if(gameover == true)
         {
             b.restart();
+            //Clear the file
+            fishFile.open("move.txt", std::ofstream::out | std::ofstream::trunc);
+            fishFile.close();
             gameover = false;
         }
+        
     }
     
     SDL_DestroyRenderer(d.render);

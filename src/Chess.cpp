@@ -38,14 +38,22 @@ uint8_t board_t::isCheck()
             {
                 for(unsigned i = 0; i < container[x][y].attackable.size(); ++i)
                 {
-                    if(container[x][y].attackable[i] == wKingPos) return WHITE_CHECK;
+                    if(container[x][y].attackable[i] == wKingPos)
+                    {
+                        std::cout<<"WHITE CHECK"<<std::endl;
+                        return WHITE_CHECK;
+                    } 
                 }
             }
             else if(container[x][y].type != EMPTY) //If the piece is white
             {
                 for(unsigned i = 0; i < container[x][y].attackable.size(); ++i)
                 {
-                    if(container[x][y].attackable[i] == bKingPos) return BLACK_CHECK;
+                    if(container[x][y].attackable[i] == bKingPos)
+                    {
+                        std::cout<<"BLACK CHECK"<<std::endl;
+                        return BLACK_CHECK;
+                    } 
                 }
             }
         }
