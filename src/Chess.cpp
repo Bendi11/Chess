@@ -213,6 +213,18 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
     }
     else rVal = MOVE_BAD; //Return move bad if the player tried to move a peice they don't control
     if(rVal == MOVE_BAD) return rVal;
+    findMoves(); //Find new moves of all moved pieces
+    unsigned int check = isCheck(); //Checking if white or black king is in check
+
+    //If white moved their king into check, they just lose
+    if(wChecks == 0 && WHITE && check == WHITE_CHECK)
+    {
+        WINNER = WINNER_BLACK;
+    }
+    else if(bChecks == 0 && !WHITE && check == BLACK_CHECK) //Same for black
+    {
+        WINNER = WINNER_WHITE;
+    }
 
     counter++; //Add to move counter
     if(WHITE) 
@@ -227,8 +239,6 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
     }
     PGN.append(" "); //Add a space separating the PGN
 
-    findMoves(); //Find new moves of all moved pieces
-    unsigned int check = isCheck(); //Checking if white or black king is in check
     
     //Checking for white checkmate
     if(check == WHITE_CHECK)
