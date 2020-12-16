@@ -6,8 +6,9 @@ update attackable squares, etc.
 using namespace Chess;
 
 //Function to check if a side is in check
-uint8_t board_t::isCheck()
+unsigned int board_t::isCheck()
 {
+    std::cout<<"IS CHECK: "<<std::endl;
     //Where the kings are on the board
     std::pair<unsigned int, unsigned int> wKingPos;
     std::pair<unsigned int, unsigned int> bKingPos;
@@ -38,7 +39,7 @@ uint8_t board_t::isCheck()
             {
                 for(unsigned i = 0; i < container[x][y].attackable.size(); ++i)
                 {
-                    if(container[x][y].attackable[i] == wKingPos)
+                    if(container[x][y].attackable[i].first == wKingPos.first && container[x][y].attackable[i].second == wKingPos.second)
                     {
                         std::cout<<"WHITE CHECK"<<std::endl;
                         return WHITE_CHECK;

@@ -1,2 +1,0 @@
-setoption name Skill Level value 20
-position startpos move e2e4 c7c5 e1e2 e7e6 
