@@ -2,7 +2,7 @@
 
 using namespace Bot;
 
-std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigned int> > parseStockfish(std::string outStr)
+std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigned int> > parseStockfish(std::string outStr, Chess::board_t& Board)
 {
     std::string good = "bestmove";
     std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigned int> > move;
@@ -14,6 +14,10 @@ std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigne
     {
         if(line.find(good) != std::string::npos) //Check if best move was outputted
         {
+            if(line == "bestmove (no move)")
+            {
+                Board.WINNER = WINNER_BLACK;
+            }
             switch(line[9])
             {
                 case 'a': val = 0; break;
@@ -76,7 +80,7 @@ void computerEnemy::stockfishMove(Chess::board_t& Board, std::string& record, st
     write.close();
 
     std::string res = exec("E:\\Chess\\bin\\stockfish_20090216_x64_bmi2.exe < move.txt", d); //Makea  new instance of Stockfish
-    std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigned int> > move = parseStockfish(res); //Parse received data
+    std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigned int> > move = parseStockfish(res, Board); //Parse received data
 
     //std::cout<<move.first.first<<", "<<move.first.second<<"\t"<<move.second.first<<", "<<move.second.second<<std::endl; //Print the move
 
