@@ -2,8 +2,15 @@
 #include "Chess.hpp"
 #include "render.hpp"
 #include <math.h>
-#include <random>
-#include <time.h>
+#include <array>
+#include <sstream>
+#include <fstream>
+#include <string>
+#include <memory>
+#include <limits>
+
+#include <stdio.h>
+
 
 namespace Bot //Namespace containing all bot objects
 {
@@ -18,7 +25,23 @@ namespace Bot //Namespace containing all bot objects
         const double Bwt = 330;
         const double Rwt = 500;
         const double Qwt = 900;
-        const double Kwt = 200000;
+        const double Kwt = 2000000;
+
+        //How important mobility is for each piece
+        uint8_t pawnMobil = 10;
+        uint8_t knightMobil = 20;
+        uint8_t bishopMobil = 45;
+        uint8_t rookMobil = 50;
+        uint8_t kingMobil = 10;
+        uint8_t queenMobil = 60;
+
+        //How important attackable tiles are for each piece
+        uint8_t pawnAtk = 20;
+        uint8_t knightAtk = 30;
+        uint8_t bishopAtk = 35;
+        uint8_t rookAtk = 25;
+        uint8_t kingAtk = 0;
+        uint8_t queenAtk = 40;
 
         //Where pawns are encouraged to go
         double wPawnTable[8][8] = 
@@ -171,5 +194,7 @@ namespace Bot //Namespace containing all bot objects
         moveScore miniMax(Chess::board_t& Board, int depth); //Function to minimax the position
         moveScore graphicMiniMax(Chess::board_t& Board, int depth, renderer::Drawer& d, bool WHITE); //Function to minimax each possible possition and display them
         double evaluate(Chess::board_t& Board); //Function to evaluate a chess position and return a score
+
+        void stockfishMove(Chess::board_t& Board, std::string& record, std::ofstream& write, unsigned int difficulty); //Function to start stockfish process
     };
 }
