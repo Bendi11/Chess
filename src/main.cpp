@@ -197,6 +197,30 @@ int main(int argc, char** argv)
 
     while(d.running)
     {
+        if(b.WINNER != WINNER_NONE)
+        {
+            if(b.WINNER == WINNER_WHITE)
+            {
+                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "Chess", "White won by checkmate!", d.win); //Display that white won the game
+                b.restart(); //Reset all chess board values and positions
+                //Clear the communication file
+                fishFile.open("move.txt", std::ofstream::out | std::ofstream::trunc);
+                fishFile.close(); 
+                recordString.clear(); //Clear the PGN recording, effectively restarting Stockfish
+                gameover = false; //Reset gameover
+            }
+            else if(b.WINNER == WINNER_BLACK)
+            {
+                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "Chess", "Black won by checkmate!", d.win); //Display that black won the game
+                b.restart(); //Reset all chess board values and positions
+                //Clear the communication file
+                fishFile.open("move.txt", std::ofstream::out | std::ofstream::trunc);
+                fishFile.close(); 
+                recordString.clear(); //Clear the PGN recording, effectively restarting Stockfish
+                gameover = false; //Reset gameover
+            }
+        }
+    
         d.input(b);
         d.drawBoard(b);
         
@@ -244,48 +268,7 @@ int main(int argc, char** argv)
                 recordString.append(" ");
                 fishFile<<recordString<<std::endl;
                 fishFile.close();
-            }
-
-            /*Check for a checkmate victory*/
-            result = b.isCheck();
-            std::cout<<(unsigned int)result<<std::endl;
-            if(result == WHITE_CHECK)
-            {
-                wCheck++; //Increase turns white is in check for
-                if(wCheck > 1) //Test if white lost by checkmate
-                {
-                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Chess", "Black won by checkmate!", d.win);
-                    gameover = true;
-                }
-            }
-            else
-            {
-                //wCheck = 0; //Reset hwo many turns white is in check for if white is no longer in check
-            }
-            
-            if(result == BLACK_CHECK)
-            {
-                bCheck++; //Increase turns black is in check for
-                if(bCheck > 1) //Test if black lost by checkmate
-                {
-                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Chess", "White won by checkmate!", d.win);
-                    gameover = true;
-                }
-            }
-            else
-            {
-                bCheck = 0; //Reset how many turns white is in check for if white is no longer in check
-            }
-        
-        }
-        if(gameover == true)
-        {
-            b.restart();
-            //Clear the file
-            fishFile.open("move.txt", std::ofstream::out | std::ofstream::trunc);
-            fishFile.close();
-            recordString.clear();
-            gameover = false;
+            }    
         }
         
         if(isOnline)
@@ -306,60 +289,40 @@ int main(int argc, char** argv)
             if(b.counter % 2) e.stockfishMove(b, recordString, fishFile, botDifficulty, d); //Make a move for the opponent
         }
 
+        if(b.WINNER != WINNER_NONE) 
+        {
+            if(b.WINNER == WINNER_WHITE)
+            {
+                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "Chess", "White won by checkmate!", d.win); //Display that white won the game
+                b.restart(); //Reset all chess board values and positions
+                //Clear the communication file
+                fishFile.open("move.txt", std::ofstream::out | std::ofstream::trunc);
+                fishFile.close(); 
+                recordString.clear(); //Clear the PGN recording, effectively restarting Stockfish
+                gameover = false; //Reset gameover
+            }
+            else if(b.WINNER == WINNER_BLACK)
+            {
+                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "Chess", "Black won by checkmate!", d.win); //Display that black won the game
+                b.restart(); //Reset all chess board values and positions
+                //Clear the communication file
+                fishFile.open("move.txt", std::ofstream::out | std::ofstream::trunc);
+                fishFile.close(); 
+                recordString.clear(); //Clear the PGN recording, effectively restarting Stockfish
+                gameover = false; //Reset gameover
+            }
+        }
     
-        if(bMoveString != b.bMoveString) //If a move was made and we don't know about it...
-        {
-            bMoveString = b.bMoveString;
-            /*Check for a checkmate victory*/
-            result = b.isCheck();
-            std::cout<<result<<std::endl;
-            if(result == WHITE_CHECK)
-            {
-                wCheck++; //Increase turns white is in check for
-                //std::cout<<wCheck<<std::endl;
-                if(wCheck > 1) //Test if white lost by checkmate
-                {
-                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Chess", "Black won by checkmate!", d.win);
-                    gameover = true;
-                }
-            }
-            else
-            {
-                //wCheck = 0; //Reset hwo many turns white is in check for if white is no longer in check
-            }
-            
-            if(result == BLACK_CHECK)
-            {
-                bCheck++; //Increase turns black is in check for
-                if(bCheck > 1) //Test if black lost by checkmate
-                {
-                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Chess", "White won by checkmate!", d.win);
-                    gameover = true;
-                }
-            }
-            else
-            {
-                bCheck = 0; //Reset hwo many turns white is in check for if white is no longer in check
-            }
-        
-        }
-        if(gameover == true)
-        {
-            b.restart();
-            //Clear the file
-            fishFile.open("move.txt", std::ofstream::out | std::ofstream::trunc);
-            fishFile.close();
-            gameover = false;
-        }
-        
     }
     
-    SDL_DestroyRenderer(d.render);
-    SDL_DestroyWindow(d.win);
-    SDL_CloseAudio();
-    SDL_FreeWAV(d.wavBuffer);
-    IMG_Quit();
-    SDL_Quit();
+    SDL_DestroyRenderer(d.render); //Destroy SDL2 renderer
+    SDL_DestroyWindow(d.win); //Destroy SDL2 window
+    socket.close(); //Close the socket
+    SDL_CloseAudio(); //Close SDL2 audio device
+    SDL_FreeWAV(d.wavBuffer); //Free the WAV storage
+    IMG_Quit(); //Quit SDL2_IMG
+    TTF_Quit(); //Quit SDL2_TTF
+    SDL_Quit(); //Finally, quit SDL2
     
     return 0;
 }

@@ -42,6 +42,9 @@ namespace Chess
         unsigned int sizeX = 7;
         unsigned int sizeY = 7;
 
+        unsigned int wChecks = 0; //How many turns white has been in check for
+        unsigned int bChecks = 0; //How many turns black has been in check for
+
         /*Functions*/
 
         board_t(void); //One constructor for making a default chess board

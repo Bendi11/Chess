@@ -91,7 +91,7 @@ std::string makeMoveString(unsigned int x, unsigned int y, unsigned int mX, unsi
 uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, unsigned int moveY, bool WHITE)
 {
     uint8_t rVal = MOVE_BAD; //Return value
-    findMoves();
+    findMoves(); //Find availible moves for all pieces
 
     //Make sure the player is only controlling their pieces and that it is their turn and that nobody has won
     if( ( ( (container[x][y].type > WHITE_END && !WHITE) || (container[x][y].type <= WHITE_END && WHITE)  ) && WINNER == WINNER_NONE ) && ( (WHITE && counter % 2 == 0) || (!WHITE && counter % 2 != 0 ) ) ) 
@@ -173,19 +173,35 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
 
     counter++; //Add to move counter
 
-    bool foundWKing = false;
-    bool foundBKing = false;
-
-    for(unsigned __x = 0; __x < 8; ++__x)
+    findMoves(); //Find new moves of all moved pieces
+    unsigned int check = isCheck(); //Checking if white or black king is in check
+    
+    //Checking for white checkmate
+    if(check == WHITE_CHECK)
     {
-        for(unsigned __y = 0; __y < 8; ++__y)
+        wChecks++;
+        if(wChecks > 1) //If white is in check for two consecutive turns, they were checkmated
         {
-            if(container[__x][__y].type == wKING) foundWKing = true;
-            else if(container[__x][__y].type == bKING) foundBKing = true;
+            WINNER = WINNER_BLACK; //Black wins
         }
     }
-    if(!foundWKing) WINNER = WINNER_BLACK;
-    if(!foundBKing) WINNER = WINNER_WHITE;
+    else 
+    {
+        wChecks = 0; //If white is no longer in check, their consecutive checks are reset
+    }
+
+    if(check == BLACK_CHECK) //Checking for black checkmate
+    {
+        bChecks++;
+        if(bChecks > 1)
+        {
+            WINNER = WINNER_WHITE; //White wins by checkmate here
+        }
+    }
+    else 
+    {
+        bChecks = 0; //Reset the consecutive checks counter to 0
+    }
 
     return rVal;
 }
