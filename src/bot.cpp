@@ -2,52 +2,6 @@
 
 using namespace Bot;
 
-std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigned int> > parseStockfishPonder(std::string outStr)
-{
-    std::string good = "ponder";
-    std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigned int> > move;
-    std::istringstream str(outStr); //Make string into stream
-    std::string line; //String holding contents of read line
-    unsigned int val = 0;
-    //bestmove 0000 ponder 0000
-
-    while(std::getline(str, line))
-    {
-        if(line.find(good) != std::string::npos) //Check if best move was outputted
-        {
-            switch(line[21])
-            {
-                case 'a': val = 0; break;
-                case 'b': val = 1; break;
-                case 'c': val = 2; break;
-                case 'd': val = 3; break;
-                case 'e': val = 4; break;
-                case 'f': val = 5; break;
-                case 'g': val = 6; break;
-                case 'h': val = 7; break;
-            }
-            move.first.first = val;
-            move.first.second = (line[22] - '0') - 1;
-
-            switch(line[23])
-            {
-                case 'a': val = 0; break;
-                case 'b': val = 1; break;
-                case 'c': val = 2; break;
-                case 'd': val = 3; break;
-                case 'e': val = 4; break;
-                case 'f': val = 5; break;
-                case 'g': val = 6; break;
-                case 'h': val = 7; break;
-            }
-            move.second.first = val;
-            move.second.second = (line[24] - '0') - 1;
-            std::cout<<line<<std::endl;
-            return move;
-        }
-    }
-}
-
 std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigned int> > parseStockfish(std::string outStr)
 {
     std::string good = "bestmove";
@@ -91,24 +45,28 @@ std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigne
             return move;
         }
     }
+    return move; //Just to stop warnings, this will never actually be reached
 }
 
-std::string exec(const char* cmd) 
+std::string exec(const char* cmd, renderer::Drawer& d) 
 {
-    std::array<char, 128> buffer;
-    std::string result;
-    std::shared_ptr<FILE> pipe(popen(cmd, "r"), pclose);
+    std::array<char, 128> buffer; //128 bytes at a time read
+    std::string result; //Stringified result
+    std::shared_ptr<FILE> pipe(popen(cmd, "r"), pclose); //Open a stockfish instance
+    SDL_RaiseWindow(d.win); //Set the window above the terminal window
+
     if (!pipe) throw std::runtime_error("popen() failed!");
-    while (!feof(pipe.get())) 
+    while (!feof(pipe.get())) //Get data until EOF (End Of File)
     {
         if (fgets(buffer.data(), 128, pipe.get()) != nullptr)
-            result += buffer.data();
+            result += buffer.data(); //Fill the buffer with data and add it to the string
     }
-    return result;
+    return result; //Return the output
 }
 
-void computerEnemy::stockfishMove(Chess::board_t& Board, std::string& record, std::ofstream& write, unsigned int difficulty)
+void computerEnemy::stockfishMove(Chess::board_t& Board, std::string& record, std::ofstream& write, unsigned int difficulty, renderer::Drawer& d)
 {
+    //Add all data to tell stockfish what difficulty to play at and how long a move should take
     write.open("move.txt", std::ofstream::app | std::ofstream::out);
     write<<"setoption name Skill Level value "<<difficulty<<std::endl;
     write<<"go movetime 1000"<<std::endl; //Write command
@@ -116,13 +74,14 @@ void computerEnemy::stockfishMove(Chess::board_t& Board, std::string& record, st
     write<<"go movetime 1000"<<std::endl;
     write.close();
 
-    std::string res = exec("E:\\Chess\\bin\\stockfish_20090216_x64_bmi2.exe < move.txt");
+    std::string res = exec("E:\\Chess\\bin\\stockfish_20090216_x64_bmi2.exe < move.txt", d); //Makea  new instance of Stockfish
     std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigned int> > move = parseStockfish(res); //Parse received data
 
-    std::cout<<move.first.first<<", "<<move.first.second<<"\t"<<move.second.first<<", "<<move.second.second<<std::endl; //Print the move
+    //std::cout<<move.first.first<<", "<<move.first.second<<"\t"<<move.second.first<<", "<<move.second.second<<std::endl; //Print the move
 
+    /*Storing the stringified move by Stockfish*/
     std::string sentStr = "0000";
-    switch(move.first.first)
+    switch(move.first.first) //Converting characters sent into letters
     {
         case 0: sentStr[0] = 'a'; break;
         case 1: sentStr[0] = 'b'; break;
@@ -154,12 +113,11 @@ void computerEnemy::stockfishMove(Chess::board_t& Board, std::string& record, st
     write.open("move.txt", std::ofstream::out | std::ofstream::trunc);
     write.close();
     write.open("move.txt", std::ofstream::out);
-    write<<"setoption name Skill Level value "<<difficulty<<std::endl;
 
-    
-    write<<"position startpos move ";
+    write<<"setoption name Skill Level value "<<difficulty<<std::endl; //Set the difficulty again
+    write<<"position startpos move "; //Tell stocckfish the board layout
     write<<record<<std::endl;
-    write.close();
+    write.close(); //Close the communication file
 
     Board.playerMove(move.first.first, move.first.second, move.second.first, move.second.second, false); //Make the move on the board
 }

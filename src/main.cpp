@@ -259,7 +259,7 @@ int main(int argc, char** argv)
         }
         else
         {
-            if(b.counter % 2) e.stockfishMove(b, recordString, fishFile, botDifficulty); //Make a move for the opponent
+            if(b.counter % 2) e.stockfishMove(b, recordString, fishFile, botDifficulty, d); //Make a move for the opponent
         }
         
         /*Check for a checkmate victory*/

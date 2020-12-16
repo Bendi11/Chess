@@ -87,7 +87,7 @@ void Drawer::init(unsigned int w, unsigned int h, Chess::board_t& Board)
 
     
     //Create an SDL2 window with the given parameters
-    win = SDL_CreateWindow("Chess", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_ALWAYS_ON_TOP);
+    win = SDL_CreateWindow("Chess", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     if(!win) //If the window doesn't exist
     {
         exit(EXIT_FAILURE); //Quit the program
