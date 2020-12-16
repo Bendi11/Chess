@@ -267,6 +267,7 @@ int main(int argc, char** argv)
          
         if(storedCount != b.counter) //If a move was made and we don't know about it...
         {
+            storedCount = b.counter;
             if(result == WHITE_CHECK)
             {
                 wCheck++; //Increase turns white is in check for
@@ -303,12 +304,12 @@ int main(int argc, char** argv)
         {
             if(b.WINNER == WINNER_WHITE)
             {
-                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Chess", "You won by checkmate!", d.win);
+                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Chess", "White won by checkmate!", d.win);
                 gameover = true;
             }
             else
             {
-                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Chess", "You lost by checkmate!", d.win);
+                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Chess", "Black won by checkmate!", d.win);
                 gameover = true;
             }
             
