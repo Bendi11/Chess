@@ -184,6 +184,8 @@ namespace Bot //Namespace containing all bot objects
             {-30,-40,-40,-50,-50,-40,-40,-30,}
         };
 
+        std::string storedString; //The last string received from Stockfish used to detect a checkmate
+        
         std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigned int> > bestMove; //The best evauluated move 
 
         void makeMove(Chess::board_t& Board, bool graphic, renderer::Drawer& d); //Function to make a move on the chess board
