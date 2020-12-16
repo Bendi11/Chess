@@ -5,6 +5,49 @@ update attackable squares, etc.
 #include "include/Chess.hpp"
 using namespace Chess;
 
+//Function to write game PGN to PGN file
+void board_t::writePGN(std::string path)
+{
+    
+    std::ofstream PGNFile; //Open the PGN file at the specified path
+    //Clear the file and write PGN to it
+    PGNFile.open(path, std::ofstream::out | std::ofstream::trunc);
+    PGNFile<<PGN<<std::endl; //Write the PGN to the file
+}
+
+//Function to make a PGN file of the current move
+std::string makePGN(unsigned int x, unsigned int y, unsigned int mX, unsigned int mY, bool promote)
+{
+    std::string sentStr = "0000"; //PGN string
+                
+    switch(x)
+    {
+        case 0: sentStr[0] = 'a'; break;
+        case 1: sentStr[0] = 'b'; break;
+        case 2: sentStr[0] = 'c'; break;
+        case 3: sentStr[0] = 'd'; break;
+        case 4: sentStr[0] = 'e'; break;
+        case 5: sentStr[0] = 'f'; break;
+        case 6: sentStr[0] = 'g'; break;
+        case 7: sentStr[0] = 'h'; break;
+    }
+    sentStr[1] =  (y + 1) + '0';
+    switch(mX)
+    {
+        case 0: sentStr[2] = 'a'; break;
+        case 1: sentStr[2] = 'b'; break;
+        case 2: sentStr[2] = 'c'; break;
+        case 3: sentStr[2] = 'd'; break;
+        case 4: sentStr[2] = 'e'; break;
+        case 5: sentStr[2] = 'f'; break;
+        case 6: sentStr[2] = 'g'; break;
+        case 7: sentStr[2] = 'h'; break;
+    }
+    sentStr[3] =  (mY + 1) + '0';
+    if(promote) sentStr.append("q"); //Append that promotion happened
+    return sentStr;
+}
+
 //Function to check if a side is in check
 unsigned int board_t::isCheck()
 {
@@ -91,6 +134,7 @@ std::string makeMoveString(unsigned int x, unsigned int y, unsigned int mX, unsi
 uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, unsigned int moveY, bool WHITE)
 {
     uint8_t rVal = MOVE_BAD; //Return value
+    bool promoted; //If a pawn was promoted
     findMoves(); //Find availible moves for all pieces
 
     //Make sure the player is only controlling their pieces and that it is their turn and that nobody has won
@@ -145,7 +189,7 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
                 if(WHITE) wMoveString = makeMoveString(x, y, moveX, moveY, true);
                 else bMoveString = makeMoveString(x, y, moveX, moveY, false);
 
-                checkPromotion(moveX, moveY, WHITE); //Check if the piece can be promoted
+                promoted = checkPromotion(moveX, moveY, WHITE); //Check if the piece can be promoted
 
                 rVal = MOVE_GOOD; //Return that the move was good
             }
@@ -158,7 +202,7 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
                 container[moveX][moveY] = piece_t(container[x][y].type, true); //Assign  the moving square's type as the moved piece
                 container[x][y] = piece_t(EMPTY, true); //Make the old location empty
 
-                checkPromotion(moveX, moveY, WHITE); //Check if the piece can be promoted
+                promoted = checkPromotion(moveX, moveY, WHITE); //Check if the piece can be promoted
 
                 /*Make a move string for this move to be sent to the TCP enemy*/
                 if(WHITE) wMoveString = makeMoveString(x, y, moveX, moveY, true);
@@ -172,6 +216,17 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
     if(rVal == MOVE_BAD) return rVal;
 
     counter++; //Add to move counter
+    if(WHITE) 
+    {
+        wPGN = makePGN(x, y, moveX, moveY, promoted); //Make PGN of the move
+        PGN.append(wPGN);
+    }
+    else
+    {
+        bPGN = makePGN(x, y, moveX, moveY, promoted); //Make PGN of the move
+        PGN.append(bPGN);
+    }
+    PGN.append(" "); //Add a space separating the PGN
 
     findMoves(); //Find new moves of all moved pieces
     unsigned int check = isCheck(); //Checking if white or black king is in check
@@ -382,7 +437,6 @@ void board_t::findMoves()
     
 }
 
-
 //Functions for finding moves for each type of piece
 void board_t::findPawn(unsigned int _x, unsigned int _y, bool WHITE) //Function to find black or white pawn's moves
 {
@@ -454,10 +508,19 @@ void board_t::findPawn(unsigned int _x, unsigned int _y, bool WHITE) //Function 
 }
 
 //Function to check promotion status of a pawn
-void board_t::checkPromotion(unsigned int x, unsigned int y, bool WHITE)
+bool board_t::checkPromotion(unsigned int x, unsigned int y, bool WHITE)
 {
-    if(container[x][y].type == wPAWN && y == board_8) container[x][y] = piece_t(wQUEEN, true); //Set the pawn to a queen if it is promoted
-    else if(container[x][y].type == bPAWN && y == board_1) container[x][y] = piece_t(bQUEEN, true); //Set the pawn to a queen if it is promoted
+    if(container[x][y].type == wPAWN && y == board_8)
+    {
+        container[x][y] = piece_t(wQUEEN, true); //Set the pawn to a queen if it is promoted
+        return true;
+    } 
+    else if(container[x][y].type == bPAWN && y == board_1)
+    {
+        container[x][y] = piece_t(bQUEEN, true); //Set the pawn to a queen if it is promoted
+        return true;
+    } 
+    return false;
 }
 
 void board_t::findRook(unsigned int _x, unsigned int _y, bool WHITE) //Function to find black or white rook's moves

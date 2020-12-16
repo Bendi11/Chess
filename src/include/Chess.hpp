@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 
+#include <fstream>
 #include <iostream> //Take this out
 
 
@@ -37,6 +38,9 @@ namespace Chess
         uint8_t WINNER = WINNER_NONE; //If white or black won
         std::string wMoveString = " "; //String holding the stringified version of white's last move
         std::string bMoveString = " "; //String holding the stringified version of black's last move
+        std::string wPGN = " "; //String holding PGN of white's last move
+        std::string bPGN = " "; //String holding PGN of black's last move
+        std::string PGN = " "; //PGN recording of entire game
 
         /*Board size*/
         unsigned int sizeX = 7;
@@ -46,7 +50,7 @@ namespace Chess
         unsigned int bChecks = 0; //How many turns black has been in check for
 
         /*Functions*/
-
+        void writePGN(std::string path); //Function to write to a PGN recording file
         board_t(void); //One constructor for making a default chess board
         //board_t operator =(board_t& Board); //Function to assign one chess board to another
         board_t(unsigned int w, unsigned int h); //Function for making a variable height and width grid
@@ -58,7 +62,7 @@ namespace Chess
 
         //Functions for finding moves for each type of piece
         void findPawn(unsigned int x, unsigned int y, bool WHITE); //Function to find black or white pawn's moves
-        void checkPromotion(unsigned int x, unsigned int y, bool WHITE); //Function to find black or white pawn's promotion status
+        bool checkPromotion(unsigned int x, unsigned int y, bool WHITE); //Function to find black or white pawn's promotion status
 
         void findRook(unsigned int x, unsigned int y, bool WHITE); //Function to find black or white rook's moves
 

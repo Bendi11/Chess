@@ -151,12 +151,10 @@ int main(int argc, char** argv)
     Bot::computerEnemy e;
     renderer::Drawer d;
     showStartupBox();
-    unsigned int wCheck = 1; //If white is in check for two turns, black wins
-    unsigned int bCheck = 0; //If black is in check for two turns, white wins
 
     std::ofstream fishFile("move.txt"); //File used for communication between processes
     
-    d.init(624, 624, b);
+    d.init(624, 624, b); 
     bool gameover = false;
     d.WHITEORBLACK = true;
 
@@ -235,39 +233,12 @@ int main(int argc, char** argv)
                 fishFile.open("move.txt", std::ofstream::out);
                 fishFile<<"uci"<<std::endl;
 
-                std::string sentStr = "0000";
-                
-                storedWMove = b.wMoveString;
-                switch(wMoveString[2])
-                {
-                    case '0': sentStr[0] = 'a'; break;
-                    case '1': sentStr[0] = 'b'; break;
-                    case '2': sentStr[0] = 'c'; break;
-                    case '3': sentStr[0] = 'd'; break;
-                    case '4': sentStr[0] = 'e'; break;
-                    case '5': sentStr[0] = 'f'; break;
-                    case '6': sentStr[0] = 'g'; break;
-                    case '7': sentStr[0] = 'h'; break;
-                }
-                sentStr[1] =  (wMoveString[4] + 1);
-                switch(wMoveString[7])
-                {
-                    case '0': sentStr[2] = 'a'; break;
-                    case '1': sentStr[2] = 'b'; break;
-                    case '2': sentStr[2] = 'c'; break;
-                    case '3': sentStr[2] = 'd'; break;
-                    case '4': sentStr[2] = 'e'; break;
-                    case '5': sentStr[2] = 'f'; break;
-                    case '6': sentStr[2] = 'g'; break;
-                    case '7': sentStr[2] = 'h'; break;
-                }
-                sentStr[3] =  (wMoveString[9] + 1);
-
                 fishFile<<"position startpos move ";
-                recordString.append(sentStr); //Add to the recorded string 
+                recordString.append(b.wPGN); //Add to the recorded string 
                 recordString.append(" ");
                 fishFile<<recordString<<std::endl;
                 fishFile.close();
+                b.writePGN("assets/PGN/test.txt");
             }    
         }
         
@@ -276,7 +247,7 @@ int main(int argc, char** argv)
             if(storedBMove != b.bMoveString && !server)
             {
                 storedBMove = b.bMoveString;
-                asio::write(socket, asio::buffer(b.bMoveString));
+                asio::write(socket, asio::buffer(b.bMoveString)); //Write our move to the socket
             }
             else if(storedWMove != b.wMoveString && server) //Check if we need to send a move and we are white
             {
@@ -286,7 +257,7 @@ int main(int argc, char** argv)
         }
         else
         {
-            if(b.counter % 2) e.stockfishMove(b, recordString, fishFile, botDifficulty, d); //Make a move for the opponent
+            if(b.counter % 2) e.stockfishMove(b, recordString, fishFile, botDifficulty, d); //Make a move by Stockfish
         }
 
         if(b.WINNER != WINNER_NONE) 

@@ -67,6 +67,7 @@ void Drawer::assignTextures(Chess::board_t& Board, unsigned int x, unsigned int 
     
 }
 
+//Function to start drawer with all correct SDL2 values etc.
 void Drawer::init(unsigned int w, unsigned int h, Chess::board_t& Board)
 {
     /*Set screen dimensions according to inputted values*/
@@ -180,20 +181,20 @@ void Drawer::init(unsigned int w, unsigned int h, Chess::board_t& Board)
             if(y % 2 == 0)
             {
                 if(x % 2)
-                    BGTextures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bSquare.png"));
+                    BGTextures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wSquare.png"));
                 else
                 {
-                    BGTextures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wSquare.png"));
+                    BGTextures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bSquare.png"));
                 }
                 
             }
             else
             {
                  if(x % 2)
-                    BGTextures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wSquare.png"));
+                    BGTextures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bSquare.png"));
                 else
                 {
-                    BGTextures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bSquare.png"));
+                    BGTextures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wSquare.png"));
                 }
             }
             
