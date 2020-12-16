@@ -182,7 +182,7 @@ int main(int argc, char** argv)
                     localIPs.append(", ");
                 }
             }
-            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Chess Hosting", localIPs.c_str(), NULL); //Show the user what to paste to the other computer
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, "Chess Hosting", localIPs.c_str(), d.win); //Show the user what to paste to the other computer
             servAccept.accept(socket); //Await a connection request
         } 
         else 
