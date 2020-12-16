@@ -42,6 +42,10 @@ namespace Chess
         std::string bPGN = " "; //String holding PGN of black's last move
         std::string PGN = " "; //PGN recording of entire game
 
+        /*Where kings are on the board*/
+        std::pair<unsigned int, unsigned int> wKingP;
+        std::pair<unsigned int, unsigned int> bKingP;
+
         /*Board size*/
         unsigned int sizeX = 7;
         unsigned int sizeY = 7;

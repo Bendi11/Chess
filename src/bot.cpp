@@ -64,14 +64,14 @@ std::string exec(const char* cmd, renderer::Drawer& d)
     return result; //Return the output
 }
 
-void computerEnemy::stockfishMove(Chess::board_t& Board, std::string& record, std::ofstream& write, unsigned int difficulty, renderer::Drawer& d)
+void computerEnemy::stockfishMove(Chess::board_t& Board, std::string& record, std::ofstream& write, unsigned int difficulty, renderer::Drawer& d, unsigned int time)
 {
     //Add all data to tell stockfish what difficulty to play at and how long a move should take
     write.open("move.txt", std::ofstream::app | std::ofstream::out);
     write<<"setoption name Skill Level value "<<difficulty<<std::endl;
-    write<<"go movetime 1000"<<std::endl; //Write command
+    write<<"go movetime "<<time<<std::endl; //Write command
     write<<"position startpos move "<<record<<std::endl;//<<record<<std::endl;
-    write<<"go movetime 1000"<<std::endl;
+    write<<"go movetime "<<time<<std::endl;
     write.close();
 
     std::string res = exec("E:\\Chess\\bin\\stockfish_20090216_x64_bmi2.exe < move.txt", d); //Makea  new instance of Stockfish

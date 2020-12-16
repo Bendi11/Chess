@@ -20,6 +20,7 @@ std::string wMoveString = " ";
 std::string bMoveString = " ";
 std::string recordString; //Recorded match
 unsigned int botDifficulty; //Stockfish difficulty
+unsigned int botTime; //How much time the bot gets to decide a move
 
 
 /*--------------------NETWORKING OBJECTS--------------------*/
@@ -113,11 +114,12 @@ void showStartupBox()
         //Displaying a message box asking for difficulty
         const SDL_MessageBoxButtonData buttonsDiff[] = 
         {
-            {/*Flags,   buttonid, text*/ 0, 0, "Easy"},
-            {0, 1, "Fun"},
-            {0, 2, "Medium"},
-            {0, 3, "Hard"},
-            {0, 4, "Grandmaster"}
+             {0, 0, "Beginner"},
+            {/*Flags,   buttonid, text*/ 0, 1, "Easy"},
+            {0, 2, "Fun"},
+            {0, 3, "Medium"},
+            {0, 4, "Hard"},
+            {0, 5, "Grandmaster"}
         };
         const SDL_MessageBoxData messageDataDiff = 
         {
@@ -134,11 +136,12 @@ void showStartupBox()
         //Check what button was pressed
         switch(buttonID)
         {
-            case 0: botDifficulty = 0; break;
-            case 1: botDifficulty = 5; break;
-            case 2: botDifficulty = 7; break;
-            case 3: botDifficulty = 12; break;
-            case 4: botDifficulty = 20; break;
+            case 0: botDifficulty = 0; botTime = 100; break;
+            case 1: botDifficulty = 0; botTime = 500; break;
+            case 2: botDifficulty = 5; botTime = 1000; break;
+            case 3: botDifficulty = 7; botTime = 1000; break;
+            case 4: botDifficulty = 12; botTime = 1500; break;
+            case 5: botDifficulty = 20; botTime = 2000; break;
         }
     }
 
@@ -257,7 +260,7 @@ int main(int argc, char** argv)
         }
         else
         {
-            if(b.counter % 2) e.stockfishMove(b, recordString, fishFile, botDifficulty, d); //Make a move by Stockfish
+            if(b.counter % 2) e.stockfishMove(b, recordString, fishFile, botDifficulty, d, botTime); //Make a move by Stockfish
         }
 
         if(b.WINNER != WINNER_NONE) 

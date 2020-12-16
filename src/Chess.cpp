@@ -51,7 +51,6 @@ std::string makePGN(unsigned int x, unsigned int y, unsigned int mX, unsigned in
 //Function to check if a side is in check
 unsigned int board_t::isCheck()
 {
-    std::cout<<"IS CHECK: "<<std::endl;
     //Where the kings are on the board
     std::pair<unsigned int, unsigned int> wKingPos;
     std::pair<unsigned int, unsigned int> bKingPos;
@@ -851,13 +850,13 @@ void board_t::findBishop(unsigned int _x, unsigned int _y, bool WHITE) //Functio
 
 }
 
-void board_t::findKing(unsigned int _x, unsigned int _y, bool WHITE) //Function to find black or white king's moves
+void board_t::findKing(unsigned int __x, unsigned int __y, bool WHITE) //Function to find black or white king's moves
 {
     //We have to cast to a signed int because I am not very smart and
     //Need to prevent underflowing when subtracting 2 from 0. 
     //I am an idiot
-    int x = (int)_x;
-    int y = (int)_y;
+    int x = (int)__x;
+    int y = (int)__y;
 
 
     //Check top 3 moves first
@@ -871,7 +870,7 @@ void board_t::findKing(unsigned int _x, unsigned int _y, bool WHITE) //Function 
             }
             else
             {
-                if((container[x + i][y + 1].type > WHITE_END && WHITE) || (container[x + i][y + 1].type <= WHITE_END && !WHITE)) //If the tile isn't empty but contains a color we aren't...
+                if((container[x + i][y + 1].type > WHITE_END && WHITE) || (container[x + i][y + 1].type <= WHITE_END && !WHITE && container[x + i][y + 1].type != EMPTY)) //If the tile isn't empty but contains a color we aren't...
                 {
                     container[x][y].attackable.push_back(std::make_pair(x + i, y + 1)); //Add to attackable list if enemy
                 }
@@ -891,7 +890,7 @@ void board_t::findKing(unsigned int _x, unsigned int _y, bool WHITE) //Function 
             }
             else
             {
-                if((container[x + i][y - 1].type > WHITE_END && WHITE) || (container[x + i][y - 1].type <= WHITE_END && !WHITE))
+                if((container[x + i][y - 1].type > WHITE_END && WHITE) || (container[x + i][y - 1].type <= WHITE_END && !WHITE && container[x + i][y - 1].type != EMPTY))
                 {
                     container[x][y].attackable.push_back(std::make_pair(x + i, y - 1)); //Add to attackable list if enemy
                 }
@@ -909,7 +908,7 @@ void board_t::findKing(unsigned int _x, unsigned int _y, bool WHITE) //Function 
         }
         else
         {
-            if((container[x + 1][y].type > WHITE_END && WHITE) || (container[x + 1][y].type <= WHITE_END && !WHITE))
+            if((container[x + 1][y].type > WHITE_END && WHITE) || (container[x + 1][y].type <= WHITE_END && !WHITE && container[x + 1][y].type != EMPTY))
             {
                 container[x][y].attackable.push_back(std::make_pair(x + 1, y)); //Add to attackable list if enemy
             }
@@ -923,7 +922,7 @@ void board_t::findKing(unsigned int _x, unsigned int _y, bool WHITE) //Function 
         }
         else
         {
-            if((container[x - 1][y].type > WHITE_END && WHITE) || (container[x - 1][y].type <= WHITE_END && !WHITE))
+            if((container[x - 1][y].type > WHITE_END && WHITE) || (container[x - 1][y].type <= WHITE_END && !WHITE && container[x - 1][y].type != EMPTY))
             {
                 container[x][y].attackable.push_back(std::make_pair(x - 1, y)); //Add to attackable list if enemy
             }
