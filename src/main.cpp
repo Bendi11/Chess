@@ -21,6 +21,7 @@ std::string bMoveString = " ";
 std::string recordString; //Recorded match
 unsigned int botDifficulty; //Stockfish difficulty
 unsigned int botTime; //How much time the bot gets to decide a move
+unsigned int botContempt; //How aggressive the bot will be 
 
 
 /*--------------------NETWORKING OBJECTS--------------------*/
@@ -136,12 +137,12 @@ void showStartupBox()
         //Check what button was pressed
         switch(buttonID)
         {
-            case 0: botDifficulty = 0; botTime = 100; break;
-            case 1: botDifficulty = 0; botTime = 500; break;
-            case 2: botDifficulty = 5; botTime = 1000; break;
-            case 3: botDifficulty = 7; botTime = 1000; break;
-            case 4: botDifficulty = 12; botTime = 1500; break;
-            case 5: botDifficulty = 20; botTime = 2000; break;
+            case 0: botDifficulty = 0; botTime = 100; botContempt = 0; break;
+            case 1: botDifficulty = 0; botTime = 500; botContempt = 10; break;
+            case 2: botDifficulty = 5; botTime = 1000; botContempt = 20; break;
+            case 3: botDifficulty = 7; botTime = 1000; botContempt = 24; break;
+            case 4: botDifficulty = 12; botTime = 1500; botContempt = 24; break;
+            case 5: botDifficulty = 20; botTime = 2000; botContempt = 24; break;
         }
     }
 
@@ -260,7 +261,7 @@ int main(int argc, char** argv)
         }
         else
         {
-            if(b.counter % 2) e.stockfishMove(b, recordString, fishFile, botDifficulty, d, botTime); //Make a move by Stockfish
+            if(b.counter % 2) e.stockfishMove(b, recordString, fishFile, botDifficulty, d, botTime, botContempt); //Make a move by Stockfish
         }
 
         if(b.WINNER != WINNER_NONE) 
