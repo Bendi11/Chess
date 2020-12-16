@@ -83,7 +83,6 @@ unsigned int board_t::isCheck()
                 {
                     if(container[x][y].attackable[i].first == wKingPos.first && container[x][y].attackable[i].second == wKingPos.second)
                     {
-                        std::cout<<"WHITE CHECK"<<std::endl;
                         return WHITE_CHECK;
                     } 
                 }
@@ -94,7 +93,6 @@ unsigned int board_t::isCheck()
                 {
                     if(container[x][y].attackable[i] == bKingPos)
                     {
-                        std::cout<<"BLACK CHECK"<<std::endl;
                         return BLACK_CHECK;
                     } 
                 }
@@ -213,6 +211,7 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
     }
     else rVal = MOVE_BAD; //Return move bad if the player tried to move a peice they don't control
     if(rVal == MOVE_BAD) return rVal;
+
     findMoves(); //Find new moves of all moved pieces
     unsigned int check = isCheck(); //Checking if white or black king is in check
 
@@ -220,10 +219,12 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
     if(wChecks == 0 && WHITE && check == WHITE_CHECK)
     {
         WINNER = WINNER_BLACK;
+        return MOVE_GOOD;
     }
     else if(bChecks == 0 && !WHITE && check == BLACK_CHECK) //Same for black
     {
         WINNER = WINNER_WHITE;
+        return MOVE_GOOD;
     }
 
     counter++; //Add to move counter
@@ -244,6 +245,8 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
     if(check == WHITE_CHECK)
     {
         wChecks++;
+        std::cout<<wChecks<<std::endl;
+
         if(wChecks > 1) //If white is in check for two consecutive turns, they were checkmated
         {
             WINNER = WINNER_BLACK; //Black wins
