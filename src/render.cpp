@@ -84,7 +84,7 @@ void Drawer::init(unsigned int w, unsigned int h, Chess::board_t& Board)
 
     IMG_Init(IMG_INIT_PNG); //Start SDL2_image
     TTF_Init(); //Start text rendering
-    sans = TTF_OpenFont("assets/FreeSans.ttf", 14); //Load the font from file
+    sans = TTF_OpenFont("assets/FreeSansBold.ttf", 14); //Load the font from file
 
     
     //Create an SDL2 window with the given parameters
@@ -164,8 +164,19 @@ void Drawer::init(unsigned int w, unsigned int h, Chess::board_t& Board)
     temp = IMG_Load("assets/moveable.png"); //Load the moveable texture
     moveableTexture = SDL_CreateTextureFromSurface(render, temp);
 
-    SDL_FreeSurface(temp);
+    labelPos.resize(16); //Resize to hold all labels
+    labelTexts.resize(16); //Resize to hold all label textures
+    
+    //Getting color of each background texture to make the text match opposite colors
+    SDL_Color darkTextCol = {0, 0, 0};
+    temp = IMG_Load("assets/bSquare.png"); //Load dark background square
+    Uint32 * pixTemp = (Uint32 *)temp->pixels;
+    SDL_GetRGB(pixTemp[0], temp->format, &darkTextCol.r, &darkTextCol.g, &darkTextCol.b); //Get color of first pixel
 
+    SDL_Color lightTextCol = {0, 0, 0};
+    temp = IMG_Load("assets/wSquare.png"); //Load the png
+    pixTemp = (Uint32 *)temp->pixels;
+    SDL_GetRGB(pixTemp[0], temp->format, &lightTextCol.r, &lightTextCol.g, &lightTextCol.b); //Get color of first pixel
 
     for(unsigned x = 0; x < 8; ++x)
     {
@@ -178,24 +189,52 @@ void Drawer::init(unsigned int w, unsigned int h, Chess::board_t& Board)
         for(unsigned y = 0; y < 8; ++y)
         {
             /*Making the checkerboard pattern for the background*/
-            if(y % 2 == 0)
+            if(y % 2 == 0) //Y is even
             {
-                if(x % 2)
+                if(x % 2) //X is odd
                     BGTextures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wSquare.png"));
-                else
+                else //X is even
                 {
                     BGTextures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bSquare.png"));
                 }
                 
             }
-            else
+            else //Y is odd
             {
-                 if(x % 2)
+                 if(x % 2) //X is odd
                     BGTextures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/bSquare.png"));
-                else
+                else //X is even
                 {
                     BGTextures[x][y] = SDL_CreateTextureFromSurface(render, IMG_Load("assets/wSquare.png"));
                 }
+            }
+            if(x == 0) //Assign labels on Y axis
+            {
+                char yLabel[2] = {y + '1', 0}; 
+                SDL_Color txtCol;
+                if(y % 2) txtCol = darkTextCol; //Set color to black is square is white
+                else txtCol = lightTextCol; //Set text color to white if the square is black
+                temp = TTF_RenderText_Solid(sans, yLabel, txtCol); //Render the tile label
+                labelTexts[realY] = SDL_CreateTextureFromSurface(render, temp); //Create the texture
+                /*Set all label positions*/
+                labelPos[realY].h = temp->h;
+                labelPos[realY].w = temp->w;
+                labelPos[realY].x = 3;
+                labelPos[realY].y = (realY ) * (SCREEN_HEIGHT / 8);
+            }
+            if(realY == 0) //Assign values to X axis
+            {
+                char xLabel[2] = {x + 'a', 0}; //Added 97 to Y coord maps numbers to letters a - h
+                SDL_Color txtCol;
+                if(x % 2) txtCol = darkTextCol; //Set color to black is square is white
+                else txtCol = lightTextCol; //Set text color to white if the square is black
+                temp = TTF_RenderText_Solid(sans, xLabel, txtCol); //Render the tile label
+                labelTexts[8 + x] = SDL_CreateTextureFromSurface(render, temp); //Create the texture
+                /*Set all label positions*/
+                labelPos[8 + x].h = temp->h;
+                labelPos[8 + x].w = temp->w;
+                labelPos[8 + x].x = x * (SCREEN_WIDTH / 8) + ( (SCREEN_WIDTH / 8) - 10);
+                labelPos[8 + x].y = SCREEN_HEIGHT - (TTF_FontHeight(sans) + 3);
             }
             
             /*Assigning the right values to the position rectangle, mapping the chess coordinate to the screen coordinate*/
@@ -207,7 +246,7 @@ void Drawer::init(unsigned int w, unsigned int h, Chess::board_t& Board)
             
         }
     }
-
+    SDL_FreeSurface(temp);
 }
 
 //Function to draw a chess board onscreen
@@ -223,6 +262,10 @@ void Drawer::drawBoard(Chess::board_t& Board)
             assignTextures(Board, x, y); //Assign the correct texture to this coordinate
             SDL_RenderCopy(render, BGTextures[x][y], &size, &pos[x][y]); //Add the background texture 
             SDL_RenderCopy(render, textures[x][y], &size, &pos[x][y]); //Draw the piece texture over it 
+            for(unsigned i = 0; i < 16; ++i)
+            {
+                SDL_RenderCopy(render, labelTexts[i], &size, &labelPos[i]);
+            }
         }
     }
     if(isDragging) //If the user is dragging a piece

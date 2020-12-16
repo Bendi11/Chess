@@ -25,7 +25,7 @@ namespace renderer
         Uint32 wavLength; //How long the sound effect is
         uint8_t *wavBuffer; //Buffer for the sound effect
 
-        unsigned int movedX;
+        unsigned int movedX; //Moves X and Y for pieces
         unsigned int movedY;
 
         /*What dimensions the screen will be*/
@@ -51,6 +51,9 @@ namespace renderer
         std::vector<SDL_Texture *> attackableTexts; //List of all dots indicating attackable tiles
         std::vector<SDL_Rect > attackablePos; //List of all attackable dot location
         std::vector<SDL_Rect > moveablePos; //List of all moveable sprite positions
+
+        std::vector<SDL_Texture *> labelTexts; //List of a-h and 1-8 labels for tiles
+        std::vector<SDL_Rect > labelPos; //List of all label positions onscreen
 
 
         SDL_Rect size; //We only need one size rectangle, all sprites are the same size
