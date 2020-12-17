@@ -5,6 +5,115 @@ update attackable squares, etc.
 #include "include/Chess.hpp"
 using namespace Chess;
 
+void board_t::checkLogic() //Function to check for a stalemate, checkmate, mate, etc.
+{
+    //Stalemate only occurrs if a player also has no other pieces
+    unsigned int numWhite;
+    unsigned int numBlack;
+
+    for(unsigned x = 0; x < 8; ++x)
+    {
+        for(unsigned y = 0; y < 8; ++y)
+        {
+            if(container[x][y].type != EMPTY)
+            {
+                if(container[x][y].type > WHITE_END) //If the piece is black
+                {
+                    for(unsigned i = 0; i < container[x][y].attackable.size(); ++i)
+                    {
+                        if(container[x][y].attackable[i].first == wKingPos.first && container[x][y].attackable[i].second == wKingPos.second)
+                        {
+                            wCheck = true;
+                        } 
+                    }
+                }
+                else if(container[x][y].type != EMPTY) //If the piece is white
+                {
+                    for(unsigned i = 0; i < container[x][y].attackable.size(); ++i)
+                    {
+                        if(container[x][y].attackable[i] == bKingPos)
+                        {
+                            bCheck = true;
+                        } 
+                    }
+                }
+
+
+                if(container[x][y].type > WHITE_END) //Check for black pieces
+                {
+                    if(container[x][y].type != bKING) numBlack++; //Increase how many black pieces there are
+                    //Check every attackable square with every king moveable square
+                    for(unsigned i = 0; i < container[x][y].attackable.size(); ++i)
+                    {
+                        for(unsigned n = 0; n < container[wKingPos.first][wKingPos.second].moveable.size(); ++n)
+                        {
+                            if(container[wKingPos.first][wKingPos.second].moveable[n] == container[x][y].attackable[i])
+                            {
+                                container[wKingPos.first][wKingPos.second].moveable.erase(container[wKingPos.first][wKingPos.second].moveable.begin() + n); //Remove the move from king
+                            }
+                        }
+                        for(unsigned n = 0; n < container[wKingPos.first][wKingPos.second].attackable.size(); ++n)
+                        {
+                            if(container[wKingPos.first][wKingPos.second].attackable[n] == container[x][y].attackable[i])
+                            {
+                                container[wKingPos.first][wKingPos.second].attackable.erase(container[wKingPos.first][wKingPos.second].attackable.begin() + n); //Remove the move from king
+                            }
+                        }
+                        
+                    }
+                }
+                
+                else //White pieces
+                {
+                    if(container[x][y].type != wKING) numWhite++; //Increase how many white pieces there are
+                    //Check every attackable square with every king moveable square
+                    for(unsigned i = 0; i < container[x][y].attackable.size(); ++i)
+                    {
+                        for(unsigned n = 0; n < container[bKingPos.first][bKingPos.second].moveable.size(); ++n)
+                        {
+                            if(container[bKingPos.first][bKingPos.second].moveable[n] == container[x][y].attackable[i])
+                            {
+                                container[bKingPos.first][bKingPos.second].moveable.erase(container[bKingPos.first][bKingPos.second].moveable.begin() + n); //Remove the move from king
+                            }
+                        }
+                        for(unsigned n = 0; n < container[bKingPos.first][bKingPos.second].attackable.size(); ++n)
+                        {
+                            if(container[bKingPos.first][bKingPos.second].attackable[n] == container[x][y].attackable[i])
+                            {
+                                container[bKingPos.first][bKingPos.second].attackable.erase(container[bKingPos.first][bKingPos.second].attackable.begin() + n); //Remove the move from king
+                            }
+                        }
+                        
+                    }
+                }
+                
+                
+            }
+        }
+    }
+
+    //If white cannot go anywhere
+    if(container[wKingPos.first][wKingPos.second].moveable.size() == 0 && container[wKingPos.first][wKingPos.second].attackable.size() == 0)
+    {
+        wNoMoves = true;
+        if(numWhite == 0)
+        {
+            stalemate = true;
+        }
+        
+    }
+    //If black cannot go anywhere
+    if(container[bKingPos.first][bKingPos.second].moveable.size() == 0 && container[bKingPos.first][bKingPos.second].attackable.size() == 0)
+    {
+        bNoMoves = true;
+        if(numBlack == 0)
+        {
+            stalemate = true;
+        }
+    }
+    return;
+}
+
 //Function to write game PGN to PGN file
 void board_t::writePGN(std::string path)
 {
@@ -213,15 +322,20 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
     if(rVal == MOVE_BAD) return rVal;
 
     findMoves(); //Find new moves of all moved pieces
-    unsigned int check = isCheck(); //Checking if white or black king is in check
+    checkLogic(); //Check for king moves and stalemate
+
+    if(stalemate)
+    {
+        WINNER = STALEMATE;
+    }
 
     //If white moved their king into check, they just lose
-    if(wChecks == 0 && WHITE && check == WHITE_CHECK)
+    if(wChecks == 0 && WHITE && wCheck == true)
     {
         WINNER = WINNER_BLACK;
         return MOVE_GOOD;
     }
-    else if(bChecks == 0 && !WHITE && check == BLACK_CHECK) //Same for black
+    else if( (bChecks == 0 && !WHITE ) && wCheck == true) //Same for black
     {
         WINNER = WINNER_WHITE;
         return MOVE_GOOD;
@@ -242,8 +356,13 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
 
     
     //Checking for white checkmate
-    if(check == WHITE_CHECK)
+    if(wCheck)
     {
+        if(wNoMoves) //If white cannot go anywhere and is in check, they are in check mate
+        {
+            WINNER = WINNER_BLACK; //Black wins
+            return MOVE_BAD;
+        }
         wChecks++;
         std::cout<<wChecks<<std::endl;
 
@@ -254,12 +373,18 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
     }
     else 
     {
-        wChecks = 0; //If white is no longer in check, their consecutive checks are reset
+        wChecks = 0; //Reset check counter
     }
 
-    if(check == BLACK_CHECK) //Checking for black checkmate
+    if(bCheck) //Checking for black checkmate
     {
+        if(bNoMoves) //If black cannot go anywhere and is in check, they are in check mate
+        {
+            WINNER = WINNER_WHITE; //White wins
+            return MOVE_BAD;
+        }
         bChecks++;
+        std::cout<<bChecks<<std::endl;
         if(bChecks > 1)
         {
             WINNER = WINNER_WHITE; //White wins by checkmate here
@@ -267,7 +392,7 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
     }
     else 
     {
-        bChecks = 0; //Reset the consecutive checks counter to 0
+        bChecks = 0; //Reset checks
     }
 
     return rVal;
@@ -421,11 +546,15 @@ void board_t::findMoves()
                 break;
 
                 case wKING:
+                    wKingPos.first = x;
+                    wKingPos.second = y;
                     findKing(x, y, true); //Find white king moves
                     findCastle(true); //Find white castles
                 break;
 
                 case bKING:
+                    bKingPos.first = x;
+                    bKingPos.second = y;
                     findKing(x, y, false); //Find black king moves
                     findCastle(false); //Find black castles
                 break;

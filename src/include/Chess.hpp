@@ -41,6 +41,14 @@ namespace Chess
         std::string wPGN = " "; //String holding PGN of white's last move
         std::string bPGN = " "; //String holding PGN of black's last move
         std::string PGN = " "; //PGN recording of entire game
+        std::pair<unsigned int, unsigned int> wKingPos;
+        std::pair<unsigned int, unsigned int> bKingPos;
+        /*Various flags*/
+        bool wCheck;
+        bool bCheck;
+        bool stalemate;
+        bool wNoMoves;
+        bool bNoMoves;
 
         /*Board size*/
         unsigned int sizeX = 7;
@@ -72,6 +80,7 @@ namespace Chess
 
         void findKing(unsigned int x, unsigned int y, bool WHITE); //Function to find black or white king's moves
         void findCastle(bool WHITE); //Function to check for possible castles
+        void checkLogic(); //Function to check if a board is in stalemate, checkmate, check, etc.
 
         void findQueen(unsigned int x, unsigned int y, bool WHITE); //Function to find black or white queen's moves
 

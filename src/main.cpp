@@ -22,6 +22,7 @@ std::string recordString; //Recorded match
 unsigned int botDifficulty; //Stockfish difficulty
 unsigned int botTime; //How much time the bot gets to decide a move
 unsigned int botContempt; //How aggressive the bot will be 
+bool limitStrength; //If the engine should limit its strength to meet elo requirement
 
 
 /*--------------------NETWORKING OBJECTS--------------------*/
@@ -137,12 +138,12 @@ void showStartupBox()
         //Check what button was pressed
         switch(buttonID)
         {
-            case 0: botDifficulty = 0; botTime = 200; botContempt = 2; break;
-            case 1: botDifficulty = 0; botTime = 500; botContempt = 10; break;
-            case 2: botDifficulty = 5; botTime = 1000; botContempt = 20; break;
-            case 3: botDifficulty = 7; botTime = 1000; botContempt = 24; break;
-            case 4: botDifficulty = 12; botTime = 1500; botContempt = 24; break;
-            case 5: botDifficulty = 20; botTime = 2000; botContempt = 24; break;
+            case 0: botDifficulty = 200; botTime = 100; botContempt = 0; limitStrength = true; break;
+            case 1: botDifficulty = 700; botTime = 500; botContempt = 10; limitStrength = true; break;
+            case 2: botDifficulty = 1350; botTime = 1000; botContempt = 20; limitStrength = true; break;
+            case 3: botDifficulty = 1500; botTime = 1000; botContempt = 24; limitStrength = true; break;
+            case 4: botDifficulty = 1750; botTime = 1500; botContempt = 24; limitStrength = false; break;
+            case 5: botDifficulty = 2300; botTime = 2000; botContempt = 24; limitStrength = false; break;
         }
     }
 
@@ -221,6 +222,16 @@ int main(int argc, char** argv)
                 recordString.clear(); //Clear the PGN recording, effectively restarting Stockfish
                 gameover = false; //Reset gameover
             }
+            else if(b.WINNER == STALEMATE)
+            {
+                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "Chess", "Draw by stalemate!", d.win); //Display that black won the game
+                b.restart(); //Reset all chess board values and positions
+                //Clear the communication file
+                fishFile.open("move.txt", std::ofstream::out | std::ofstream::trunc);
+                fishFile.close(); 
+                recordString.clear(); //Clear the PGN recording, effectively restarting Stockfish
+                gameover = false; //Reset gameover
+            }
         }
     
         d.input(b);
@@ -261,7 +272,7 @@ int main(int argc, char** argv)
         }
         else
         {
-            if(b.counter % 2) e.stockfishMove(b, recordString, fishFile, botDifficulty, d, botTime, botContempt); //Make a move by Stockfish
+            if(b.counter % 2) e.stockfishMove(b, recordString, fishFile, botDifficulty, d, botTime, botContempt, limitStrength); //Make a move by Stockfish
         }
 
         if(b.WINNER != WINNER_NONE) 
@@ -279,6 +290,16 @@ int main(int argc, char** argv)
             else if(b.WINNER == WINNER_BLACK)
             {
                 SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "Chess", "Black won by checkmate!", d.win); //Display that black won the game
+                b.restart(); //Reset all chess board values and positions
+                //Clear the communication file
+                fishFile.open("move.txt", std::ofstream::out | std::ofstream::trunc);
+                fishFile.close(); 
+                recordString.clear(); //Clear the PGN recording, effectively restarting Stockfish
+                gameover = false; //Reset gameover
+            }
+            else if(b.WINNER == STALEMATE)
+            {
+                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "Chess", "Draw by stalemate!", d.win); //Display that black won the game
                 b.restart(); //Reset all chess board values and positions
                 //Clear the communication file
                 fishFile.open("move.txt", std::ofstream::out | std::ofstream::trunc);

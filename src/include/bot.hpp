@@ -197,6 +197,6 @@ namespace Bot //Namespace containing all bot objects
         moveScore graphicMiniMax(Chess::board_t& Board, int depth, renderer::Drawer& d, bool WHITE); //Function to minimax each possible possition and display them
         double evaluate(Chess::board_t& Board); //Function to evaluate a chess position and return a score
 
-        void stockfishMove(Chess::board_t& Board, std::string& record, std::ofstream& write, unsigned int difficulty, renderer::Drawer& d, unsigned int time, unsigned int contempt); //Function to start stockfish process
+        void stockfishMove(Chess::board_t& Board, std::string& record, std::ofstream& write, unsigned int difficulty, renderer::Drawer& d, unsigned int time, unsigned int contempt, bool limitStrength); //Function to start stockfish process
     };
 }

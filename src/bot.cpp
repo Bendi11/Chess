@@ -69,11 +69,21 @@ std::string exec(const char* cmd, renderer::Drawer& d)
     return result; //Return the output
 }
 
-void computerEnemy::stockfishMove(Chess::board_t& Board, std::string& record, std::ofstream& write, unsigned int difficulty, renderer::Drawer& d, unsigned int time, unsigned int contempt)
+void computerEnemy::stockfishMove(Chess::board_t& Board, std::string& record, std::ofstream& write, unsigned int difficulty, renderer::Drawer& d, unsigned int time, unsigned int contempt, bool limitStrength)
 {
     //Add all data to tell stockfish what difficulty to play at and how long a move should take
     write.open("move.txt", std::ofstream::app | std::ofstream::out);
-    write<<"setoption name Skill Level value "<<difficulty<<std::endl;
+    //Enable or disable strength limiting
+    if(limitStrength)
+    {
+        write<<"setoption name UCI_LimitStrength value "<<"true"<<std::endl;
+    }
+    else
+    {
+        write<<"setoption name UCI_LimitStrength value"<<"false"<<std::endl;
+    }
+    
+    write<<"setoption name UCI_Elo value "<<difficulty<<std::endl;
     write<<"setoption name Contempt value "<<contempt<<std::endl;
     write<<"go movetime "<<time<<std::endl; //Write command
     write<<"position startpos move "<<record<<std::endl;//<<record<<std::endl;

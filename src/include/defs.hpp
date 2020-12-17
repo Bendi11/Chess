@@ -12,10 +12,15 @@
 #define WINNER_NONE 0
 #define WINNER_WHITE 1
 #define WINNER_BLACK 2
+#define STALEMATE 3
 
 #define WHITE_CHECK 0
 #define BLACK_CHECK 1
 #define NO_CHECK 2
+
+#define WHITE_STALE 0
+#define BLACK_STALE 1
+#define NO_STALE 2
 
 //--------------------CHESS PIECE DEFINITIONS--------------------//
 
