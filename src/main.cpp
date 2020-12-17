@@ -2,8 +2,10 @@
 Chess by Benjamin L (Bendi11)
 Chess game made with C++
 Compile commands: 
+
 Windows: 
- g++  -o bin/Chess.exe src/main.cpp src/Chess.cpp src/render.cpp src/bot.cpp -Isrc/include  -Lbin/ -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -static-libgcc -static-libstdc++ -lws2_32 -O3  icon.o -IE:\asio-1.18.0\include
+g++  -o bin/Chess.exe src/main.cpp src/Chess.cpp src/render.cpp src/bot.cpp -Isrc/include  -Lbin/ -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -static-libgcc -static-libstdc++ -lws2_32 -O3  icon.o -IE:\asio-1.18.0\include
+
 Linux: 
 g++ -o bin/Chess src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -static-libgcc -static-libstdc++ icon.o
 */
@@ -138,12 +140,12 @@ void showStartupBox()
         //Check what button was pressed
         switch(buttonID)
         {
-            case 0: botDifficulty = 200; botTime = 100; botContempt = 0; limitStrength = true; break;
-            case 1: botDifficulty = 700; botTime = 500; botContempt = 10; limitStrength = true; break;
-            case 2: botDifficulty = 1350; botTime = 1000; botContempt = 20; limitStrength = true; break;
-            case 3: botDifficulty = 1500; botTime = 1000; botContempt = 24; limitStrength = true; break;
-            case 4: botDifficulty = 1750; botTime = 1500; botContempt = 24; limitStrength = false; break;
-            case 5: botDifficulty = 2300; botTime = 2000; botContempt = 24; limitStrength = false; break;
+            case 0: botDifficulty = 500; botTime = 5; botContempt = 2; limitStrength = true; break;
+            case 1: botDifficulty = 700; botTime = 2; botContempt = 10; limitStrength = true; break;
+            case 2: botDifficulty = 1350; botTime = 4; botContempt = 20; limitStrength = true; break;
+            case 3: botDifficulty = 1500; botTime = 5; botContempt = 24; limitStrength = true; break;
+            case 4: botDifficulty = 1750; botTime = 10; botContempt = 24; limitStrength = false; break;
+            case 5: botDifficulty = 2300; botTime = 30; botContempt = 24; limitStrength = false; break;
         }
     }
 
@@ -253,7 +255,7 @@ int main(int argc, char** argv)
                 recordString.append(" ");
                 fishFile<<recordString<<std::endl;
                 fishFile.close();
-                b.writePGN("assets/PGN/test.txt");
+                b.writePGN("assets/Record/test.txt");
             }    
         }
         

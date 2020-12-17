@@ -44,11 +44,11 @@ namespace Chess
         std::pair<unsigned int, unsigned int> wKingPos;
         std::pair<unsigned int, unsigned int> bKingPos;
         /*Various flags*/
-        bool wCheck;
-        bool bCheck;
-        bool stalemate;
-        bool wNoMoves;
-        bool bNoMoves;
+        bool wCheck = false;
+        bool bCheck = false;
+        bool stalemate = false;
+        bool wNoMoves = false;
+        bool bNoMoves = false;
 
         /*Board size*/
         unsigned int sizeX = 7;

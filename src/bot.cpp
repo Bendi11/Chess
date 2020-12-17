@@ -85,9 +85,9 @@ void computerEnemy::stockfishMove(Chess::board_t& Board, std::string& record, st
     
     write<<"setoption name UCI_Elo value "<<difficulty<<std::endl;
     write<<"setoption name Contempt value "<<contempt<<std::endl;
-    write<<"go movetime "<<time<<std::endl; //Write command
+    write<<"go depth "<<time<<std::endl; //Write command
     write<<"position startpos move "<<record<<std::endl;//<<record<<std::endl;
-    write<<"go movetime "<<time<<std::endl;
+    write<<"go depth "<<time<<std::endl;
     write.close();
 
     std::string res = exec("E:\\Chess\\bin\\stockfish_20090216_x64_bmi2.exe < move.txt", d); //Makea  new instance of Stockfish
@@ -142,8 +142,8 @@ void computerEnemy::stockfishMove(Chess::board_t& Board, std::string& record, st
 double computerEnemy::evaluate(Chess::board_t& Board)
 {
     /*If a side is in check, it is very bad, so just return that the board configuration is bad*/
-    uint8_t check = Board.isCheck();
-    if(check == WHITE_CHECK)
+    //uint8_t check = Board.isCheck();
+    /*if(check == WHITE_CHECK)
     {
         return 100000000;
     }
@@ -384,5 +384,5 @@ moveScore computerEnemy::ABMin(double alpha, double beta, Chess::board_t& Board,
         }
     }
     return ret;
+    */
 }
-
