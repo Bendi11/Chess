@@ -4,8 +4,7 @@ Chess game made with C++
 Compile commands: 
 
 Windows: 
-g++  -o bin/Chess.exe src/main.cpp src/Chess.cpp src/render.cpp src/bot.cpp -Isrc/include  -Lbin/ -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -static-libgcc -static-libstdc++ -lws2_32 -O3  icon.o -IE:\asio-1.18.0\include
-
+g++  -o bin/Chess.exe src/main.cpp src/Chess.cpp src/render.cpp src/bot.cpp -Isrc/include  -Lbin/ -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -static-libgcc -static-libstdc++ -lws2_32 -O3  icon.o -IE:\asio-1.18.0\include\
 Linux: 
 g++ -o bin/Chess src/main.cpp src/Chess.cpp src/render.cpp -Isrc/include -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -static-libgcc -static-libstdc++ icon.o
 */

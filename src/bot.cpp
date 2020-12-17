@@ -135,7 +135,30 @@ void computerEnemy::stockfishMove(Chess::board_t& Board, std::string& record, st
     write<<record<<std::endl;
     write.close(); //Close the communication file
 
-    Board.playerMove(move.first.first, move.first.second, move.second.first, move.second.second, false); //Make the move on the board
+    uint8_t result = Board.playerMove(move.first.first, move.first.second, move.second.first, move.second.second, false);
+
+    if(result != MOVE_BAD) //Make the move on the board
+    {
+        if(result == MOVE_GOOD) //If the move completed
+            {
+                if(d.USING_SOUND)
+                {
+                    SDL_LoadWAV("assets/sounds/move.wav", &d.wavSpec, &d.wavBuffer, &d.wavLength); //Load the move sound effect
+                    SDL_QueueAudio(d.audioDevice, d.wavBuffer, d.wavLength); //Play the sound effect for moving
+                    SDL_PauseAudioDevice(d.audioDevice, 0); //Un - pause audio
+                } 
+            }
+            else if(result == MOVE_CAPTURED)
+            {
+                if(d.USING_SOUND)
+                {
+                    SDL_LoadWAV("assets/sounds/capture.wav", &d.wavSpec, &d.wavBuffer, &d.wavLength); //Load the capture sound effect
+                    SDL_QueueAudio(d.audioDevice, d.wavBuffer, d.wavLength); //Play the sound effect for capturing a piece
+                    SDL_PauseAudioDevice(d.audioDevice, 0); //Un - pause audio
+                }
+                
+            } 
+    }
 }
 
 //Function to evaluate a chess position and return a score
