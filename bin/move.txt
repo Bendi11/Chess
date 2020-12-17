@@ -1,2 +1,2 @@
 setoption name Skill Level value 500
-position startpos move e2e4 c7c5 
+position startpos move e2e3 d7d5 
