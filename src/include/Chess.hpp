@@ -34,7 +34,10 @@ namespace Chess
     {
     public:
         pMat container; //The object holding all pieces on the board
+
         unsigned int counter = 0; //How many turns the game has gone for
+        unsigned int fiftyCounter = 0; //How many turns without capture or pawn movement, used for 50 move rule
+
         uint8_t WINNER = WINNER_NONE; //If white or black won
         std::string wMoveString = " "; //String holding the stringified version of white's last move
         std::string bMoveString = " "; //String holding the stringified version of black's last move
@@ -43,6 +46,10 @@ namespace Chess
         std::string PGN = " "; //PGN recording of entire game
         std::pair<unsigned int, unsigned int> wKingPos;
         std::pair<unsigned int, unsigned int> bKingPos;
+
+        bool justCaptured = false; //If a capture has just been mave
+        bool pawnMoved = false; //Used for 50 move rule draws
+
         /*Various flags*/
         bool wCheck = false;
         bool bCheck = false;

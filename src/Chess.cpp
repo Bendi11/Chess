@@ -7,14 +7,21 @@ using namespace Chess;
 
 void board_t::checkLogic() //Function to check for a stalemate, checkmate, mate, etc.
 {
+    if(justCaptured)
+    {
+        fiftyCounter = 0; //Reset 50 move rule counter if a piece has been captured
+        justCaptured = false; //Reset just captured flag
+    }
+    if(pawnMoved)
+    {
+        fiftyCounter = 0; //Reset the 50 move rule counter if a pawn has been moved
+        pawnMoved = false; //Reset pawn moved flag
+    }
     //Stalemate only occurrs if a player also has no other pieces
     unsigned int numWhite = 0;
     unsigned int numBlack = 0;
     unsigned int checkTilesBlack = 0;
     unsigned int checkTilesWhite = 0;
-
-    std::vector<std::pair<unsigned int, unsigned int> > blockedWMoves; //List of all blocked white king moves
-    std::vector<std::pair<unsigned int, unsigned int> > blockedBMoves; //List of all blocked black king moves
 
     wCheck = false;
     bCheck = false;
@@ -179,6 +186,8 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
                 container[moveX][moveY] = piece_t(container[x][y].type, true); //Assign  the moving square's type as the moved piece
                 container[x][y] = piece_t(EMPTY, true); //Make the old location empty
 
+                if(container[moveX][moveY].type == wPAWN || container[moveX][moveY].type == bPAWN) pawnMoved = true;
+
                 /*Make a move string for this move*/
                 if(WHITE) wMoveString = makeMoveString(x, y, moveX, moveY, true);
                 else bMoveString = makeMoveString(x, y, moveX, moveY, false);
@@ -197,11 +206,13 @@ uint8_t board_t::playerMove(unsigned int x, unsigned int y, unsigned int moveX, 
                 container[x][y] = piece_t(EMPTY, true); //Make the old location empty
 
                 promoted = checkPromotion(moveX, moveY, WHITE); //Check if the piece can be promoted
+                if(container[moveX][moveY].type == wPAWN || container[moveX][moveY].type == bPAWN) pawnMoved = true;
 
                 /*Make a move string for this move to be sent to the TCP enemy*/
                 if(WHITE) wMoveString = makeMoveString(x, y, moveX, moveY, true);
                 else bMoveString = makeMoveString(x, y, moveX, moveY, false);
 
+                justCaptured = true; //We just captured a piece
                 rVal = MOVE_CAPTURED; //Return that the move captured a piece
             }
         }
