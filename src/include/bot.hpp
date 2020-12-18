@@ -11,6 +11,16 @@
 
 #include <stdio.h>
 
+#ifdef __WINDOWS__
+#define STOCKFISH_PATH "stockfish_20090216_x64_bmi2.exe"
+#endif
+#ifdef __LINUX__
+#define STOCKFISH_PATH "stockfish"
+#endif
+#ifdef __MAC__
+#define STOCKFISH_PATH "stockfish"
+#endif
+
 
 namespace Bot //Namespace containing all bot objects
 {
@@ -194,9 +204,10 @@ namespace Bot //Namespace containing all bot objects
         moveScore ABMin(double alpha, double beta, Chess::board_t& Board, int depth, renderer::Drawer& d, bool graphic);
 
         moveScore miniMax(Chess::board_t& Board, int depth); //Function to minimax the position
-        moveScore graphicMiniMax(Chess::board_t& Board, int depth, renderer::Drawer& d, bool WHITE); //Function to minimax each possible possition and display them
+        moveScore graphicMiniMax(Chess::board_t& Board, int depth, renderer::Drawer& d, bool WHITE); //Function to minimax each possible positions and display them
         double evaluate(Chess::board_t& Board); //Function to evaluate a chess position and return a score
 
-        void stockfishMove(Chess::board_t& Board, std::string& record, std::ofstream& write, unsigned int difficulty, renderer::Drawer& d, unsigned int time, unsigned int contempt, bool limitStrength); //Function to start stockfish process
+        void stockfishMove(Chess::board_t& Board, std::string& record, std::ofstream& write, unsigned int difficulty, renderer::Drawer& d, unsigned int time, unsigned int contempt, bool limitStrength); //Function to call Stockfish and play its recommended move for black
+        void stockfishMoveW(Chess::board_t& Board, std::string& record, std::ofstream& write, unsigned int difficulty, renderer::Drawer& d, unsigned int time, unsigned int contempt, bool limitStrength); //Function to call Stockfish and play its recommended move for white
     };
 }

@@ -2,7 +2,7 @@
 
 using namespace Bot;
 
-std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigned int> > parseStockfish(std::string outStr, Chess::board_t& Board, std::string& stored)
+std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigned int> > parseStockfish(std::string outStr, Chess::board_t& Board, std::string& stored, bool WHITE)
 {
     std::string good = "bestmove";
     std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigned int> > move;
@@ -16,7 +16,8 @@ std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigne
         {
             if(line == "bestmove (no move)" || line == stored) //If Stockfish broke then we know it won
             {
-                Board.WINNER = WINNER_BLACK;
+                if(!WHITE) Board.WINNER = WINNER_BLACK;
+                else Board.WINNER = WINNER_WHITE;
             }
             stored = line;
             switch(line[9])
@@ -90,8 +91,8 @@ void computerEnemy::stockfishMove(Chess::board_t& Board, std::string& record, st
     write<<"go depth "<<time<<std::endl;
     write.close();
 
-    std::string res = exec("E:\\Chess\\bin\\stockfish_20090216_x64_bmi2.exe < move.txt", d); //Makea  new instance of Stockfish
-    std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigned int> > move = parseStockfish(res, Board, storedString); //Parse received data
+    std::string res = exec(STOCKFISH_PATH" < move.txt", d); //Makea  new instance of Stockfish
+    std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigned int> > move = parseStockfish(res, Board, storedString, false); //Parse received data
 
     //std::cout<<move.first.first<<", "<<move.first.second<<"\t"<<move.second.first<<", "<<move.second.second<<std::endl; //Print the move
 
@@ -122,8 +123,8 @@ void computerEnemy::stockfishMove(Chess::board_t& Board, std::string& record, st
     }
     sentStr[3] = move.second.second + 49;
 
-    record.append(sentStr); //Record the move
-    record.append(" ");
+    //record.append(sentStr); //Record the move
+    //record.append(" ");
     
     //Clear the file
     write.open("move.txt", std::ofstream::out | std::ofstream::trunc);
@@ -136,6 +137,99 @@ void computerEnemy::stockfishMove(Chess::board_t& Board, std::string& record, st
     write.close(); //Close the communication file
 
     uint8_t result = Board.playerMove(move.first.first, move.first.second, move.second.first, move.second.second, false);
+
+    if(result != MOVE_BAD) //Make the move on the board
+    {
+        if(result == MOVE_GOOD) //If the move completed
+            {
+                if(d.USING_SOUND)
+                {
+                    SDL_LoadWAV("assets/sounds/move.wav", &d.wavSpec, &d.wavBuffer, &d.wavLength); //Load the move sound effect
+                    SDL_QueueAudio(d.audioDevice, d.wavBuffer, d.wavLength); //Play the sound effect for moving
+                    SDL_PauseAudioDevice(d.audioDevice, 0); //Un - pause audio
+                } 
+            }
+            else if(result == MOVE_CAPTURED)
+            {
+                if(d.USING_SOUND)
+                {
+                    SDL_LoadWAV("assets/sounds/capture.wav", &d.wavSpec, &d.wavBuffer, &d.wavLength); //Load the capture sound effect
+                    SDL_QueueAudio(d.audioDevice, d.wavBuffer, d.wavLength); //Play the sound effect for capturing a piece
+                    SDL_PauseAudioDevice(d.audioDevice, 0); //Un - pause audio
+                }
+                
+            } 
+    }
+}
+
+//Function to make a move for white using Stockfish
+void computerEnemy::stockfishMoveW(Chess::board_t& Board, std::string& record, std::ofstream& write, unsigned int difficulty, renderer::Drawer& d, unsigned int time, unsigned int contempt, bool limitStrength)
+{
+    //Add all data to tell stockfish what difficulty to play at and how long a move should take
+    write.open("move.txt", std::ofstream::app | std::ofstream::out);
+    //Enable or disable strength limiting
+    if(limitStrength)
+    {
+        write<<"setoption name UCI_LimitStrength value "<<"true"<<std::endl;
+    }
+    else
+    {
+        write<<"setoption name UCI_LimitStrength value"<<"false"<<std::endl;
+    }
+    
+    write<<"setoption name UCI_Elo value "<<difficulty<<std::endl;
+    write<<"setoption name Contempt value "<<contempt<<std::endl;
+    write<<"go depth "<<time<<std::endl; //Write command
+    write<<"position startpos move "<<record<<std::endl;//<<record<<std::endl;
+    write<<"go depth "<<time<<std::endl;
+    write.close();
+
+    std::string res = exec(STOCKFISH_PATH" < move.txt", d); //Makea  new instance of Stockfish
+    std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigned int> > move = parseStockfish(res, Board, storedString, true); //Parse received data
+
+    //std::cout<<move.first.first<<", "<<move.first.second<<"\t"<<move.second.first<<", "<<move.second.second<<std::endl; //Print the move
+
+    /*Storing the stringified move by Stockfish*/
+    std::string sentStr = "0000";
+    switch(move.first.first) //Converting characters sent into letters
+    {
+        case 0: sentStr[0] = 'a'; break;
+        case 1: sentStr[0] = 'b'; break;
+        case 2: sentStr[0] = 'c'; break;
+        case 3: sentStr[0] = 'd'; break;
+        case 4: sentStr[0] = 'e'; break;
+        case 5: sentStr[0] = 'f'; break;
+        case 6: sentStr[0] = 'g'; break;
+        case 7: sentStr[0] = 'h'; break;
+    }
+    sentStr[1] = move.first.second + 49;
+    switch(move.second.first)
+    {
+        case 0: sentStr[2] = 'a'; break;
+        case 1: sentStr[2] = 'b'; break;
+        case 2: sentStr[2] = 'c'; break;
+        case 3: sentStr[2] = 'd'; break;
+        case 4: sentStr[2] = 'e'; break;
+        case 5: sentStr[2] = 'f'; break;
+        case 6: sentStr[2] = 'g'; break;
+        case 7: sentStr[2] = 'h'; break;
+    }
+    sentStr[3] = move.second.second + 49;
+
+    //record.append(sentStr); //Record the move
+    //record.append(" ");
+    
+    //Clear the file
+    write.open("move.txt", std::ofstream::out | std::ofstream::trunc);
+    write.close();
+    write.open("move.txt", std::ofstream::out);
+
+    write<<"setoption name Skill Level value "<<difficulty<<std::endl; //Set the difficulty again
+    write<<"position startpos move "; //Tell stocckfish the board layout
+    write<<record<<std::endl;
+    write.close(); //Close the communication file
+
+    uint8_t result = Board.playerMove(move.first.first, move.first.second, move.second.first, move.second.second, true);
 
     if(result != MOVE_BAD) //Make the move on the board
     {

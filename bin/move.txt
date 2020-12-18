@@ -1,0 +1,2 @@
+uci
+position startpos move  g1f3 c7c6 d2d4 g8f6 a2a3 d7d5 b1d2 g7g6 h2h3 b8d7 c2c4 b7b6 c4d5 c6d5 b2b4 a7a5 b4a5 f6e4 d2e4 a8a5 e4g5 d8c7 c1d2 a5a7 d1b3 e7e6 d2b4 h7h5 e2e4 f8b4 b3b4 c7c2 e4e5 c8a6 f1a6 a7a6 e1g1 a6a8 a1c1 c2a2 b4d6 a2a3 c1c8 a8c8 d6a3 h8h6 a3d3 c8c6 h3h4 e8e7 d3a3 e7e8 g2g3 c6c4 a3a8 d7b8 a8b8 e8d7 g5f7 g6g5 b8d6 d7c8 d6d8 c8b7 f7d6 b7a6 f1a1 c4a4 d8c8 a6a5 c8c3 a5a6 c3c8 a6a7 c8b7 g1f3 

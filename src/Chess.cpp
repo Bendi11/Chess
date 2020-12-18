@@ -12,8 +12,13 @@ void board_t::checkLogic() //Function to check for a stalemate, checkmate, mate,
     unsigned int numBlack = 0;
     unsigned int checkTilesBlack = 0;
     unsigned int checkTilesWhite = 0;
+
+    std::vector<std::pair<unsigned int, unsigned int> > blockedWMoves; //List of all blocked white king moves
+    std::vector<std::pair<unsigned int, unsigned int> > blockedBMoves; //List of all blocked black king moves
+
     wCheck = false;
     bCheck = false;
+
     wNoMoves = false;
     bNoMoves = false;
 

@@ -210,7 +210,7 @@ void Drawer::init(unsigned int w, unsigned int h, Chess::board_t& Board)
             }
             if(x == 0) //Assign labels on Y axis
             {
-                char yLabel[2] = {y + '1', 0}; 
+                char yLabel[2] = {static_cast<char>(y + '1'), 0}; 
                 SDL_Color txtCol;
                 if(y % 2) txtCol = darkTextCol; //Set color to black is square is white
                 else txtCol = lightTextCol; //Set text color to white if the square is black
@@ -224,7 +224,7 @@ void Drawer::init(unsigned int w, unsigned int h, Chess::board_t& Board)
             }
             if(realY == 0) //Assign values to X axis
             {
-                char xLabel[2] = {x + 'a', 0}; //Added 97 to Y coord maps numbers to letters a - h
+                char xLabel[2] = {static_cast<char>(x + 'a'), 0}; //Added 97 to Y coord maps numbers to letters a - h
                 SDL_Color txtCol;
                 if(x % 2) txtCol = darkTextCol; //Set color to black is square is white
                 else txtCol = lightTextCol; //Set text color to white if the square is black
