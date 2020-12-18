@@ -59,10 +59,11 @@ namespace renderer
         SDL_Rect size; //We only need one size rectangle, all sprites are the same size
 
         float scale; //How much to scale pieces for a certain screen shape
+        bool PAUSED = false;
 
         void init(unsigned int w, unsigned int h, Chess::board_t& Board); //Function to start SDL2 and init other values like BG textures
         void input(Chess::board_t& Board); //Function to handle input
-        void getSpectatorInput(bool *paused); //Function to get spectator input like play, pause advance, etc.
+        bool getSpectatorInput(); //Function to get spectator input like play, pause advance, etc.
 
         void drawBoard(Chess::board_t& Board); //Function to draw all pieces on a chessboard
         void fastDrawBoard(Chess::board_t& Board); //Function to draw all pieces on a chessboard without FPS cap

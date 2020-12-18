@@ -504,14 +504,63 @@ void Drawer::fastDrawBoard(Chess::board_t& Board)
 }
 
 //Function to get spectator mode input like play and pause
-void Drawer::getSpectatorInput(bool *paused)
+bool Drawer::getSpectatorInput()
 {
-    while(SDL_WaitEventTimeout(&userIn, 100)) //Wait 100 ms for an event to appear in the queue
+    bool ret = false;
+    while(SDL_PollEvent(&userIn)) //Poll through the queue of inputted events
     {
-        if(userIn.key.keysym.sym == SDLK_SPACE) //Toggle paused 
+        //Exit the program if the inputted event was to quit
+        if(userIn.type == SDL_QUIT) 
         {
-            if(paused) *paused = false;
-            else *paused = true;
+            running = false;
+        }
+        else if(userIn.type == SDL_KEYUP)
+        {
+            if(userIn.key.keysym.sym == SDLK_SPACE)
+            {
+                ret = true;
+            }
+        }
+        else if(userIn.type == SDL_MOUSEMOTION) //Check if the user just moved their mouse
+        {
+            if(isDragging) //If the user is currently drag and dropping a piece
+            {
+                /*Set mouse dragged sprite position*/
+                mouseRect.x = userIn.motion.x - (PIECE_X / 2);
+                mouseRect.y = userIn.motion.y - (PIECE_Y / 2);
+            }
+        }
+        else if(userIn.type == SDL_MOUSEBUTTONDOWN && userIn.button.button == SDL_BUTTON_LEFT) //Start drag and dropping a piece
+        {
+            if(!isDragging) //Make sure we aren't already dragging
+            {
+                /*Changing mouse screen coordinates to chess board coordinates*/
+                storedX = (unsigned int)(userIn.motion.x / (SCREEN_WIDTH / 8) );
+                storedY = (unsigned int)(userIn.motion.y / (SCREEN_HEIGHT / 8));
+                storedY =   -(storedY - 7); //Y coords need to be reversed because I am not a smart person
+
+                /*Set the mouse dragged sprite position*/
+                mouseRect.x = userIn.motion.x - (PIECE_X / 2);
+                mouseRect.y = userIn.motion.y - (PIECE_Y / 2);
+
+                isDragging = true; //The user is dragging a piece
+            }
+            
+
+        }   
+        //Checking if the event was a mouse release
+        else if(userIn.type == SDL_MOUSEBUTTONUP && userIn.button.button == SDL_BUTTON_LEFT && isDragging)
+        {
+            isDragging = false; //We aren't trying to drag and drop anymore
+
+            /*Changing mouse screen coordinates to chess board coordinates*/
+            unsigned int mX = (unsigned int)(userIn.motion.x / (SCREEN_WIDTH / 8) );
+            unsigned int mY = (unsigned int)(userIn.motion.y / (SCREEN_HEIGHT / 8));
+
+            mY =   -(mY - 7); //Y coords need to be reversed because I am not a smart person
+
         }
     }
+
+    return ret;
 }

@@ -238,6 +238,7 @@ int main(int argc, char** argv)
     std::ofstream fishFile("move.txt"); //File used for communication between processes
     
     d.init(624, 624, b); 
+    b.findMoves(); //Find all moves to stop a delay on displaying possible moves
     bool gameover = false;
     d.WHITEORBLACK = true;
 
@@ -428,10 +429,11 @@ int main(int argc, char** argv)
         }
         
         d.drawBoard(b);
-        d.getSpectatorInput(&spectatorPause); //Check for a pause
+        spectatorPause = d.getSpectatorInput(); //Check for a pause
 
-        if(b.counter % 2 && !spectatorPause) //Black's turn
+        if(b.counter % 2 && spectatorPause) //Black's turn
         {
+            spectatorPause = false;
             e.stockfishMove(b, recordString, fishFile, botDifficulty, d, botTime, botContempt, limitStrength); //Make a move for black
             if(!isOnline) //Send the move string to Stockfish
             {
@@ -442,20 +444,18 @@ int main(int argc, char** argv)
                 fishFile<<"uci"<<std::endl;
 
                 fishFile<<"position startpos move ";
-                //recordString.append(b.bPGN); //Add to the recorded string 
                 recordString = b.PGN;
                 std::cout<<"position startpos move "<<recordString<<std::endl;
-                //recordString.append(" ");
                 
                 fishFile<<recordString<<std::endl;
                 fishFile.close();
                 b.writePGN("assets/Record/test.txt");
             } 
-            SDL_Delay(1000);
    
         }
-        else if(!spectatorPause) //White's turn
+        else if(spectatorPause) //White's turn
         {
+            spectatorPause = false;
             e2.stockfishMoveW(b, recordString, fishFile, botDifficulty2, d, botTime2, botContempt2, limitStrength2); //Make a move for black
             if(wMoveString != b.wMoveString) //If a move was made and we don't know about it...
             {
@@ -478,7 +478,6 @@ int main(int argc, char** argv)
                     b.writePGN("assets/Record/test.txt");
                 }    
             }
-            SDL_Delay(1000);
 
         }
         
