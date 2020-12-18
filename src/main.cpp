@@ -144,7 +144,7 @@ void showStartupBox()
             case 2: botDifficulty = 1350; botTime = 4; botContempt = 20; limitStrength = true; break;
             case 3: botDifficulty = 1500; botTime = 5; botContempt = 24; limitStrength = true; break;
             case 4: botDifficulty = 1750; botTime = 10; botContempt = 24; limitStrength = false; break;
-            case 5: botDifficulty = 2300; botTime = 30; botContempt = 24; limitStrength = false; break;
+            case 5: botDifficulty = 2300; botTime = 20; botContempt = 24; limitStrength = false; break;
         }
     }
 
