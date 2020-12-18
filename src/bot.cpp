@@ -14,7 +14,7 @@ std::pair<std::pair<unsigned int, unsigned int>, std::pair<unsigned int, unsigne
     {
         if(line.find(good) != std::string::npos) //Check if best move was outputted
         {
-            if(line == "bestmove (no move)" || line == stored) //If Stockfish broke then we know it won
+            if(line == "bestmove (none)" || line == stored) //If Stockfish broke then we know it won
             {
                 if(!WHITE) Board.WINNER = WINNER_BLACK;
                 else Board.WINNER = WINNER_WHITE;

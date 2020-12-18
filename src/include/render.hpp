@@ -62,6 +62,7 @@ namespace renderer
 
         void init(unsigned int w, unsigned int h, Chess::board_t& Board); //Function to start SDL2 and init other values like BG textures
         void input(Chess::board_t& Board); //Function to handle input
+        void getSpectatorInput(bool *paused); //Function to get spectator input like play, pause advance, etc.
 
         void drawBoard(Chess::board_t& Board); //Function to draw all pieces on a chessboard
         void fastDrawBoard(Chess::board_t& Board); //Function to draw all pieces on a chessboard without FPS cap

@@ -502,3 +502,16 @@ void Drawer::fastDrawBoard(Chess::board_t& Board)
 
     SDL_RenderPresent(render);
 }
+
+//Function to get spectator mode input like play and pause
+void Drawer::getSpectatorInput(bool *paused)
+{
+    while(SDL_WaitEventTimeout(&userIn, 100)) //Wait 100 ms for an event to appear in the queue
+    {
+        if(userIn.key.keysym.sym == SDLK_SPACE) //Toggle paused 
+        {
+            if(paused) *paused = false;
+            else *paused = true;
+        }
+    }
+}

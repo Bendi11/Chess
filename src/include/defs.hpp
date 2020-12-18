@@ -13,6 +13,7 @@
 #define WINNER_WHITE 1
 #define WINNER_BLACK 2
 #define STALEMATE 3
+#define DRAW 4
 
 #define WHITE_CHECK 0
 #define BLACK_CHECK 1

@@ -7,6 +7,7 @@ using namespace Chess;
 
 void board_t::checkLogic() //Function to check for a stalemate, checkmate, mate, etc.
 {
+    fiftyCounter++;
     if(justCaptured)
     {
         fiftyCounter = 0; //Reset 50 move rule counter if a piece has been captured
@@ -16,6 +17,10 @@ void board_t::checkLogic() //Function to check for a stalemate, checkmate, mate,
     {
         fiftyCounter = 0; //Reset the 50 move rule counter if a pawn has been moved
         pawnMoved = false; //Reset pawn moved flag
+    }
+    if(fiftyCounter > 49)
+    {
+        WINNER = DRAW; //A draw if 50 move rule is fulfilled
     }
     //Stalemate only occurrs if a player also has no other pieces
     unsigned int numWhite = 0;
@@ -362,6 +367,7 @@ void board_t::restart()
     stalemate = false;
     wNoMoves = false;
     bNoMoves = false;
+    fiftyCounter = 0;
 
     unsigned int i; //Iterator variable
 

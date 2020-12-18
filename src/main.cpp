@@ -31,6 +31,8 @@ unsigned int botTime2; //How much time the bot gets to decide a move
 unsigned int botContempt2; //How aggressive the bot will be 
 bool limitStrength2; //If the engine should limit its strength to meet elo requirement
 
+bool spectatorPause = false; //If the playback is paused
+
 
 /*--------------------NETWORKING OBJECTS--------------------*/
 using asio::ip::tcp;
@@ -186,9 +188,9 @@ void showStartupBox()
             case 0: botDifficulty = 500; botTime = 5; botContempt = 2; limitStrength = true; break;
             case 1: botDifficulty = 700; botTime = 2; botContempt = 10; limitStrength = true; break;
             case 2: botDifficulty = 1350; botTime = 4; botContempt = 20; limitStrength = true; break;
-            case 3: botDifficulty = 1500; botTime = 5; botContempt = 24; limitStrength = true; break;
-            case 4: botDifficulty = 1750; botTime = 10; botContempt = 24; limitStrength = false; break;
-            case 5: botDifficulty = 2300; botTime = 20; botContempt = 24; limitStrength = false; break;
+            case 3: botDifficulty = 1500; botTime = 10; botContempt = 24; limitStrength = true; break;
+            case 4: botDifficulty = 1750; botTime = 15; botContempt = 24; limitStrength = false; break;
+            case 5: botDifficulty = 2300; botTime = 24; botContempt = 24; limitStrength = false; break;
         }
         
         messageDataSpectate = 
@@ -395,43 +397,40 @@ int main(int argc, char** argv)
     {
         //Check for a winner
         if(b.WINNER != WINNER_NONE)
+        {
+            switch(b.WINNER)
             {
-                if(b.WINNER == WINNER_WHITE)
-                {
-                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "Chess", "White won by checkmate!", d.win); //Display that white won the game
-                    b.restart(); //Reset all chess board values and positions
-                    //Clear the communication file
-                    fishFile.open("move.txt", std::ofstream::out | std::ofstream::trunc);
-                    fishFile.close(); 
-                    recordString.clear(); //Clear the PGN recording, effectively restarting Stockfish
-                    gameover = false; //Reset gameover
-                }
-                else if(b.WINNER == WINNER_BLACK)
-                {
-                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "Chess", "Black won by checkmate!", d.win); //Display that black won the game
-                    b.restart(); //Reset all chess board values and positions
-                    //Clear the communication file
-                    fishFile.open("move.txt", std::ofstream::out | std::ofstream::trunc);
-                    fishFile.close(); 
-                    recordString.clear(); //Clear the PGN recording, effectively restarting Stockfish
-                    gameover = false; //Reset gameover
-                }
-                else if(b.WINNER == STALEMATE)
-                {
-                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "Chess", "Draw by stalemate!", d.win); //Display that black won the game
-                    b.restart(); //Reset all chess board values and positions
-                    //Clear the communication file
-                    fishFile.open("move.txt", std::ofstream::out | std::ofstream::trunc);
-                    fishFile.close(); 
-                    recordString.clear(); //Clear the PGN recording, effectively restarting Stockfish
-                    gameover = false; //Reset gameover
-                }
-                b.WINNER = WINNER_NONE;
-                e.storedString = " ";
-                e2.storedString = " ";
-            }
+                case WINNER_WHITE:
+                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "Chess", "Game ended with checkmate!", d.win); //Display that white won the game
+                break;
+
+                case WINNER_BLACK:
+                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "Chess", "Game ended with checkmate!", d.win); //Display that black won the game
+                break;
+
+                case DRAW:
+                case STALEMATE:
+                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "Chess", "Game ended with draw!", d.win); //Display that black won the game
+                break;
+            }   
+            b.restart(); //Reset all chess board values and positions
+            //Clear the communication file
+            fishFile.open("move.txt", std::ofstream::out | std::ofstream::trunc);
+            fishFile.close(); 
+            recordString.clear(); //Clear the PGN recording, effectively restarting Stockfish
+            gameover = false; //Reset gameover
+            b.WINNER = WINNER_NONE;
+            e.storedString = " ";
+            e2.storedString = " ";
+            b.PGN = " ";
+            b.wPGN = " ";
+            b.bPGN = " ";
+        }
         
-        if(b.counter % 2) //Black's turn
+        d.drawBoard(b);
+        d.getSpectatorInput(&spectatorPause); //Check for a pause
+
+        if(b.counter % 2 && !spectatorPause) //Black's turn
         {
             e.stockfishMove(b, recordString, fishFile, botDifficulty, d, botTime, botContempt, limitStrength); //Make a move for black
             if(!isOnline) //Send the move string to Stockfish
@@ -451,9 +450,11 @@ int main(int argc, char** argv)
                 fishFile<<recordString<<std::endl;
                 fishFile.close();
                 b.writePGN("assets/Record/test.txt");
-            }    
+            } 
+            SDL_Delay(1000);
+   
         }
-        else //White's turn
+        else if(!spectatorPause) //White's turn
         {
             e2.stockfishMoveW(b, recordString, fishFile, botDifficulty2, d, botTime2, botContempt2, limitStrength2); //Make a move for black
             if(wMoveString != b.wMoveString) //If a move was made and we don't know about it...
@@ -477,47 +478,41 @@ int main(int argc, char** argv)
                     b.writePGN("assets/Record/test.txt");
                 }    
             }
+            SDL_Delay(1000);
+
         }
-        d.drawBoard(b);
-        SDL_Delay(1);
+        
 
         if(b.WINNER != WINNER_NONE) //Check for a winner after that move
         {
-            if(b.WINNER == WINNER_WHITE)
+            switch(b.WINNER)
             {
-                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "Chess", "Game ended with checkmate!", d.win); //Display that white won the game
-                b.restart(); //Reset all chess board values and positions
-                //Clear the communication file
-                fishFile.open("move.txt", std::ofstream::out | std::ofstream::trunc);
-                fishFile.close(); 
-                recordString.clear(); //Clear the PGN recording, effectively restarting Stockfish
-                gameover = false; //Reset gameover
-                
-            }
-            else if(b.WINNER == WINNER_BLACK)
-            {
-                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "Chess", "Game ended with checkmate!", d.win); //Display that black won the game
-                b.restart(); //Reset all chess board values and positions
-                //Clear the communication file
-                fishFile.open("move.txt", std::ofstream::out | std::ofstream::trunc);
-                fishFile.close(); 
-                recordString.clear(); //Clear the PGN recording, effectively restarting Stockfish
-                gameover = false; //Reset gameover
-            }
-            else if(b.WINNER == STALEMATE)
-            {
-                SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "Chess", "Draw by stalemate!", d.win); //Display that black won the game
-                b.restart(); //Reset all chess board values and positions
-                //Clear the communication file
-                fishFile.open("move.txt", std::ofstream::out | std::ofstream::trunc);
-                fishFile.close(); 
-                recordString.clear(); //Clear the PGN recording, effectively restarting Stockfish
-                gameover = false; //Reset gameover
-            }
+                case WINNER_WHITE:
+                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "Chess", "Game ended with checkmate!", d.win); //Display that white won the game
+                break;
+
+                case WINNER_BLACK:
+                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "Chess", "Game ended with checkmate!", d.win); //Display that black won the game
+                break;
+
+                case DRAW:
+                    SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "Chess", "Game ended with draw!", d.win); //Display that black won the game
+                break;
+            }   
+            b.restart(); //Reset all chess board values and positions
+            //Clear the communication file
+            fishFile.open("move.txt", std::ofstream::out | std::ofstream::trunc);
+            fishFile.close(); 
+            recordString.clear(); //Clear the PGN recording, effectively restarting Stockfish
+            gameover = false; //Reset gameover
+            b.WINNER = WINNER_NONE;
+            e.storedString = " ";
+            e2.storedString = " ";
+            b.PGN = " ";
+            b.wPGN = " ";
+            b.bPGN = " ";
         }
-        b.WINNER = WINNER_NONE;
-        e.storedString = " ";
-        e2.storedString = " ";
+        
         
     }
     
