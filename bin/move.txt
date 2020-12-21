@@ -1,0 +1,2 @@
+uci
+position startpos move  d2d4 d7d5 

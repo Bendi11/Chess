@@ -495,6 +495,7 @@ int main(int argc, char** argv)
                 break;
 
                 case DRAW:
+                case STALEMATE:
                     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_COLOR_TEXT, "Chess", "Game ended with draw!", d.win); //Display that black won the game
                 break;
             }   
