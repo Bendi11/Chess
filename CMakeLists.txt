@@ -7,7 +7,7 @@ set(CMAKE_BUILD_TYPE "Release")
 endif()
 
 set(SOURCES
-    "src/Chess.cpp"
+    "src/bitboard.cpp"
     "src/main.cpp"
 )
 
