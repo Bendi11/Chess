@@ -10,7 +10,7 @@ set(CMAKE_BUILD_TYPE "Release")
 endif()
 
 set(SOURCES
-    "src/bitboard.cpp"
+    "src/board.cpp"
     "src/main.cpp"
 )
 
