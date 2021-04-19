@@ -3,8 +3,9 @@
 
 int main(int argc, char* argv[])
 {
-    Bb b = BbFile::D;
-    b |= 1 << BbSquare::a1;
-    std::cout << bb_str(b) << std::endl;
+    Bb b = RANK_MASKS[3];
+    //b |= 1 << BbSquare::a1;
+    //b.set(BbSquare::a4, true);
+    std::cout << b.str() << std::endl;
     return 0;
 }
