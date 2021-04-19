@@ -10,3 +10,4 @@ Makefile
 .ninja_log
 *.ninja
 bin/*
+vscodecmake

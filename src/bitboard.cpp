@@ -1,5 +1,12 @@
 #include "bitboard.hpp"
 
+const char* Bb::str(void) const
+{
+    char bb_s[72] = {'\n'};
+
+    return bb_s;
+}
+
 std::string bb_str(Bb bb)
 {
     std::string bb_s; //String holding the representation of the bitboard in text

@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin)
 project(Chess)
 
+include(deps.cmake) #Download all dependencies of the project
+
 if(NOT DEFINED CMAKE_BUILD_TYPE)
 set(CMAKE_BUILD_TYPE "Release")
 endif()

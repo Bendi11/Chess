@@ -7,10 +7,17 @@
 typedef uint64_t bitboard;
 
 
+/**
+ * @brief Wrapper class around a raw bitboard allowing member methods for bitboards
+ * sizeof(Bb) is 8 bytes, the same size as a raw bitboard, but with member methods and
+ * implicit conversions to and from raw 64 bit numbers
+ * 
+ * @see bitboard
+ * 
+ */
 class Bb
 {
 public:
-    //Bb(const uint64_t& c) : m_bb{c} {}
     
     /**
      * @brief Constructor of the Bitboard class that takes any type castable
@@ -23,23 +30,102 @@ public:
     template<typename T, typename = std::enable_if<std::is_convertible<T, uint64_t>::value > >
         constexpr Bb(const T& in) : m_bb{static_cast<bitboard>(in)} {}
 
+    Bb(int t) : m_bb{static_cast<bitboard>(t)} {}
     Bb() = default;
 
     //Implicitly convert the bitboard struct to a uint64_t when needed
     inline constexpr operator uint64_t() const {return m_bb;}
 
+
+    //----------BINARY MATH OPERATORS----------//
+
+    //Perform an OR on the bitboard and assign the value
     inline Bb& operator |=(const Bb& other) 
     {
         this->m_bb |= other.m_bb;
         return *this;
     }
 
+    //Perform AND on another bitboard and assign the value
+    inline Bb& operator &=(const Bb& other) 
+    {
+        this->m_bb &= other.m_bb;
+        return *this;
+    }
+
+    //XOR two bitboards together and assign the value to the LHS
+    inline Bb& operator ^=(const Bb& other)
+    {
+        this->m_bb ^= other.m_bb;
+        return *this;
+    }
+
+    //Bitshift a bitboard to the left and assign the expression result to the LHS
+    inline Bb& operator <<=(int lshift)
+    {
+        this->m_bb <<= lshift;
+        return *this;
+    }
+
+    //Bitshift a bitboard to the right and assign the value to the LHS
+    inline Bb& operator >>=(unsigned long long rshift)
+    {
+        this->m_bb >>= rshift;
+        return *this;
+    }
+
+
+    //Bitshift a bitboard to the left 
+    inline Bb operator <<(unsigned long long lshift)
+    {
+        return Bb(this->m_bb << lshift);
+    }
+
+    //Bitshift a bitboard to the right
+    inline Bb operator >>(unsigned long long rshift)
+    {
+        return Bb(this->m_bb >> rshift);
+    }
+
+    //OR two bitboards together
+    inline Bb operator |(const Bb& other) 
+    {
+        return Bb(this->m_bb | other.m_bb);
+    }
+
+    //AND two bitboards together
+    inline Bb operator &(const Bb& other) 
+    {
+        return Bb(this->m_bb & other.m_bb);
+    }
+
+    //XOR two bitboards together
+    inline Bb operator ^(const Bb& other) 
+    {
+        return Bb(this->m_bb ^ other.m_bb);
+    }
+
+    inline Bb operator &(const int& other)
+    {
+        return Bb(m_bb & other);
+    }
+
     const bool nth(uint8_t n) const {return (m_bb >> n) & 1;}
+    const char* str(void) const;
 
 private:
     bitboard m_bb; //Internal 64 bit number representing the bitboard
 };
 
+class Board
+{
+public:
+
+private:
+    Bb w_pawns;
+    Bb b_pawns;
+
+};
 
 /**
  * @brief Taken from the chess programming wiki, this represents where all squares
