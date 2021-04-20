@@ -10,7 +10,39 @@
 
 #include "board.hpp"
 
+/**
+ * @brief A sprite contains all information needed to render an image
+ * using OpenGL. This includes size, position, and texture IDs in OpenGL
+ * 
+ */
+struct Sprite
+{
+public:
+    /// Display the sprite at its stored position and size using Dear ImGui's draw list
+    void display(void);
 
+    /// Load a sprite from a file using the file path
+    Sprite(const char* f_name);
+
+    Sprite(const Sprite& other) = default;
+
+    void setpos(const ImVec2& pos) {m_pos = pos;}
+
+private:    
+    /// The texture ID of this sprite
+    unsigned int m_txid;
+    /// The size of the sprite rendered in OpenGL
+    ImVec2 m_size;
+    /// The position of the sprite rendered in OpenGL
+    ImVec2 m_pos;
+};
+
+/**
+ * @brief The `ChessGui` class contains a `Board` object and displays it, using user input to 
+ * configure and manipulate the board
+ * @see Board
+ * 
+ */
 class ChessGui
 {
 public:

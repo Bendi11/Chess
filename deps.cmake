@@ -1,5 +1,19 @@
 include(FetchContent)
 
+FetchContent_Declare(glfw
+    GIT_REPOSITORY https://github.com/glfw/glfw)
+FetchContent_GetProperties(glfw)
+if(NOT glfw_POPULATED)
+    FetchContent_Populate(glfw)
+
+    set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "")
+    set(GLFW_BUILD_TESTS OFF CACHE INTERNAL "")
+    set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "")
+    set(GLFW_INSTALL OFF CACHE INTERNAL "")
+
+    add_subdirectory(${glfw_SOURCE_DIR} ${glfw_BINARY_DIR})
+endif()
+
 #Declare the glad openGL extension loader
 FetchContent_Declare(
         glad
@@ -14,19 +28,7 @@ if(NOT glad_POPULATED)
     add_subdirectory(${glad_SOURCE_DIR} ${glad_BINARY_DIR})
 endif()
 
-FetchContent_Declare(glfw
-    GIT_REPOSITORY https://github.com/glfw/glfw)
-FetchContent_GetProperties(glfw)
-if(NOT glfw_POPULATED)
-    FetchContent_Populate(glfw)
 
-    set(GLFW_BUILD_EXAMPLES OFF CACHE INTERNAL "")
-    set(GLFW_BUILD_TESTS OFF CACHE INTERNAL "")
-    set(GLFW_BUILD_DOCS OFF CACHE INTERNAL "")
-    set(GLFW_INSTALL OFF CACHE INTERNAL "")
-
-    add_subdirectory(${glfw_SOURCE_DIR} ${glfw_BINARY_DIR})
-endif()
 
 FetchContent_Declare(stb 
     GIT_REPOSITORY https://github.com/nothings/stb.git)
@@ -68,6 +70,7 @@ if(NOT imgui_POPULATED)
         ${imgui_SOURCE_DIR}
         ${imgui_SOURCE_DIR}/backends
         ${imgui_SOURCE_DIR}/misc/cpp
+        ${glad_BINARY_DIR}/include
     )
 
     target_link_libraries(imgui PUBLIC glfw glad)
