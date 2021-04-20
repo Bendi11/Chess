@@ -8,6 +8,7 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
+#include <array>
 #include "board.hpp"
 
 /**
@@ -21,20 +22,31 @@ public:
     /// Display the sprite at its stored position and size using Dear ImGui's draw list
     void display(void);
 
+    /**
+     * @brief Display the sprite at is scale and offset
+     * 
+     * @param scale The scale size data
+     * @param offset The screen coordinates to put the sprite at
+     */
+    void display(ImVec2 scale, ImVec2 offset);
+
     /// Load a sprite from a file using the file path
     Sprite(const char* f_name);
+    Sprite() = default;
 
     Sprite(const Sprite& other) = default;
 
-    void setpos(const ImVec2& pos) {m_pos = pos;}
+    Sprite& operator =(const Sprite& other) = default;
+
+    /// The size of the sprite rendered in OpenGL
+    ImVec2 size;
+    /// The position of the sprite rendered in OpenGL
+    ImVec2 pos;
 
 private:    
     /// The texture ID of this sprite
     unsigned int m_txid;
-    /// The size of the sprite rendered in OpenGL
-    ImVec2 m_size;
-    /// The position of the sprite rendered in OpenGL
-    ImVec2 m_pos;
+    
 };
 
 /**
@@ -46,6 +58,7 @@ private:
 class ChessGui
 {
 public:
+    ChessGui();
     void init(void);
 
     void loop(void);
@@ -65,4 +78,6 @@ private:
 
     /// The chess board that we will display
     Board chess;
+
+    std::array<std::array<Sprite, 8>, 8> m_boardsprites; //Sprites that are displayed as the board background
 };
