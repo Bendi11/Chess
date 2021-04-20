@@ -1,10 +1,9 @@
-#include "board.hpp"
-#include "piece.hpp"
+/*#include "board.hpp"
 
 void Piece::gen_moves(const Board& board)
 {
     m_moves.clear();
-    
+
     switch(m_kind)
     {
         case Type::PAWN:
@@ -29,4 +28,4 @@ void Piece::add_move_empty(const Board& b, Position p)
 void Piece::add_move_attack(const Board& b, Position p)
 {
     if(b.valid(p.x, p.y) && b[p.x][p.y] && b[p.x][p.y]->m_flags[raw_enum(Flags::COLOR)] != m_flags[raw_enum(Flags::COLOR)]) m_moves.push_back(Move(m_pos, p));
-}
+}*/

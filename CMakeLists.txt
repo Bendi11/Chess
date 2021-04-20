@@ -11,11 +11,15 @@ endif()
 
 set(SOURCES
     "src/board.cpp"
+    "src/gui.cpp"
     "src/main.cpp"
 )
 
 include_directories(
     "src/include"
+    ${CMAKE_SOURCE_DIR}"/src"
 )
 
-add_executable(${CMAKE_PROJECT_NAME} ${SOURCES})
+
+add_executable(${CMAKE_PROJECT_NAME} WIN32 ${SOURCES})
+target_link_libraries(${CMAKE_PROJECT_NAME} imgui)

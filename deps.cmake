@@ -28,6 +28,14 @@ if(NOT glfw_POPULATED)
     add_subdirectory(${glfw_SOURCE_DIR} ${glfw_BINARY_DIR})
 endif()
 
+FetchContent_Declare(stb 
+    GIT_REPOSITORY https://github.com/nothings/stb.git)
+FetchContent_GetProperties(stb)
+if(NOT stb_POPULATED)
+    FetchContent_Populate(stb)
+endif()
+include_directories(${stv_SOURCE_DIR})
+
 #Get IMGUI from a git repo
 FetchContent_Declare(imgui
     GIT_REPOSITORY https://github.com/ocornut/imgui.git
