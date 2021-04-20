@@ -34,7 +34,7 @@ FetchContent_GetProperties(stb)
 if(NOT stb_POPULATED)
     FetchContent_Populate(stb)
 endif()
-include_directories(${stv_SOURCE_DIR})
+include_directories(${stb_SOURCE_DIR})
 
 #Get IMGUI from a git repo
 FetchContent_Declare(imgui

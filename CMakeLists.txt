@@ -20,6 +20,12 @@ include_directories(
     ${CMAKE_SOURCE_DIR}"/src"
 )
 
-
+if(WIN32)
+set(SOURCES 
+    ${SOURCES}
+    "src/res.rc"
+)
 add_executable(${CMAKE_PROJECT_NAME} WIN32 ${SOURCES})
+endif()
+
 target_link_libraries(${CMAKE_PROJECT_NAME} imgui)
