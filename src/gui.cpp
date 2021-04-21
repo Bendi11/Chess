@@ -79,6 +79,7 @@ void ChessGui::init(void)
     Sprite black_tile("assets/bSquare.png"); //Load the black tile texture
     Sprite white_tile("assets/wSquare.png"); //Load the white tile texture
     
+    //Set the board sprites to the correct colors
     std::size_t x = 0;
     std::transform(m_boardsprites.begin(), m_boardsprites.end(), m_boardsprites.begin(), [&x, &black_tile, &white_tile](std::array<Sprite, 8>& file) -> std::array<Sprite, 8>
     {
@@ -101,6 +102,20 @@ void ChessGui::init(void)
         x++;
         return file;
     });
+
+    piece_sprites[Piece::Type::PAWN] = Sprite("assets/wPawn.png");
+    piece_sprites[Piece::Type::ROOK] = Sprite("assets/wRook.png");
+    piece_sprites[Piece::Type::BISHOP] = Sprite("assets/wBishop.png");
+    piece_sprites[Piece::Type::KNIGHT] = Sprite("assets/wKnight.png");
+    piece_sprites[Piece::Type::KING] = Sprite("assets/wKing.png");
+    piece_sprites[Piece::Type::QUEEN] = Sprite("assets/wQueen.png");
+
+    piece_sprites[Piece::Type::PAWN + 6] = Sprite("assets/bPawn.png");
+    piece_sprites[Piece::Type::ROOK + 6] = Sprite("assets/bRook.png");
+    piece_sprites[Piece::Type::BISHOP + 6] = Sprite("assets/bBishop.png");
+    piece_sprites[Piece::Type::KNIGHT + 6] = Sprite("assets/bKnight.png");
+    piece_sprites[Piece::Type::KING + 6] = Sprite("assets/bKing.png");
+    piece_sprites[Piece::Type::QUEEN + 6] = Sprite("assets/bQueen.png");
 }
 
 ChessGui::ChessGui() 
@@ -110,12 +125,10 @@ ChessGui::ChessGui()
 
 void ChessGui::loop(void)
 {
-    Sprite s("assets/wPawn.png");
-    Sprite s2 = s;
-    s.pos = ImVec2(400., 400.);
-    s2.pos = ImVec2(100., 100.);
-
-    ImVec2 offset;
+    chess.gen_moves();
+    //ImVec2 offset;
+    bool clicked = false; //If the user clicked on a position
+    ImVec2 old_clickpos;
 
     while(!glfwWindowShouldClose(win))
     {
@@ -128,9 +141,9 @@ void ChessGui::loop(void)
         ImGui::NewFrame();
 
         // Get the largest display dimension and smallest to properly scale and align the chess board
-        int max = (display_w > display_h) ? display_w : display_h;
-        int min = (display_w > display_h) ? display_h : display_w;
-        bool width_max = max == display_w;
+        max = (display_w > display_h) ? display_w : display_h;
+        min = (display_w > display_h) ? display_h : display_w;
+        width_max = max == display_w;
         
         std::size_t x = 0, y = 0;
         for(auto& file : m_boardsprites)
@@ -147,14 +160,20 @@ void ChessGui::loop(void)
             x = 0;
         }
 
-        s.display();
-        s2.display();
+        for(auto piece : chess.pieces())
+        {
+            //Transform and scale the piece coordinates based on screen dimensions
+            //float piece_x = (width_max) ? piece.m_pos.x *((float)min / 8) + (float)((max - min) / 2) : piece.m_pos.x *((float)min / 8);
+            //float piece_y = (width_max) ? -(piece.m_pos.y - 7) *((float)min / 8) : -(piece.m_pos.y - 7) * ((float)min / 8) + (float)((max - min) / 2) ;
+            ImVec2 piece_pos = to_screencoords(piece.m_pos);
 
-        ImGui::Begin("Chess Menu");
-
-        ImGui::End();
-
-
+            //Draw the piece using the correct sprite for the color and piece type
+            Sprite s = piece_sprites[static_cast<std::size_t>(piece.m_kind) + ( (piece.m_flags[Piece::Flags::COLOR]) ? 0 : 6)];
+            s.display(
+                ImVec2((float)min / 8, (float)min / 8), 
+                piece_pos
+            );
+        }
 
         // Rendering
         ImGui::Render();
@@ -165,5 +184,25 @@ void ChessGui::loop(void)
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(win);
+        if(ImGui::IsMouseDown(ImGuiMouseButton_::ImGuiMouseButton_Left) )
+        {
+            if(!clicked)
+            {
+                clicked = true;
+                old_clickpos = ImGui::GetMousePos();
+            }
+        }
+        else 
+        {
+            if(clicked && ImGui::IsMouseReleased(ImGuiMouseButton_::ImGuiMouseButton_Left))
+            {
+                msg::info("Mouse move (%zu, %zu) to (%zu, %zu)", to_chesscoords(old_clickpos).x, to_chesscoords(old_clickpos).y, to_chesscoords(ImGui::GetMousePos()).x, to_chesscoords(ImGui::GetMousePos()).y);
+                clicked = false;
+                if(chess.make_move(Move(to_chesscoords(old_clickpos), to_chesscoords(ImGui::GetMousePos()))) )
+                {
+                    chess.gen_moves();
+                }
+            }
+        }
     }
 }
