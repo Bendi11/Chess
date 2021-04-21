@@ -45,7 +45,8 @@ void ChessGui::init(void)
 {
     if(!glfwInit()) 
     {
-        
+        msg::error("Failed to initialize GLFW3");
+        exit(-1);
     }
     
     
@@ -57,7 +58,8 @@ void ChessGui::init(void)
     win = glfwCreateWindow(1280, 720, "Chess", NULL, NULL); //Initialize the GLFW window
     if(win == NULL) //Check for window creation errors
     {
-
+        msg::error("Failed to create GLFW3 window!");
+        exit(-1);
     }
 
     glfwMakeContextCurrent(win);
@@ -66,7 +68,8 @@ void ChessGui::init(void)
     //Check for glad extension load fails
     if(gladLoadGL() == 0)
     {
-        
+        msg::error("glad extension loader failed to load OpenGL 3.3 extensions"); //Display the error message
+        exit(-1); //Exit the program
     }
     
     IMGUI_CHECKVERSION();
@@ -75,6 +78,30 @@ void ChessGui::init(void)
 
     ImGui_ImplGlfw_InitForOpenGL(win, true); //Start ImGui for OpenGL 3.3 and Glfw3
     ImGui_ImplOpenGL3_Init(glsl_version);
+
+    SF_INFO capsound_info;
+    SNDFILE* capsound_file = sf_open("assets/sounds/capture.wav", SFM_READ, &capsound_info); //Open the capture sound information
+    capture_sound = new float[capsound_info.frames * capsound_info.channels];
+    sf_readf_float(capsound_file, capture_sound, capsound_info.frames);
+
+
+    PaError err = Pa_OpenDefaultStream(&audio_stream, 
+        0, //Input channel no.
+        1, //Mono output
+        paFloat32,
+        capsound_info.samplerate,
+        capsound_info.frames,
+        NULL, //Don't use callbacks as we are using blocking I/O
+        NULL
+    );
+    if(err != paNoError)
+    {
+        msg::error("Unable to open audio output! Code %i", err);
+        exit(-1);
+    }
+
+    Pa_WriteStream(audio_stream, capture_sound, capsound_info.frames);
+
 
     Sprite black_tile("assets/bSquare.png"); //Load the black tile texture
     Sprite white_tile("assets/wSquare.png"); //Load the white tile texture
@@ -116,6 +143,7 @@ void ChessGui::init(void)
     piece_sprites[Piece::Type::KNIGHT + 6] = Sprite("assets/bKnight.png");
     piece_sprites[Piece::Type::KING + 6] = Sprite("assets/bKing.png");
     piece_sprites[Piece::Type::QUEEN + 6] = Sprite("assets/bQueen.png");
+    moveable = Sprite("assets/moveable.png");
 }
 
 ChessGui::ChessGui() 
@@ -129,6 +157,7 @@ void ChessGui::loop(void)
     //ImVec2 offset;
     bool clicked = false; //If the user clicked on a position
     ImVec2 old_clickpos;
+    bool game_over = false;
 
     while(!glfwWindowShouldClose(win))
     {
@@ -165,10 +194,10 @@ void ChessGui::loop(void)
             //Transform and scale the piece coordinates based on screen dimensions
             //float piece_x = (width_max) ? piece.m_pos.x *((float)min / 8) + (float)((max - min) / 2) : piece.m_pos.x *((float)min / 8);
             //float piece_y = (width_max) ? -(piece.m_pos.y - 7) *((float)min / 8) : -(piece.m_pos.y - 7) * ((float)min / 8) + (float)((max - min) / 2) ;
-            ImVec2 piece_pos = to_screencoords(piece.m_pos);
+            ImVec2 piece_pos = to_screencoords(piece.get().m_pos);
 
             //Draw the piece using the correct sprite for the color and piece type
-            Sprite s = piece_sprites[static_cast<std::size_t>(piece.m_kind) + ( (piece.m_flags[Piece::Flags::COLOR]) ? 0 : 6)];
+            Sprite s = piece_sprites[static_cast<std::size_t>(piece.get().m_kind) + ( (piece.get().m_flags[Piece::Flags::COLOR]) ? 0 : 6)];
             s.display(
                 ImVec2((float)min / 8, (float)min / 8), 
                 piece_pos
@@ -187,8 +216,17 @@ void ChessGui::loop(void)
                 Position old_click = to_chesscoords(old_clickpos);
                 if(chess[old_click].has_value())
                 {
+                    //Display a dot to represent where a piece can move
+                    for(auto& mov : chess[old_click]->m_moves)
+                    {
+                        Sprite moveable_sprite = moveable;
+                        moveable_sprite.display(ImVec2((float)min / 8, (float)min / 8), to_screencoords(mov.m_new));
+                    }
+                    
+                    // Display the sprite at the dragged cursor pos
                     Sprite s = piece_sprites[static_cast<std::size_t>(chess[old_click]->m_kind) + ( ((chess[old_click]->m_flags[Piece::Flags::COLOR]) ? 0 : 6)) ];
                     s.display(ImVec2((float)min / 8, (float)min / 8), ImVec2(ImGui::GetMousePos().x - (float)min / 16, ImGui::GetMousePos().y - (float)min / 16));
+                    
                 }
             }
         }
@@ -196,13 +234,30 @@ void ChessGui::loop(void)
         {
             if(clicked && ImGui::IsMouseReleased(ImGuiMouseButton_::ImGuiMouseButton_Left))
             {
-                msg::info("Mouse move (%zu, %zu) to (%zu, %zu)", to_chesscoords(old_clickpos).x, to_chesscoords(old_clickpos).y, to_chesscoords(ImGui::GetMousePos()).x, to_chesscoords(ImGui::GetMousePos()).y);
                 clicked = false;
                 if(chess.make_move(Move(to_chesscoords(old_clickpos), to_chesscoords(ImGui::GetMousePos()))) )
                 {
-                    chess.gen_moves();
+                    
                 }
+                chess.gen_moves();
             }
+        }
+
+        auto state = chess.get_state();
+        if(state.black_checkmate || state.white_checkmate)
+        {
+            game_over = true;
+        }
+        if(game_over)
+        {
+            ImGui::Begin("Game Over");
+            ImGui::Text("%s won the game by checkmate", (state.white_checkmate) ? "Black" : "White");
+            if(ImGui::Button("Resset"))
+            {
+                chess = Board();
+                game_over = false;
+            }
+            ImGui::End();
         }
 
         // Rendering

@@ -217,14 +217,14 @@ public:
     inline std::optional<Piece>& operator [](const Position& pos) {return m_board[pos.x][pos.y];}
 
     /// Return a list containing all pieces on the board
-    inline std::list<Piece> pieces(void) const
+    inline std::list<std::reference_wrapper<Piece>> pieces(void) 
     {
-        std::list<Piece> ret; //The returned list of pieces
+        std::list<std::reference_wrapper<Piece> > ret; //The returned list of pieces
         for(auto& file : m_board)
             for(auto& rank : file)
             {
                 if(rank.has_value())
-                    ret.push_back(rank.value()); //Add the piece to our list
+                    ret.push_back(*rank); //Add the piece to our list
             }
         return ret;
     }
@@ -235,11 +235,14 @@ public:
     /// Make a move using a Move struct
     inline bool make_move(const Move& mov)
     {
+        
         if(!mov.valid()) return false;
         if(!m_board[mov.m_old.x][mov.m_old.y].has_value()) //Ensure there is a piece there
             return false;
         
         Piece& moved = *m_board[mov.m_old.x][mov.m_old.y];
+        if(to_move != moved.m_flags.test(Piece::Flags::COLOR)) return false; //Only move the color
+
         bool has_move = false;
         for(auto& move : moved.m_moves)
         {
@@ -251,15 +254,54 @@ public:
         moved.m_flags.set(Piece::Flags::MOVED);
         this->operator[](mov.m_new).swap(this->operator [](mov.m_old)); //Move the piece
         this->operator[](mov.m_old).reset(); //Remove the old piece
+        to_move = !to_move; //Toggle the side to move
         update_pos();
-        
+                
         return true; //Return that the move was good
     }
 
+    struct GameState 
+    {
+        bool white_checkmate = false;
+        bool black_checkmate = false;
+        GameState(bool white, bool black) : white_checkmate{white}, black_checkmate{black} {}
+    };
+
+    GameState get_state(void)
+    {
+        return GameState(white_checkmate, black_checkmate);
+    }
 
     /// @brief Generate moves for every piece on the board
     void gen_moves(void);
 private:
+    bool in_check(bool white)
+    {
+        bool check = false;
+        for(auto& piece : pieces())
+        {
+            if(piece.get().m_flags[Piece::Flags::COLOR] != white)
+                for(auto& move : piece.get().m_moves)
+                {
+                    //If a move would put the entity in check
+                    if(this->operator[](move.m_new).has_value() && 
+                    this->operator[](move.m_new)->m_kind == Piece::Type::KING && 
+                    this->operator[](move.m_new)->m_flags[Piece::Flags::COLOR] == white )
+                    {
+                        check = true;
+                        break;
+                    }
+                }
+        }
+        return check;
+    }
+
+    std::pair<bool, bool> checks;
+    bool to_move = true; //True for white, false for black
+
+    bool white_checkmate = false;
+    bool black_checkmate = false;
+
     /// @brief The 8x8 for chess array of pieces that are the board
     std::array<std::array<std::optional<Piece>, 8>, 8> m_board;
 

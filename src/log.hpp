@@ -51,4 +51,14 @@ namespace msg
         fwrite(ss.str().c_str(), sizeof(char), ss.str().size(), detail::log_file);
         fflush(detail::log_file);
     }
+
+    template<typename ... Args>
+    inline void error(const char* const fmt, Args ... args)
+    {
+        std::stringstream ss;
+        ss << "[ " << detail::current_date_time() << "]-ERROR: ";
+        ss << detail::format(fmt, args ...) << std::endl;
+        fwrite(ss.str().c_str(), sizeof(char), ss.str().size(), detail::log_file);
+        fflush(detail::log_file);
+    }
 }

@@ -14,6 +14,35 @@ if(NOT glfw_POPULATED)
     add_subdirectory(${glfw_SOURCE_DIR} ${glfw_BINARY_DIR})
 endif()
 
+FetchContent_Declare(portaudio
+    GIT_REPOSITORY https://github.com/PortAudio/portaudio.git)
+FetchContent_GetProperties(portaudio)
+if(NOT portaudio_POPULATED)
+    FetchContent_Populate(portaudio)
+
+    set(PA_BUILD_SHARED OFF CACHE INTERNAL "")
+    set(PA_BUILD_STATIC ON CACHE INTERNAL "")
+    set(PA_DISABLE_INSTALL ON CACHE INTERNAL "")
+    set(PA_BUILD_TESTS OFF CACHE INTERNAL "")
+    set(PA_BUILD_EXAMPLES OFF CACHE INTERNAL "")
+
+    add_subdirectory(${portaudio_SOURCE_DIR} ${portaudio_BINARY_DIR})
+    add_library(portaudio::portaudio_static ALIAS portaudio_static)
+endif()
+
+FetchContent_Declare(sndfile
+    GIT_REPOSITORY https://github.com/libsndfile/libsndfile.git)
+FetchContent_GetProperties(sndfile)
+if(NOT sndfile_POPULATED)
+    FetchContent_Populate(sndfile)
+
+    set(BUILD_PROGRAMS OFF CACHE INTERNAL "")
+    set(BUILD_EXAMPLES OFF CACHE INTERNAL "")
+    set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "")
+
+    add_subdirectory(${sndfile_SOURCE_DIR} ${sndfile_BINARY_DIR})
+endif()
+
 #Declare the glad openGL extension loader
 FetchContent_Declare(
         glad
@@ -73,7 +102,7 @@ if(NOT imgui_POPULATED)
         ${glad_BINARY_DIR}/include
     )
 
-    target_link_libraries(imgui PUBLIC glfw glad)
+    target_link_libraries(imgui PUBLIC glfw glad portaudio::portaudio_static sndfile)
 
 endif()
 

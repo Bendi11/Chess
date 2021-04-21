@@ -3,6 +3,9 @@
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_glfw.h"
+#include "portaudio.h"
+#include "sndfile.h"
+
 
 #include <glad/glad.h>
 #define GLFW_INCLUDE_NONE
@@ -73,6 +76,12 @@ public:
         ImGui::DestroyContext();
         glfwDestroyWindow(win);
         glfwTerminate();
+
+        Pa_Terminate();   
+        Pa_CloseStream(audio_stream);
+
+        delete move_sound;
+        delete capture_sound;
     }
 private:
 
@@ -110,11 +119,8 @@ private:
             (-((int)pos.y - max) - (float)((max - min) / 2) ) / ((float)min / 8) ;
         
 
-        msg::info("Converted position (%.3f, %.3f) to (%zu, %zu)", pos.x, pos.y, ret.x, ret.y);
         return ret;
     }
-
-
 
     bool width_max;
     int max;
@@ -122,5 +128,11 @@ private:
 
     std::array<std::array<Sprite, 8>, 8> m_boardsprites; //Sprites that are displayed as the board background
 
+    Sprite moveable;
     std::array<Sprite, 12> piece_sprites; //The sprites of all pieces including colors, indexed by Piece::Type enum and multiplied by 2 if black piece
+
+    PaStream* audio_stream; //The audio stream to write sound effects to
+    float* move_sound; 
+    float* capture_sound;
+    
 };
