@@ -55,7 +55,7 @@ void ChessGui::init(void)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-    win = glfwCreateWindow(1280, 720, "Chess", NULL, NULL); //Initialize the GLFW window
+    win = glfwCreateWindow(800, 800, "Chess", NULL, NULL); //Initialize the GLFW window
     if(win == NULL) //Check for window creation errors
     {
         msg::error("Failed to create GLFW3 window!");
@@ -79,19 +79,30 @@ void ChessGui::init(void)
     ImGui_ImplGlfw_InitForOpenGL(win, true); //Start ImGui for OpenGL 3.3 and Glfw3
     ImGui_ImplOpenGL3_Init(glsl_version);
 
+    Pa_Initialize();
+
     SF_INFO capsound_info;
     SNDFILE* capsound_file = sf_open("assets/sounds/capture.wav", SFM_READ, &capsound_info); //Open the capture sound information
     capture_sound = new float[capsound_info.frames * capsound_info.channels];
     sf_readf_float(capsound_file, capture_sound, capsound_info.frames);
 
+    SF_INFO movsound_info;
+    SNDFILE* mov_file = sf_open("assets/sounds/move.wav", SFM_READ, &movsound_info);
+    move_sound = new float[movsound_info.frames * movsound_info.channels];
+    sf_readf_float(mov_file, move_sound, movsound_info.frames);
 
-    PaError err = Pa_OpenDefaultStream(&audio_stream, 
-        0, //Input channel no.
-        1, //Mono output
+    sf_close(capsound_file);
+    sf_close(mov_file);
+
+    num_frames = capsound_info.frames;
+
+    PaError err = Pa_OpenDefaultStream(&audio_stream,
+        0,
+        capsound_info.channels,
         paFloat32,
         capsound_info.samplerate,
         capsound_info.frames,
-        NULL, //Don't use callbacks as we are using blocking I/O
+        NULL,
         NULL
     );
     if(err != paNoError)
@@ -99,8 +110,7 @@ void ChessGui::init(void)
         msg::error("Unable to open audio output! Code %i", err);
         exit(-1);
     }
-
-    Pa_WriteStream(audio_stream, capture_sound, capsound_info.frames);
+    
 
 
     Sprite black_tile("assets/bSquare.png"); //Load the black tile texture
@@ -237,7 +247,9 @@ void ChessGui::loop(void)
                 clicked = false;
                 if(chess.make_move(Move(to_chesscoords(old_clickpos), to_chesscoords(ImGui::GetMousePos()))) )
                 {
-                    
+                    Pa_StartStream(audio_stream);
+
+                    Pa_WriteStream(audio_stream, move_sound, num_frames);
                 }
                 chess.gen_moves();
             }

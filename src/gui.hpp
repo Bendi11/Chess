@@ -134,5 +134,6 @@ private:
     PaStream* audio_stream; //The audio stream to write sound effects to
     float* move_sound; 
     float* capture_sound;
+    int num_frames;
     
 };
