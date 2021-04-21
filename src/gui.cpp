@@ -81,11 +81,13 @@ void ChessGui::init(void)
 
     Pa_Initialize();
 
+    //Open the capture sound from the wav file
     SF_INFO capsound_info;
     SNDFILE* capsound_file = sf_open("assets/sounds/capture.wav", SFM_READ, &capsound_info); //Open the capture sound information
     capture_sound = new float[capsound_info.frames * capsound_info.channels];
     sf_readf_float(capsound_file, capture_sound, capsound_info.frames);
 
+    
     SF_INFO movsound_info;
     SNDFILE* mov_file = sf_open("assets/sounds/move.wav", SFM_READ, &movsound_info);
     move_sound = new float[movsound_info.frames * movsound_info.channels];
@@ -111,7 +113,7 @@ void ChessGui::init(void)
         exit(-1);
     }
     
-
+    Pa_StartStream(audio_stream);
 
     Sprite black_tile("assets/bSquare.png"); //Load the black tile texture
     Sprite white_tile("assets/wSquare.png"); //Load the white tile texture
@@ -164,7 +166,6 @@ ChessGui::ChessGui()
 void ChessGui::loop(void)
 {
     chess.gen_moves();
-    //ImVec2 offset;
     bool clicked = false; //If the user clicked on a position
     ImVec2 old_clickpos;
     bool game_over = false;
@@ -202,8 +203,6 @@ void ChessGui::loop(void)
         for(auto piece : chess.pieces())
         {
             //Transform and scale the piece coordinates based on screen dimensions
-            //float piece_x = (width_max) ? piece.m_pos.x *((float)min / 8) + (float)((max - min) / 2) : piece.m_pos.x *((float)min / 8);
-            //float piece_y = (width_max) ? -(piece.m_pos.y - 7) *((float)min / 8) : -(piece.m_pos.y - 7) * ((float)min / 8) + (float)((max - min) / 2) ;
             ImVec2 piece_pos = to_screencoords(piece.get().m_pos);
 
             //Draw the piece using the correct sprite for the color and piece type
@@ -224,7 +223,7 @@ void ChessGui::loop(void)
             else 
             {
                 Position old_click = to_chesscoords(old_clickpos);
-                if(chess[old_click].has_value())
+                if(old_click.valid() && chess[old_click].has_value())
                 {
                     //Display a dot to represent where a piece can move
                     for(auto& mov : chess[old_click]->m_moves)
@@ -247,8 +246,7 @@ void ChessGui::loop(void)
                 clicked = false;
                 if(chess.make_move(Move(to_chesscoords(old_clickpos), to_chesscoords(ImGui::GetMousePos()))) )
                 {
-                    Pa_StartStream(audio_stream);
-
+                    //Pa_StartStream(audio_stream);
                     Pa_WriteStream(audio_stream, move_sound, num_frames);
                 }
                 chess.gen_moves();

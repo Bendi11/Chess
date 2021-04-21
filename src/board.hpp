@@ -214,6 +214,7 @@ public:
     /// Get the rank at the specified file index
     inline const std::array<std::optional<Piece>, 8> operator [](const std::size_t s) const {return m_board[s];}
 
+    /// Get the optional piece at the position given to the array index operator
     inline std::optional<Piece>& operator [](const Position& pos) {return m_board[pos.x][pos.y];}
 
     /// Return a list containing all pieces on the board
@@ -233,6 +234,7 @@ public:
     inline bool filled(Position pos) const {return m_board[pos.x][pos.y].has_value();}
 
     /// Make a move using a Move struct
+    /// @return true if the move succeeded
     inline bool make_move(const Move& mov)
     {
         
@@ -274,6 +276,8 @@ public:
 
     /// @brief Generate moves for every piece on the board
     void gen_moves(void);
+
+    bool to_move = true; //True for white, false for black
 private:
     bool in_check(bool white)
     {
@@ -297,8 +301,7 @@ private:
     }
 
     std::pair<bool, bool> checks;
-    bool to_move = true; //True for white, false for black
-
+    
     bool white_checkmate = false;
     bool black_checkmate = false;
 
