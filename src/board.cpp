@@ -1,7 +1,7 @@
 #include "board.hpp"
 #include "log.hpp"
 
-void Piece::gen_moves(const Board& board)
+void Piece::gen_moves(Board& board)
 {
     m_moves.clear();
     Position move_to;
@@ -28,6 +28,8 @@ void Piece::gen_moves(const Board& board)
             add_move_empty(board, Position(m_pos.x, m_pos.y + modifier));
             add_move_attack(board, Position(m_pos.x + 1, m_pos.y + modifier));
             add_move_attack(board, Position(m_pos.x - 1, m_pos.y + modifier));
+            if(!m_flags.test(Flags::MOVED))
+                add_move_empty(board, Position(m_pos.x, m_pos.y + modifier + modifier));
         } break;
         case Type::BISHOP:
         {
@@ -54,18 +56,19 @@ void Piece::gen_moves(const Board& board)
 
 void Board::gen_moves(void)
 {
-    for(auto& piece : pieces())
-        piece.gen_moves(*this); //Get moves for each piece 
+    for(auto& file : m_board)
+        for(auto& rank : file)
+            if(rank.has_value()) rank.value().gen_moves(*this); //Get moves for each piece 
     
 }
 
-bool Piece::add_move_empty(const Board& b, Position& p)
+bool Piece::add_move_empty(Board& b, Position& p)
 {
     if(p.valid() && !b.filled(p)) m_moves.push_back(Move(m_pos, p));
     return false;
 }
 
-bool Piece::add_move_attack(const Board& b, Position& p)
+bool Piece::add_move_attack(Board& b, Position& p)
 {
     if(p.valid() && b[p]) 
     if(b[p]->m_flags[Flags::COLOR] != m_flags[Flags::COLOR])

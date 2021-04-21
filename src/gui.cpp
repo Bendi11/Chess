@@ -175,21 +175,21 @@ void ChessGui::loop(void)
             );
         }
 
-        // Rendering
-        ImGui::Render();
-        //nt display_w, display_h;
-        //glfwGetFramebufferSize(win, &display_w, &display_h);
-        glViewport(0, 0, display_w, display_h);
-        glClear(GL_COLOR_BUFFER_BIT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-        glfwSwapBuffers(win);
         if(ImGui::IsMouseDown(ImGuiMouseButton_::ImGuiMouseButton_Left) )
         {
             if(!clicked)
             {
                 clicked = true;
                 old_clickpos = ImGui::GetMousePos();
+            }
+            else 
+            {
+                Position old_click = to_chesscoords(old_clickpos);
+                if(chess[old_click].has_value())
+                {
+                    Sprite s = piece_sprites[static_cast<std::size_t>(chess[old_click]->m_kind) + ( ((chess[old_click]->m_flags[Piece::Flags::COLOR]) ? 0 : 6)) ];
+                    s.display(ImVec2((float)min / 8, (float)min / 8), ImVec2(ImGui::GetMousePos().x - (float)min / 16, ImGui::GetMousePos().y - (float)min / 16));
+                }
             }
         }
         else 
@@ -204,5 +204,16 @@ void ChessGui::loop(void)
                 }
             }
         }
+
+        // Rendering
+        ImGui::Render();
+        //nt display_w, display_h;
+        //glfwGetFramebufferSize(win, &display_w, &display_h);
+        glViewport(0, 0, display_w, display_h);
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        glfwSwapBuffers(win);
+        
     }
 }

@@ -38,7 +38,7 @@ namespace msg
 
         ss << "[ " << detail::current_date_time() << "]-INFO: ";
         ss << detail::format(fmt, args ...) << std::endl;
-        fwrite(reinterpret_cast<void*>(ss.str().data()), sizeof(char), ss.str().length(), detail::log_file);
+        fwrite(ss.str().c_str(), sizeof(char), ss.str().size(), detail::log_file);
         fflush(detail::log_file);
     }
 
@@ -48,7 +48,7 @@ namespace msg
         std::stringstream ss;
         ss << "[ " << detail::current_date_time() << "]-WARNING: ";
         ss << detail::format(fmt, args ...) << std::endl;
-        fwrite(reinterpret_cast<void*>(ss.str().data()), sizeof(char), ss.str().length(), detail::log_file);
+        fwrite(ss.str().c_str(), sizeof(char), ss.str().size(), detail::log_file);
         fflush(detail::log_file);
     }
 }

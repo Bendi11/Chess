@@ -33,9 +33,9 @@ public:
     std::size_t y = 0;
 
     /// Ensure that a position is valid
-    inline bool valid(void) const {return (x > 0 && y > 0 && x < 8 && y < 8);}
+    inline bool valid(void) const {return (x >= 0 && y >= 0 && x < 8 && y < 8);}
     /// Ensure that a position is valid given an x and y coordinate
-    static inline bool valid(std::size_t t_x, std::size_t t_y) {return (t_x > 0 && t_y > 0 && t_x < 8 && t_y < 8);}
+    static inline bool valid(std::size_t t_x, std::size_t t_y) {return (t_x >= 0 && t_y >= 0 && t_x < 8 && t_y < 8);}
 
     /**
      * @brief Construct a new Position object using a string formatted in the form
@@ -146,7 +146,7 @@ public:
     }
 
     /// Generate moves for this piece given a board configuration
-    void gen_moves(const Board& b);
+    void gen_moves(Board& b);
 private:
     /// @brief The kind of piece that this is
     Type m_kind;
@@ -174,11 +174,11 @@ private:
     Position m_pos;     
 
     /// Add a move if the square if empty
-    bool add_move_empty(const Board&, Position&);
+    bool add_move_empty(Board&, Position&);
 
     /// Add a move if the square if filled with an enemy
     /// @return true if an attack was made
-    bool add_move_attack(const Board&, Position&);
+    bool add_move_attack(Board&, Position&);
 
     friend class Board;
     friend class ChessGui;
@@ -208,12 +208,13 @@ public:
     }
     {
         update_pos();
+        gen_moves();
     }
 
     /// Get the rank at the specified file index
     inline const std::array<std::optional<Piece>, 8> operator [](const std::size_t s) const {return m_board[s];}
 
-    inline std::optional<Piece> operator [](const Position& pos) const {return m_board[pos.x][pos.y];}
+    inline std::optional<Piece>& operator [](const Position& pos) {return m_board[pos.x][pos.y];}
 
     /// Return a list containing all pieces on the board
     inline std::list<Piece> pieces(void) const
@@ -238,16 +239,16 @@ public:
         if(!m_board[mov.m_old.x][mov.m_old.y].has_value()) //Ensure there is a piece there
             return false;
         
-        Piece moved = *m_board[mov.m_old.x][mov.m_old.y];
+        Piece& moved = *m_board[mov.m_old.x][mov.m_old.y];
         bool has_move = false;
         for(auto& move : moved.m_moves)
         {
-            msg::info("Comparing move (%zu, %zu)-(%zu, %zu) with (%zu, %zu)-(%zu, %zu)", move.m_old.x, move.m_old.y, move.m_new.x, move.m_new.y, mov.m_old.x, mov.m_old.y, mov.m_new.x, mov.m_new.y);
             if(mov == move)
                 has_move = true;
         }
         if(!has_move) return false; //Ensure that the piece has the move 
 
+        moved.m_flags.set(Piece::Flags::MOVED);
         this->operator[](mov.m_new).swap(this->operator [](mov.m_old)); //Move the piece
         this->operator[](mov.m_old).reset(); //Remove the old piece
         update_pos();
