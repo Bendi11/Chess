@@ -165,6 +165,7 @@ ChessGui::ChessGui()
 
 void ChessGui::loop(void)
 {
+    //Generate initial valid moves
     chess.gen_moves();
     bool clicked = false; //If the user clicked on a position
     ImVec2 old_clickpos;
@@ -185,6 +186,7 @@ void ChessGui::loop(void)
         min = (display_w > display_h) ? display_h : display_w;
         width_max = max == display_w;
         
+        //Draw each colored tile on the chess board in the correct screen space
         std::size_t x = 0, y = 0;
         for(auto& file : m_boardsprites)
         {
@@ -200,6 +202,7 @@ void ChessGui::loop(void)
             x = 0;
         }
 
+        //Draw each piece on the board
         for(auto piece : chess.pieces())
         {
             //Transform and scale the piece coordinates based on screen dimensions
@@ -213,8 +216,10 @@ void ChessGui::loop(void)
             );
         }
 
+        //If the user is clicking a piece, start moving it
         if(ImGui::IsMouseDown(ImGuiMouseButton_::ImGuiMouseButton_Left) )
         {
+            //If we weren't dragging before, remember this as the place where the user initially started the drag and drop
             if(!clicked)
             {
                 clicked = true;
@@ -222,7 +227,7 @@ void ChessGui::loop(void)
             }
             else 
             {
-                Position old_click = to_chesscoords(old_clickpos);
+                Position old_click = to_chesscoords(old_clickpos); //Get the location of the moved piece
                 if(old_click.valid() && chess[old_click].has_value())
                 {
                     //Display a dot to represent where a piece can move
@@ -241,18 +246,20 @@ void ChessGui::loop(void)
         }
         else 
         {
+            //If we were tracking a drag and drop and the mouse was just released, try to make a chess move
             if(clicked && ImGui::IsMouseReleased(ImGuiMouseButton_::ImGuiMouseButton_Left))
             {
                 clicked = false;
                 if(chess.make_move(Move(to_chesscoords(old_clickpos), to_chesscoords(ImGui::GetMousePos()))) )
                 {
-                    //Pa_StartStream(audio_stream);
+                    //Write the chess move sound to the audio device
                     Pa_WriteStream(audio_stream, move_sound, num_frames);
                 }
                 chess.gen_moves();
             }
         }
 
+        //Check if the game is over yet
         auto state = chess.get_state();
         if(state.black_checkmate || state.white_checkmate)
         {
@@ -272,8 +279,6 @@ void ChessGui::loop(void)
 
         // Rendering
         ImGui::Render();
-        //nt display_w, display_h;
-        //glfwGetFramebufferSize(win, &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

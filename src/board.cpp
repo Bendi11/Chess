@@ -28,7 +28,7 @@ void Piece::gen_moves(Board& board)
             add_move_empty(board, Position(m_pos.x, m_pos.y + modifier));
             add_move_attack(board, Position(m_pos.x + 1, m_pos.y + modifier));
             add_move_attack(board, Position(m_pos.x - 1, m_pos.y + modifier));
-            if(!m_flags.test(Flags::MOVED))
+            if(!m_flags.test(Flags::MOVED) && !board.filled(Position(m_pos.x, m_pos.y + modifier)))
                 add_move_empty(board, Position(m_pos.x, m_pos.y + modifier + modifier));
         } break;
         case Type::BISHOP:
