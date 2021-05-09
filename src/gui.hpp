@@ -91,6 +91,7 @@ private:
     /// The chess board that we will display
     Board chess;
 
+    /// Convert a chess position struct to screenspace coordinates
     ImVec2 to_screencoords(Position pos)
     {
         ImVec2 ret;
@@ -105,6 +106,7 @@ private:
         return ret;
     }
 
+    /// Convert screen coordinates to chess positions
     Position to_chesscoords(ImVec2 pos)
     {
         Position ret;

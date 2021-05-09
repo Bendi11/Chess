@@ -234,7 +234,7 @@ public:
     inline bool filled(Position pos) const {return m_board[pos.x][pos.y].has_value();}
 
     /// Make a move using a Move struct
-    /// @return true if the move succeeded
+    /// @return true if the move succeeded or false if the move is invalid
     inline bool make_move(const Move& mov)
     {
         
@@ -279,6 +279,7 @@ public:
 
     bool to_move = true; //True for white, false for black
 private:
+    /// Check a side to see if they are in check currently
     bool in_check(bool white)
     {
         bool check = false;
@@ -300,6 +301,7 @@ private:
         return check;
     }
 
+    /// Which side is currently in check; or both
     std::pair<bool, bool> checks;
     
     bool white_checkmate = false;
