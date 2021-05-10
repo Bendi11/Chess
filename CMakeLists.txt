@@ -13,6 +13,7 @@ set(SOURCES
     "src/board.cpp"
     "src/gui.cpp"
     "src/main.cpp"
+    "src/uci.cpp"
 )
 
 include_directories(
@@ -25,7 +26,7 @@ set(SOURCES
     ${SOURCES}
     "src/res.rc"
 )
-add_executable(${CMAKE_PROJECT_NAME} WIN32 ${SOURCES})
+add_executable(${CMAKE_PROJECT_NAME}  ${SOURCES})
 endif()
 
 target_link_libraries(${CMAKE_PROJECT_NAME} imgui)

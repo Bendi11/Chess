@@ -10,6 +10,7 @@
 #include <algorithm>
 #include "log.hpp"
 #include "board.hpp"
+#include "uci.hpp"
 
 /**
  * @file board.hpp
